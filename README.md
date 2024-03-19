@@ -21,6 +21,9 @@
 
 **예시)** 2023년 0조  https://kookmin-sw.github.io/capstone-2023-00/
 
+팀 개발 현황
+https://zomsik.notion.site/Capstone-96e1862baccc4cd7bcbbac7a14a24da3?pvs=4
+
 
 ## 내용에 아래와 같은 내용들을 추가하세요.
 
