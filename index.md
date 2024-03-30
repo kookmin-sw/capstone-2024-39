@@ -20,6 +20,13 @@
 
 ## 팀원 소개
 ### Frontend
+<table>
+    <tr>
+        <th>이름</th>
+        <th>학번</th>
+        <th>기술 스택</th>
+    </tr>
+</table>
 |이름|학번|기술 스택|
 |---|---|---|
 |최창연|****1684| <img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white"> <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"> <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white"> |
