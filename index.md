@@ -22,7 +22,7 @@
 ### Frontend
 <table>
     <tr>
-        <th align = >이름</th>
+        <th>이름</th>
         <th>학번</th>
         <th>기술 스택</th>
     </tr>
