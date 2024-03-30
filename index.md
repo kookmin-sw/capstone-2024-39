@@ -5,29 +5,41 @@
 ## 소개 영상
 
 ## 주요 기능
-<모임>
 
+### 모임
+<br>
 온라인 모임이 가능하도록 과제, 대표 책 선정, 게시판 등의 기능을 제공합니다!
+<br>
 
-<독서관리>
-
+### 독서 관리
+<br>
 자유, 한줄평, 인용구, 퀴즈 등의 템플릿을 제공합니다!
+<br>
 
-<독후감 공유>
-
+### 독후감 공유
+<br>
 사용자들이 작성한 독후감을 공개범위에 따라 공유할 수 있는 기능을 제공합니다!
+<br>
 
 ## 팀원 소개
 Frontend
 |이름|학번|기술 스택|
 |---|---|---|
-|최창연|****1684|<img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white"> <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"> <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white">|
-|이현준|****1654|<img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white"> <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"> <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white">|
+|최창연|****1684|
+<img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white"> 
+<img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"> 
+<img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white">|
+|이현준|****1654|
+<img src="https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white"> 
+<img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white"> 
+<img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white">|
 
 Backend
 |이름|학번|기술 스택|
 |---|---|---|
-|정지환|****1667|<img src="https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white"> <img src="https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white">|
+|정지환|****1667|
+<img src="https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white"> 
+<img src="https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white">|
 
 
 ## 사용법
