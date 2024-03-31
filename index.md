@@ -1,6 +1,6 @@
 # 📚 프로젝트 소개
 
-### 독서 모임 관리 서비스
+<a size = '20'>독서 모임 관리 서비스</a>
 
 ### [깃허브 바로가기](https://github.com/kookmin-sw/capstone-2024-39)
 
