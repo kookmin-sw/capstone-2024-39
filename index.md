@@ -2,9 +2,10 @@
 
 <font size=5>독서 모임 관리 서비스</font>
 
-### [깃허브 바로가기](https://github.com/kookmin-sw/capstone-2024-39)
-### [중간 보고서](https://docs.google.com/document/d/1i16JsIX1ZV_-k1uWRbPaX7ZjnDUnKAtCAj4W1fes8B4/edit?usp=sharing)
-
+#### [깃허브 바로가기](https://github.com/kookmin-sw/capstone-2024-39)
+#### [중간 보고서](https://docs.google.com/document/d/1i16JsIX1ZV_-k1uWRbPaX7ZjnDUnKAtCAj4W1fes8B4/edit?usp=sharing)
+#### [중간 발표 자료](https://drive.google.com/file/d/16d2ZMzQ4o3kiDXWp-8oM8cN9kBTLiGhA/view?usp=sharing)
+<br>
 ## 소개 영상
 
 ## 주요 기능
