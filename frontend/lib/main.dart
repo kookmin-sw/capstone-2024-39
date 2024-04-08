@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:frontend/screens/home/shorts/shorts_screen.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
+import 'package:frontend/screens/home/group/group_info_screen.dart';
+
 
 
 void main() async {
@@ -48,6 +52,11 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const GroupScreen(),
     ),
     GoRoute(
+      name: 'group_info',
+      path: '/group_info',
+      builder: (context, state) => const GroupInfoScreen(),
+    ),
+    GoRoute(
       name: 'bookreport',
       path: '/bookreport',
       builder: (context, state) => const GroupScreen(),
@@ -71,13 +80,14 @@ class App extends StatelessWidget {
         fontFamily: 'pretendard',
         colorScheme: ColorScheme.fromSwatch(
           backgroundColor: Colors.white,
-          accentColor: const Color(0xff0099fc),
+          primarySwatch: Colors.green,
+          accentColor: const Color(0xFF09BB10),
         ),
         textTheme: const TextTheme(
           headlineLarge: TextStyle(
               fontFamily: 'pretendard',
               fontSize: 20,
-              fontWeight: FontWeight.w200),
+              fontWeight: FontWeight.w200,),
           titleLarge: TextStyle(
               fontFamily: 'pretendard',
               fontSize: 20,
