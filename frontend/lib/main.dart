@@ -50,7 +50,12 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'group_info',
       path: '/group_info',
-      builder: (context, state) => const GroupInfoScreen(),
+      builder: (context, state){
+        String groupname = state.extra.toString();
+        return GroupInfoScreen(
+          groupName: groupname,
+        );
+      } 
     ),
     GoRoute(
       name: 'bookreport_writing',
