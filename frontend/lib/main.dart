@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,13 +11,8 @@ import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/group/group_info_screen.dart';
 
-
-
 void main() async {
-  
-  runApp(
-    const App()
-  );
+  runApp(const App());
   // provider 모델이 여러 개인 경우 List를 통해 제공
   // runApp(
   //   MultiProvider(
@@ -62,9 +58,12 @@ final GoRouter router = GoRouter(
       } 
     ),
     GoRoute(
-      name: 'bookreport',
-      path: '/bookreport',
-      builder: (context, state) => const GroupScreen(),
+      name: 'bookreport_writing',
+      path: '/bookreport_writing',
+      builder: (context, state) {
+        String title = state.extra.toString();
+        return BookReportWritingScreen(title: title);
+      },
     ),
     GoRoute(
       name: 'mypage',
@@ -90,9 +89,10 @@ class App extends StatelessWidget {
         ),
         textTheme: const TextTheme(
           headlineLarge: TextStyle(
-              fontFamily: 'pretendard',
-              fontSize: 20,
-              fontWeight: FontWeight.w200,),
+            fontFamily: 'pretendard',
+            fontSize: 20,
+            fontWeight: FontWeight.w200,
+          ),
           titleLarge: TextStyle(
               fontFamily: 'pretendard',
               fontSize: 20,
