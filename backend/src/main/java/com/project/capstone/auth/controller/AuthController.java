@@ -2,6 +2,7 @@ package com.project.capstone.auth.controller;
 
 import com.project.capstone.auth.controller.dto.LoginRequest;
 import com.project.capstone.auth.controller.dto.SignupRequest;
+import com.project.capstone.auth.controller.dto.TokenResponse;
 import com.project.capstone.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +21,13 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
         authService.signup(request);
-        return ResponseEntity.ok().body("ok");
+        TokenResponse tokenResponse = authService.login(request.email());
+        return ResponseEntity.ok().body(tokenResponse);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        authService.login(request);
-        return ResponseEntity.ok().body("ok");
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+        TokenResponse tokenResponse = authService.login(request.email());
+        return ResponseEntity.ok().body(tokenResponse);
     }
 }
