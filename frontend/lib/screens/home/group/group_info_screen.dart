@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+//그룹 상세 페이지
+
 class GroupInfoScreen extends StatefulWidget {
-  const GroupInfoScreen({super.key});
+  final String groupName;
+  
+  const GroupInfoScreen({
+    super.key,
+    required this.groupName,
+  });
 
   @override
   State<GroupInfoScreen> createState() => _GroupInfoState();
@@ -20,7 +27,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: Color(0xffE7FFEB),
           title: Text(
-            '모임 상세 페이지'
+            widget.groupName
           ),
           centerTitle: true,
         ),
