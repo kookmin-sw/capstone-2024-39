@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/screens/home/group/group_info_screen.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:go_router/go_router.dart';
 
 class GroupScreen extends StatefulWidget {
@@ -9,6 +11,8 @@ class GroupScreen extends StatefulWidget {
   @override
   State<GroupScreen> createState() => _GroupState();
 }
+
+final List<String> Test = ['Test1', '캡스톤디자인', '최창연', '정지환', '이현준'];
 
 class _GroupState extends State<GroupScreen> {
   @override
@@ -27,92 +31,44 @@ class _GroupState extends State<GroupScreen> {
         ),
         body: Center(
           child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+            scrollDirection: Axis.vertical,
+            child: Column(
               children: [
-                Ink(
-                  width: 150.w,
-                  height: 90.h,
-                  child: InkWell(
-                    child: Text(
-                      'Test_Group1',
-                      textAlign: TextAlign.center,
-                    ),
-                    onTap: () {
-                      context.push('/group_info');
-                    },
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 2,
-                        strokeAlign: BorderSide.strokeAlignOutside,
-                        color: Color(0xFFEEF1F4),
-                      ),
-                      borderRadius: BorderRadius.circular(15),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(Test.length, (int i) {
+                        return GroupListItem(groupName: Test[i]);
+                      }
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: 10.w,
+                  height: 10.h,
                 ),
-                Ink(
-                  width: 150.w,
-                  height: 90.h,
-                  child: InkWell(
-                    child: Text(
-                      'Test_Group2',
-                      textAlign: TextAlign.center,
-                    ),
-                    onTap: () {
-                      
-                    },
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 2,
-                        strokeAlign: BorderSide.strokeAlignOutside,
-                        color: Color(0xFFEEF1F4),
-                      ),
-                      borderRadius: BorderRadius.circular(15),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(Test.length, (int i) {
+                        return GroupListItem(groupName: Test[i]);
+                      }
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: 10.w,
+                  height: 10.h,
                 ),
-                Ink(
-                  width: 150.w,
-                  height: 90.h,
-                  child: InkWell(
-                    child: Text(
-                      'Test_Group3',
-                      textAlign: TextAlign.center,
-                    ),
-                    onTap: () {
-                      
-                    },
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 2,
-                        strokeAlign: BorderSide.strokeAlignOutside,
-                        color: Color(0xFFEEF1F4),
-                      ),
-                      borderRadius: BorderRadius.circular(15),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(Test.length, (int i) {
+                        return GroupListItem(groupName: Test[i]);
+                      }
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: 10.w,
+                  height: 10.h,
                 ),
               ],
             ),
