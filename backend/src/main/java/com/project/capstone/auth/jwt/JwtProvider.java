@@ -1,13 +1,20 @@
 package com.project.capstone.auth.jwt;
 
+import com.project.capstone.auth.service.PrincipalDetailService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.security.Key;
 import java.time.LocalDateTime;
@@ -16,12 +23,16 @@ import java.util.Date;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtProvider {
 
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
     private static final int EXPIRED_DURATION = 24;
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String GRANT_TYPE = "Bearer ";
+    private final PrincipalDetailService principalDetailService;
 
     @PostConstruct
     private void init() {
@@ -53,5 +64,27 @@ public class JwtProvider {
         LocalDateTime now = LocalDateTime.now();
         log.info(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()).toString());
         return Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearToken = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.hasText(bearToken) && bearToken.startsWith(GRANT_TYPE)) {
+            return bearToken.substring(7);
+        }
+        return null;
+    }
+
+    public String validateTokenAndGetEmail(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
+    }
+
+    public Authentication createAuthentication(String email) {
+        UserDetails userDetails = principalDetailService.loadUserByUsername(email);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
