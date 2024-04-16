@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,25 +19,36 @@ class GroupListItem extends StatefulWidget {
 }
 
 class _GroupListItemState extends State<GroupListItem> {
+  final bool LoginCheck = true;
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Ink(
-          width: 180.w,
+          width: 170.w,
           height: 90.h,
           child: InkWell(
             child: Row(
               children: [
-                SizedBox(
-                  // 책사진 넣는 곳
-                  width: 60.w,
-                  height: 60.h,
+                Padding(
+                  padding: EdgeInsets.only(left: 3.0),
+                  child: Container(
+                    // 책사진 넣는 곳
+                    width: 40.w,
+                    height: 60.h,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          'https://via.placeholder.com/40x60',
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 8.0.w
+                      horizontal: 7.0.w
                     ),
                     child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,28 +57,28 @@ class _GroupListItemState extends State<GroupListItem> {
                       Text(
                         '주제:${widget.groupName}', 
                         style: TextStyle(
-                          fontSize: 14.sp
+                          fontSize: 13.sp
                         )
                       ),
                       SizedBox(height: 4.h),
                       Text(
                         widget.groupName, 
                         style: TextStyle(
-                          fontSize: 16.sp, 
+                          fontSize: 15.sp, 
                           fontWeight: FontWeight.bold
                         )
                       ),
                       SizedBox(
-                        height: 4.h
+                        height: 3.h
                       ),
                       Row(
                         children: [
                           Icon(
                             Icons.people, 
-                            size: 14.w
+                            size: 13.w
                           ), // 인원수 아이콘
                           SizedBox(
-                            width: 4.w
+                            width: 3.w
                           ),
                           Text(
                             '현재 인원수', 
@@ -76,12 +89,12 @@ class _GroupListItemState extends State<GroupListItem> {
                         ],
                       ),
                       SizedBox(
-                        height: 4.h
+                        height: 3.h
                       ),
                       Text(
                         '공개/비공개', 
                         style: TextStyle(
-                          fontSize: 14.sp
+                          fontSize: 13.sp
                         )
                       ),
                     ],
@@ -92,10 +105,15 @@ class _GroupListItemState extends State<GroupListItem> {
             ),
             onTap: () {
               // 나중엔 눌렀을 각 정보를 불러와서 그걸 푸쉬하는 방식으로
-              context.push(
-                '/group_info',
-                extra: widget.groupName,
-              );
+              if (LoginCheck){
+                context.push(
+                  '/group_info',
+                  extra: widget.groupName,
+                );
+              }
+              else{ //로그인 화면으로 넘어가는 go_route 푸쉬
+                print('로그인 필요 기능');
+              }
             },
             borderRadius: BorderRadius.circular(15),
           ),
