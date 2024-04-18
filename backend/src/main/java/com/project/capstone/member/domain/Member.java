@@ -34,7 +34,6 @@ public class Member {
     private String name;
     private int age;
     private String gender;
-    private String role;
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -52,7 +51,7 @@ public class Member {
     private List<Content> contents = new ArrayList<>();
 
     public Member(SignupRequest request) {
-        this(null, request.email(), request.name(), request.age(), request.gender(), "ROLE_USER", null,
+        this(null, request.email(), request.name(), request.age(), request.gender(), null,
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 }

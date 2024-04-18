@@ -1,6 +1,7 @@
 package com.project.capstone.club.domain;
 
 import com.project.capstone.book.domain.Book;
+import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.common.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.member.domain.Member;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -27,14 +29,17 @@ public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "manager_id", columnDefinition = "BINARY(16)")
+    private UUID managerId;
     private String topic;
     private String name;
     @Column(name = "created_at")
     @CreatedDate
     private LocalDateTime createdAt;
     private int maximum;
-    @Column(name = "is_public")
-    private boolean isPublic;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "public_status")
+    private PublicStatus publicStatus;
     private Integer password;
 
     @OneToMany(mappedBy = "club")
@@ -48,4 +53,5 @@ public class Club {
 
     @ManyToOne
     private Book book;
+
 }
