@@ -2,7 +2,7 @@ package com.project.capstone.member.domain;
 
 import com.project.capstone.auth.controller.dto.SignupRequest;
 import com.project.capstone.comment.domain.Comment;
-import com.project.capstone.common.domain.MemberClub;
+import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.post.domain.Post;
 import jakarta.persistence.*;
@@ -34,7 +34,6 @@ public class Member {
     private String name;
     private int age;
     private String gender;
-    private String role;
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -52,7 +51,7 @@ public class Member {
     private List<Content> contents = new ArrayList<>();
 
     public Member(SignupRequest request) {
-        this(null, request.email(), request.name(), request.age(), request.gender(), "ROLE_USER", null,
+        this(null, request.email(), request.name(), request.age(), request.gender(), null,
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 }
