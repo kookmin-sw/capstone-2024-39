@@ -120,6 +120,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Visibility(
+                    //멤버일 경우만 회원목록을 보도록
                     visible: _isGroupMember,
                     child: IconButton(
                       icon: Icon(Icons.menu),
