@@ -29,6 +29,6 @@ public class AuthService {
     }
 
     private String generateToken(Member member) {
-        return jwtProvider.generate(member.getEmail());
+        return jwtProvider.generate(member.getId().toString());
     }
 }

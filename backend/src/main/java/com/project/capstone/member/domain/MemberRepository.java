@@ -11,4 +11,5 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     Member save(Member member);
     Optional<Member> findMemberByEmail(String email);
+    Optional<Member> findMemberById(UUID id);
 }
