@@ -1,4 +1,4 @@
-package com.project.capstone.common.domain;
+package com.project.capstone.memberclub.domain;
 
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.member.domain.Member;

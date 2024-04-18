@@ -5,10 +5,13 @@ import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.club.controller.dto.ClubResponse;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.ClubRepository;
-import com.project.capstone.common.domain.MemberClub;
-import com.project.capstone.common.domain.MemberClubRepository;
+import com.project.capstone.club.exception.ClubException;
+import com.project.capstone.memberclub.domain.MemberClub;
+import com.project.capstone.memberclub.domain.MemberClubRepository;
 import com.project.capstone.member.domain.Member;
 import com.project.capstone.member.domain.MemberRepository;
+import com.project.capstone.member.exception.MemberException;
+import com.project.capstone.memberclub.exception.MemberClubException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.project.capstone.club.exception.ClubExceptionType.*;
+import static com.project.capstone.member.exception.MemberExceptionType.*;
+import static com.project.capstone.memberclub.exception.MemberClubExceptionType.*;
 
 @Service
 @Slf4j
@@ -60,13 +67,13 @@ public class ClubService {
 
     public void join(String memberId, Long clubId) {
         Member member = memberRepository.findMemberById(UUID.fromString(memberId)).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 멤버입니다.")
+                () -> new MemberException(MEMBER_NOT_FOUND)
         );
         Club club = clubRepository.findClubById(clubId).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 모임입니다.")
+                () -> new ClubException(CLUB_NOT_FOUND)
         );
         if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(UUID.fromString(memberId), clubId).isPresent()) {
-            throw new RuntimeException("이미 가입된 모임입니다.");
+            throw new MemberClubException(ALREADY_JOIN);
         }
         memberClubRepository.save(new MemberClub(null, member, club));
     }
@@ -74,46 +81,44 @@ public class ClubService {
     @Transactional
     public void out(String userId, Long clubId) {
         Club club = clubRepository.findClubById(clubId).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 모임입니다.")
+                () -> new ClubException(CLUB_NOT_FOUND)
         );
         if (club.getManagerId().toString().equals(userId)) {
-            throw new RuntimeException("모임장은 모임을 나갈 수 없습니다. 모임장을 위임해야합니다.");
+            throw new ClubException(EXIT_WITHOUT_DELEGATION);
         }
         memberClubRepository.deleteMemberClubByClub_IdAndMember_Id(clubId, UUID.fromString(userId));
     }
 
     @Transactional
     public void delegateManager(PrincipalDetails details, UUID memberId, Long clubId) {
-        Club club = clubRepository.findClubById(clubId).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 모임입니다.")
-        );
-        if (!club.getManagerId().toString().equals(details.getUserId())) {
-            throw new RuntimeException("해당 클럽의 모임장이 아님");
-        }
-        if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(memberId, clubId).isEmpty()) {
-            throw new RuntimeException("위임하려는 멤버가 모임 구성원이 아닙니다.");
-        }
+        checkIsManagerAndTargetIsClubMember(details, memberId, clubId);
         clubRepository.updateManager(memberId);
     }
 
     @Transactional
     public void expelMember(PrincipalDetails details, UUID memberId, Long clubId) {
-        Club club = clubRepository.findClubById(clubId).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 모임입니다.")
-        );
-        if (!club.getManagerId().toString().equals(details.getUserId())) {
-            throw new RuntimeException("해당 클럽의 모임장이 아님");
-        }
-        if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(memberId, clubId).isEmpty()) {
-            throw new RuntimeException("추방하려는 멤버가 모임 구성원이 아닙니다.");
-        }
+        checkIsManagerAndTargetIsClubMember(details, memberId, clubId);
         memberClubRepository.deleteMemberClubByClub_IdAndMember_Id(clubId, memberId);
     }
 
-    public ClubResponse getClub(Long clubId) {
-        Club club = clubRepository.findClubById(clubId).orElseThrow(
-                () -> new RuntimeException("해당 모임이 존재하지 않습니다.")
+    private void checkIsManagerAndTargetIsClubMember(PrincipalDetails details, UUID memberId, Long clubId) {
+        Club club = findClubById(clubId);
+        if (!club.getManagerId().toString().equals(details.getUserId())) {
+            throw new ClubException(UNAUTHORIZED_ACTION);
+        }
+        if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(memberId, clubId).isEmpty()) {
+            throw new MemberClubException(MEMBERCLUB_NOT_FOUND);
+        }
+    }
+
+    private Club findClubById(Long clubId) {
+        return clubRepository.findClubById(clubId).orElseThrow(
+                () -> new ClubException(CLUB_NOT_FOUND)
         );
+    }
+
+    public ClubResponse getClub(Long clubId) {
+        Club club = findClubById(clubId);
         return new ClubResponse(club);
     }
 }

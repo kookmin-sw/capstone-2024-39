@@ -1,4 +1,4 @@
-package com.project.capstone.common.domain;
+package com.project.capstone.memberclub.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
