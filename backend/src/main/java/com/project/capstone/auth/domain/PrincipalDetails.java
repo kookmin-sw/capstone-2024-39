@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PrincipalDetails implements UserDetails {
@@ -26,6 +27,8 @@ public class PrincipalDetails implements UserDetails {
     public String getUsername() {
         return member.getEmail();
     }
+
+    public String getUserId() {return member.getId().toString(); }
 
     @Override
     public boolean isAccountNonExpired() {
