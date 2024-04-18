@@ -1,10 +1,8 @@
 package com.project.capstone.club.domain;
 
 import com.project.capstone.book.domain.Book;
-import com.project.capstone.club.controller.dto.ClubCreateRequest;
-import com.project.capstone.common.domain.MemberClub;
+import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
-import com.project.capstone.member.domain.Member;
 import com.project.capstone.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

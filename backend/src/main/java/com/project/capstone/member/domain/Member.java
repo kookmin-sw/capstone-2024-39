@@ -2,7 +2,7 @@ package com.project.capstone.member.domain;
 
 import com.project.capstone.auth.controller.dto.SignupRequest;
 import com.project.capstone.comment.domain.Comment;
-import com.project.capstone.common.domain.MemberClub;
+import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.post.domain.Post;
 import jakarta.persistence.*;
