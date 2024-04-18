@@ -10,6 +10,7 @@ import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/group/group_info_screen.dart';
+import 'package:frontend/screens/home/group/group_make_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -69,6 +70,11 @@ final GoRouter router = GoRouter(
       name: 'mypage',
       path: '/mypage',
       builder: (context, state) => const GroupScreen(),
+    ),
+    GoRoute(
+      name: 'group_make',
+      path: '/group_make',
+      builder: (context, state) => const GroupMakeScreen(),
     ),
   ],
 );

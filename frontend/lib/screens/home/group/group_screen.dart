@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/screens/home/group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
+import 'package:frontend/screens/home/group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class GroupScreen extends StatefulWidget {
@@ -22,15 +23,51 @@ final List<String> Test5 = ['Test5', 'Snow', 'Rain', 'Sunny'];
 
 class _GroupState extends State<GroupScreen> {
 
-  ScrollController scrollController = ScrollController();
+  ScrollController _scrollController = ScrollController();
 
   //스크롤 위치 출력
+  @override
+  void dispose(){
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void initState(){
     super.initState();
-    scrollController.addListener(() {
-      print(scrollController.offset);
+    _scrollController.addListener(() {
+      print(_scrollController.offset);
     });
   }
+
+  //테마별로 리스트 버튼 구현 + 스크롤 이동 구현
+  Widget _ThemaList(BuildContext context, List<String> Thema,){
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Row(
+        children: List.generate(Thema.length, (int i) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0.5),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
+                  ),
+                ),
+                onPressed: (){
+                  print(Thema[i] + ' 눌렸습니다.');
+                  final buttonOffset = i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.                                  
+                  _scrollController.animateTo(buttonOffset, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+                },  
+                child: Text(Thema[i]),
+              ),
+            );
+          }
+        ),
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,59 +88,25 @@ class _GroupState extends State<GroupScreen> {
             children: [
               Container(
                 width: double.infinity,
-                height: 90.h,
+                height: 80.h,
                 decoration: BoxDecoration(
                   color: Color(0xffE7FFEB),
                 ),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Row(
-                        children: List.generate(Thema.length, (int i) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0.5),
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
-                                  ),
-                                ),
-                                onPressed: (){
-                                  print(Thema[i] + ' 눌렸습니다.');
-                                  final buttonOffset = i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.                                  
-                                  scrollController.animateTo(buttonOffset, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                                },  
-                                child: Text(Thema[i]),
-                              ),
-                            );
-                          }
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Row(
-                        children: List.generate(Thema.length, (int i) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 0.5),
-                              child: ElevatedButton(
-                                onPressed: (){
-                                  print(Thema[i] + ' 눌렸습니다.');
-                                }, 
-                                child: Text(Thema[i]),
-                              ),
-                            );
-                          }
-                        ),
-                      ),
+                    _ThemaList(context, Thema),
+                    IconButton(
+                      onPressed: (){
+                        context.push('/group_make');
+                      }, 
+                      icon: Icon(Icons.control_point)
                     ),
                   ],
                 ),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  controller: scrollController,
+                  controller: _scrollController,
                   scrollDirection: Axis.vertical,
                   child: Column(
                     children: [
@@ -223,6 +226,10 @@ class _GroupState extends State<GroupScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      SizedBox(
+                        //마지막 sizedBox, 만약 목록 추가한다면 이 위로 구현
+                        height: 500.h,
                       ),
                     ],
                   ),

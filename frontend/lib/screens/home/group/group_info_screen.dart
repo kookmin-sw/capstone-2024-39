@@ -22,7 +22,9 @@ class GroupInfoScreen extends StatefulWidget {
 class _GroupInfoState extends State<GroupInfoScreen> {
 
   //그룹의 모임원 여부
-  bool isGroupMember = false;
+  bool _isGroupMember = false;
+  //사이드 메뉴바 감추기 변수(drawer)
+  final bool _hideDrawerIcon = false;
 
   List<Widget> _buildTaskList(BuildContext context, int entryCase, String Name) {
     List<Widget> tasks = [];
@@ -74,7 +76,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 15.0),
               child: Visibility(
-                visible: !isGroupMember,
+                visible: !_isGroupMember,
                 child: Ink(
                   width: 70.w,
                   height: 30.h,
@@ -105,7 +107,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     onTap:(){
                       // 회원 가입 동작 
                       setState(() {
-                        isGroupMember = true;  
+                        _isGroupMember = true;  
                       });
                     },
                     borderRadius: BorderRadius.circular(15),
@@ -113,8 +115,53 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 ),
               ),
             ),
+            Builder(
+              builder: (context) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Visibility(
+                    visible: _isGroupMember,
+                    child: IconButton(
+                      icon: Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    ),
+                  ),
+                );
+              }
+            ),
           ],
         ),
+        endDrawer: _isGroupMember ? Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children:[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Color(0xffE7FFEB),
+                ),
+                child: Text(
+                  'Side Menu',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              ListTile(
+                title: Text('Item 1'),
+                onTap: () {
+                },
+              ),
+              ListTile(
+                title: Text('Item 2'),
+                onTap: () {
+                },
+              ),
+            ],
+          ),
+        ): null,
         body: Center(
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
@@ -197,7 +244,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                       Expanded(
                         child: ListView(
                           shrinkWrap: true,
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          padding: EdgeInsets.symmetric(horizontal: 50.0),
                           children: _buildTaskList(context, 10, '과제'),
                         ),
                       ),
@@ -247,7 +294,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                       Expanded(
                         child: ListView(
                           shrinkWrap: true,
-                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
                           children: _buildTaskList(context, 10, '공지사항'),
                         ),
                       ),
