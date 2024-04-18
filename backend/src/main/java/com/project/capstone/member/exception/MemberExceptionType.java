@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
-
 @AllArgsConstructor
 public enum MemberExceptionType implements ExceptionType {
     MEMBER_NOT_FOUND(NOT_FOUND, 201, "해당 멤버를 찾을 수 없습니다.")
