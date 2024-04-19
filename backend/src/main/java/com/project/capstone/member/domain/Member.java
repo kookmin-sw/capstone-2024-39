@@ -1,7 +1,8 @@
 package com.project.capstone.member.domain;
 
+import com.project.capstone.auth.controller.dto.SignupRequest;
 import com.project.capstone.comment.domain.Comment;
-import com.project.capstone.common.domain.MemberClub;
+import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.post.domain.Post;
 import jakarta.persistence.*;
@@ -29,10 +30,10 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "BINARY(16)")
     private UUID id;
+    private String email;
     private String name;
     private int age;
     private String gender;
-    private String role;
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -48,4 +49,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Content> contents = new ArrayList<>();
+
+    public Member(SignupRequest request) {
+        this(null, request.email(), request.name(), request.age(), request.gender(), null,
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+    }
 }
