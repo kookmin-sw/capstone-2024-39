@@ -1,9 +1,12 @@
 package com.project.capstone.club.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.PublicStatus;
+import com.project.capstone.post.domain.Post;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ClubResponse (
         Long id,
@@ -12,9 +15,11 @@ public record ClubResponse (
         String name,
         LocalDateTime createdAt,
         int maximum,
-        PublicStatus publicstatus
+        PublicStatus publicstatus,
+        List<Post> posts
+
 ) {
     public ClubResponse(Club club) {
-        this(club.getId(), club.getBook() == null ? null : club.getBook().getId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(), club.getPublicStatus());
+        this(club.getId(), club.getBook() == null ? null : club.getBook().getId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(), club.getPublicStatus(), club.getPosts());
     }
 }

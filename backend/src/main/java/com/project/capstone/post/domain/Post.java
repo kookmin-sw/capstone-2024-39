@@ -1,5 +1,7 @@
 package com.project.capstone.post.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.comment.domain.Comment;
 import com.project.capstone.member.domain.Member;
@@ -33,12 +35,15 @@ public class Post {
     @Column(name = "is_sticky")
     private boolean isSticky;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
+    @JsonBackReference
     @ManyToOne
     private Member member;
 
+    @JsonBackReference
     @ManyToOne
     private Club club;
 }
