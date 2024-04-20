@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,16 +25,40 @@ class _GroupListItemState extends State<GroupListItem> {
         Ink(
           width: 170.w,
           height: 90.h,
+          decoration: ShapeDecoration(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                width: 2,
+                strokeAlign: BorderSide.strokeAlignOutside,
+                color: Color(0xFFEEF1F4),
+              ),
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
           child: InkWell(
+            onTap: () {
+              // 나중엔 눌렀을 각 정보를 불러와서 그걸 푸쉬하는 방식으로
+              if (LoginCheck){
+                context.push(
+                  '/group_info',
+                  extra: widget.groupName,
+                );
+              }
+              else{ //로그인 화면으로 넘어가는 go_route 푸쉬
+                print('로그인 필요 기능');
+              }
+            },
+            borderRadius: BorderRadius.circular(15),
             child: Row(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 3.0),
+                  padding: const EdgeInsets.only(left: 3.0),
                   child: Container(
                     // 책사진 넣는 곳
                     width: 40.w,
                     height: 60.h,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       image: DecorationImage(
                         image: NetworkImage(
                           'https://via.placeholder.com/40x60',
@@ -102,30 +124,6 @@ class _GroupListItemState extends State<GroupListItem> {
                   ),
                 ),
               ],
-            ),
-            onTap: () {
-              // 나중엔 눌렀을 각 정보를 불러와서 그걸 푸쉬하는 방식으로
-              if (LoginCheck){
-                context.push(
-                  '/group_info',
-                  extra: widget.groupName,
-                );
-              }
-              else{ //로그인 화면으로 넘어가는 go_route 푸쉬
-                print('로그인 필요 기능');
-              }
-            },
-            borderRadius: BorderRadius.circular(15),
-          ),
-          decoration: ShapeDecoration(
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                width: 2,
-                strokeAlign: BorderSide.strokeAlignOutside,
-                color: Color(0xFFEEF1F4),
-              ),
-              borderRadius: BorderRadius.circular(15),
             ),
           ),
         ),
