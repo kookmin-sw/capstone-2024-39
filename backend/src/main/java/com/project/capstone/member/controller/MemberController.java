@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 public class MemberController {
-
     @GetMapping("/test")
     public ResponseEntity<?> test() {
         return ResponseEntity.ok("ok");
