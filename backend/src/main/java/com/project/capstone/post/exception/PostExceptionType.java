@@ -1,4 +1,4 @@
-package com.project.capstone.memberclub.exception;
+package com.project.capstone.post.exception;
 
 import com.project.capstone.common.exception.ExceptionType;
 import lombok.AllArgsConstructor;
@@ -6,12 +6,11 @@ import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
-
 @AllArgsConstructor
-public enum MemberClubExceptionType implements ExceptionType {
-    ALREADY_JOIN(BAD_REQUEST, 301, "이미 가입한 모임입니다."),
-    MEMBERCLUB_NOT_FOUND(NOT_FOUND, 302, "모임에서 멤버를 찾을 수 없습니다.");
+public enum PostExceptionType implements ExceptionType {
+    POST_NOT_FOUND(NOT_FOUND, 401, "해당 게시글을 찾을 수 없습니다.")
     ;
+
 
     private final HttpStatus status;
     private final int exceptionCode;

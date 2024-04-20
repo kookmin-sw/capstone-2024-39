@@ -1,5 +1,7 @@
 package com.project.capstone.club.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
@@ -40,12 +42,15 @@ public class Club {
     private PublicStatus publicStatus;
     private Integer password;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "club")
     private List<Post> posts = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "club")
     private List<MemberClub> members = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "club")
     private List<Content> contents = new ArrayList<>();
 
