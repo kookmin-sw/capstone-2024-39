@@ -46,3 +46,10 @@ insert into member_club (id, member_id, club_id) values
 
 insert into post (id, club_id, member_id, title, body, created_at, is_sticky) values
 (1, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), '게시글 제목 1', '게시글 내용 1', '2023-05-26 15:48:57.450179', true);
+
+insert into comment (id, post_id, member_id, body, created_at) values
+(1, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 1", "2023-05-26 15:48:57.450179");
+insert into comment (id, post_id, member_id, body, created_at) values
+    (2, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 2", "2023-05-26 15:48:57.450179");
+insert into comment (id, post_id, member_id, body, created_at) values
+    (3, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 3", "2023-05-26 15:48:57.450179");
