@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/screens/home/group/group_info_screen.dart';
+import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
-import 'package:frontend/screens/home/group/group_make_screen.dart';
+import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 
 class GroupScreen extends StatefulWidget {
@@ -23,6 +21,7 @@ final List<String> Test5 = ['Test5', 'Snow', 'Rain', 'Sunny'];
 
 class _GroupState extends State<GroupScreen> {
 
+  // ignore: prefer_final_fields
   ScrollController _scrollController = ScrollController();
 
   //스크롤 위치 출력
@@ -32,6 +31,7 @@ class _GroupState extends State<GroupScreen> {
     super.dispose();
   }
 
+  @override
   void initState(){
     super.initState();
     _scrollController.addListener(() {
@@ -40,6 +40,7 @@ class _GroupState extends State<GroupScreen> {
   }
 
   //테마별로 리스트 버튼 구현 + 스크롤 이동 구현
+  // ignore: non_constant_identifier_names
   Widget _ThemaList(BuildContext context, List<String> Thema,){
     return Padding(
       padding: const EdgeInsets.all(6.0),
@@ -47,18 +48,28 @@ class _GroupState extends State<GroupScreen> {
         children: List.generate(Thema.length, (int i) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0.5),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(
+                          // borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
+                        ),
+                        elevation: 5,
+                        shadowColor: Colors.grey,
+                      ),
+                      onPressed: (){
+                        print(Thema[i] + ' 눌렸습니다.');
+                        final buttonOffset = i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.                                  
+                        _scrollController.animateTo(buttonOffset, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+                      },  
+                      child: Text('${i+1}'),
+                    ),
+                    Text(Thema[i]),
+                  ],
                 ),
-                onPressed: (){
-                  print(Thema[i] + ' 눌렸습니다.');
-                  final buttonOffset = i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.                                  
-                  _scrollController.animateTo(buttonOffset, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                },  
-                child: Text(Thema[i]),
               ),
             );
           }
@@ -72,34 +83,49 @@ class _GroupState extends State<GroupScreen> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(390, 675),
+      designSize: const Size(390, 675),
       builder:(context, child) => Scaffold(
-        // backgroundColor: Color(0xffE7FFEB),
         appBar: AppBar(
           scrolledUnderElevation: 0,
-          backgroundColor: Color(0xffE7FFEB),
-          title: Text(
-            '모임'
+          backgroundColor: const Color(0xFF0E9913),
+          title: const Text(
+            '모임',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 25,
+              fontFamily: 'Noto Sans KR',
+              fontWeight: FontWeight.w700,
+            ),
           ),
           centerTitle: true,
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            context.push('/group_make');
+          },
+          shape: const CircleBorder(),
+          child: const Icon(Icons.add),
         ),
         body: Center(
           child: Column(
             children: [
               Container(
                 width: double.infinity,
-                height: 80.h,
-                decoration: BoxDecoration(
-                  color: Color(0xffE7FFEB),
+                height: 120.h,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF0E9913),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(50),
+                    bottomRight: Radius.circular(50),
+                  ),
                 ),
                 child: Column(
                   children: [
-                    _ThemaList(context, Thema),
-                    IconButton(
-                      onPressed: (){
-                        context.push('/group_make');
-                      }, 
-                      icon: Icon(Icons.control_point)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _ThemaList(context, Thema),
+                      ],
                     ),
                   ],
                 ),
