@@ -1,5 +1,6 @@
 package com.project.capstone.member.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.auth.controller.dto.SignupRequest;
 import com.project.capstone.comment.domain.Comment;
 import com.project.capstone.memberclub.domain.MemberClub;
@@ -38,15 +39,19 @@ public class Member {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "member")
     private List<MemberClub> clubs = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "member")
     private List<Content> contents = new ArrayList<>();
 
