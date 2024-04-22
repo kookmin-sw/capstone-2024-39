@@ -21,10 +21,6 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String type;
-    @Column(name = "quiz_type")
-    private String quizType;
-    @Column(name = "quiz_answer")
-    private String quizAnswer;
     private String title;
     private String body;
     private String likes;
