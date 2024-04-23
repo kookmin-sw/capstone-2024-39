@@ -5,12 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 //그룹 상세 페이지
+//setState가 필요한 함수들은 클래스 안에 있어야 함
 
 class GroupInfoScreen extends StatefulWidget {
   final String groupName;
   
   const GroupInfoScreen({
-    super.key,
+    super.key,  
     required this.groupName,
   });
 
@@ -43,7 +44,16 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     List<Widget> tasks = [];
     for (int i = 0; i < entryCase; i++) {
       tasks.add(_buildTaskEntry(context, i, postName));
-      tasks.add(const SizedBox(height: 2,));
+      tasks.add(Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ));
     }
     return tasks;
   }
@@ -60,8 +70,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
         margin: const EdgeInsets.only(bottom: 2), // 각 항목 사이의 간격 설정
         padding: const EdgeInsets.all(4), // 내부 패딩 설정
         decoration: BoxDecoration(
-          color: Colors.grey[300], // 배경색 설정
-          borderRadius: BorderRadius.circular(10), // 모서리 둥글게
+          borderRadius: BorderRadius.circular(10), 
         ),
         child: Padding(
           padding: const EdgeInsets.only(left: 3.0,),
@@ -136,7 +145,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   //모임원 목록 사이드 바
   Widget _buildGroupList(BuildContext context){
     return Drawer(
-      width: 230,
       child: ListView(
         padding: EdgeInsets.zero,
         children:[
@@ -171,7 +179,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           ),
           // 모임원 리스트 생성(list <Widget>)
           ..._generateMemberList(context),
-          // 설정 적용 버튼
+          // 모임원의 상태 적용 - 모임장만 보이도록
           Visibility(
             visible: _isManage && _isGroupManager,
             child: Container(
@@ -406,50 +414,56 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   height: 38.h,
                 ),
                 //과제
-                Container(
+                Ink(
                   width: 350.w,
                   height: 120.h,
                   decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      shadows: const [
-                          BoxShadow(
-                              color: Color(0x3F000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 4),
-                              spreadRadius: 0,
-                          )
-                      ],
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shadows: const [
+                        BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 6,
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                        )
+                    ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 5.0,
-                          top: 3.0,
-                        ),
-                        child: Text(
-                          '과제',
-                          style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontFamily: 'Noto Sans KR',
-                          fontWeight: FontWeight.w700,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      context.push('/post_list');
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(
+                            left: 5.0,
+                            top: 3.0,
+                          ),
+                          child: Text(
+                            '과제',
+                            style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: 'Noto Sans KR',
+                            fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                          children: _buildTaskList(context, 10, '과제'),
+                        SizedBox(
+                          height: 5.h,
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: ListView(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                            children: _buildTaskList(context, 10, '과제'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
