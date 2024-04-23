@@ -14,6 +14,7 @@ import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -94,8 +95,20 @@ final GoRouter router = GoRouter(
       path: '/post_list',
       builder: (context, state) => const PostListScreen(),
     ),
+    GoRoute(
+      name: 'post',
+      path: '/post',
+      builder: (context, state){
+        final Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+        final String postTitle = extraData['title'] as String;
+        final String postBody = extraData['body'] as String;
+
+        return PostScreen(title: postTitle, body: postBody);
+      },
+    ),
   ],
 );
+
 
 class App extends StatelessWidget {
   const App({super.key});
