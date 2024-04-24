@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class BookReportScreen extends StatefulWidget {
   const BookReportScreen({super.key});
@@ -9,41 +11,35 @@ class BookReportScreen extends StatefulWidget {
 }
 
 class _BookReportState extends State<BookReportScreen> {
-  // Updated dummy data for the list of books with more entries
-  final List<Map<String, String>> books = [
-    {"title": "첫 번째 책", "imageUrl": "https://via.placeholder.com/60x86"},
-    {"title": "두 번째 책", "imageUrl": "https://via.placeholder.com/60x86"},
-    {"title": "세 번째 책", "imageUrl": "https://via.placeholder.com/60x86"},
-    // Add more book entries as needed
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: books.length + 1, // +1 for the '새로쓰기' entry
-      itemBuilder: (context, index) {
-        if (index < books.length) {
-          // Build '이어쓰기' book entry
-          return _buildBookReportEntry(
-            context,
-            books[index]['title']!,
-            books[index]['imageUrl']!,
-            '이어쓰기',
-          );
-        } else {
-          // Build '새로쓰기' entry for the last item
-          return _buildNewWritingEntry(context);
-        }
+    return Consumer<BookInfoProvider>(
+      builder: (context, bookInfoProvider, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('글쓰기'),
+            centerTitle: true,
+          ),
+          body: ListView.builder(
+            itemCount: bookInfoProvider.books.length + 1,
+            itemBuilder: (context, index) {
+              if (index < bookInfoProvider.books.length) {
+                return _buildBookReportEntry(
+                    context, bookInfoProvider.books[index], index);
+              } else {
+                return _buildNewWritingEntry(context);
+              }
+            },
+          ),
+        );
       },
     );
   }
 
-  Widget _buildBookReportEntry(
-      BuildContext context, String title, String imageUrl, String buttonText) {
+  Widget _buildBookReportEntry(BuildContext context, Book book, int index) {
     return InkWell(
       onTap: () {
-        // Implement onTap functionality for '이어쓰기'
-        context.push('/bookreport_writing', extra: title);
+        context.push('/bookreport_writing', extra: index);
       },
       child: Container(
         height: 105.68,
@@ -68,7 +64,7 @@ class _BookReportState extends State<BookReportScreen> {
               height: 85.68,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: NetworkImage(imageUrl),
+                  image: NetworkImage(book.imageUrl),
                   fit: BoxFit.fill,
                 ),
                 borderRadius: BorderRadius.circular(3),
@@ -77,7 +73,7 @@ class _BookReportState extends State<BookReportScreen> {
             const SizedBox(width: 20),
             Expanded(
               child: Text(
-                title,
+                book.title,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 15,
@@ -86,9 +82,9 @@ class _BookReportState extends State<BookReportScreen> {
                 ),
               ),
             ),
-            Text(
-              buttonText,
-              style: const TextStyle(
+            const Text(
+              '이어쓰기',
+              style: TextStyle(
                 color: Colors.black,
                 fontSize: 15,
                 fontFamily: 'Noto Sans KR',
@@ -104,8 +100,7 @@ class _BookReportState extends State<BookReportScreen> {
   Widget _buildNewWritingEntry(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Implement onTap functionality for '새로쓰기'
-        context.push('/bookreport_writing');
+        context.push('/bookreport_template');
       },
       child: Container(
         height: 105.68,
