@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/bookinfo_provider.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,20 +12,10 @@ import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/group/group_info_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   runApp(const App());
-  // provider 모델이 여러 개인 경우 List를 통해 제공
-  // runApp(
-  //   MultiProvider(
-  //     providers: [
-  //       ChangeNotifierProvider(create: (context) => FilterList()),
-  //       ChangeNotifierProvider(create: (context) => AnotherModel()),
-  //
-  //     ],
-  //     child: const App(),
-  //   ),
-  // );
 }
 
 final GoRouter router = GoRouter(
@@ -48,21 +40,28 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const GroupScreen(),
     ),
     GoRoute(
-      name: 'group_info',
-      path: '/group_info',
-      builder: (context, state){
-        String groupname = state.extra.toString();
-        return GroupInfoScreen(
-          groupName: groupname,
-        );
-      } 
+        name: 'group_info',
+        path: '/group_info',
+        builder: (context, state) {
+          String groupname = state.extra.toString();
+          return GroupInfoScreen(
+            groupName: groupname,
+          );
+        }),
+    GoRoute(
+      name: 'bookreport_template',
+      path: '/bookreport_template',
+      builder: (context, state) {
+        String title = state.extra.toString();
+        return BookReportTemplateScreen(title: title);
+      },
     ),
     GoRoute(
       name: 'bookreport_writing',
       path: '/bookreport_writing',
       builder: (context, state) {
-        String title = state.extra.toString();
-        return BookReportWritingScreen(title: title);
+        int index = state.extra as int;
+        return BookReportWritingScreen(index: index);
       },
     ),
     GoRoute(
@@ -78,36 +77,42 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: router,
-      theme: ThemeData(
-        fontFamily: 'pretendard',
-        colorScheme: ColorScheme.fromSwatch(
-          backgroundColor: Colors.white,
-          primarySwatch: Colors.green,
-          accentColor: const Color(0xFF09BB10),
-        ),
-        textTheme: const TextTheme(
-          headlineLarge: TextStyle(
-            fontFamily: 'pretendard',
-            fontSize: 20,
-            fontWeight: FontWeight.w200,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BookInfoProvider()),
+        // 다른 프로바이더도 여기에 추가
+      ],
+      child: MaterialApp.router(
+        routerConfig: router,
+        theme: ThemeData(
+          fontFamily: 'pretendard',
+          colorScheme: ColorScheme.fromSwatch(
+            backgroundColor: Colors.white,
+            primarySwatch: Colors.green,
+            accentColor: const Color(0xFF09BB10),
           ),
-          titleLarge: TextStyle(
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(
               fontFamily: 'pretendard',
               fontSize: 20,
-              fontWeight: FontWeight.w700),
-          titleMedium: TextStyle(
-              fontFamily: 'pretendard',
+              fontWeight: FontWeight.w200,
+            ),
+            titleLarge: TextStyle(
+                fontFamily: 'pretendard',
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
+            titleMedium: TextStyle(
+                fontFamily: 'pretendard',
+                fontSize: 20,
+                fontWeight: FontWeight.w500),
+            bodyLarge: TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w500),
-          bodyLarge: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w700,
+            ),
+            bodyMedium: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
