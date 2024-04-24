@@ -13,6 +13,12 @@ import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/group/group_info_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
+import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -68,6 +74,38 @@ final GoRouter router = GoRouter(
       name: 'mypage',
       path: '/mypage',
       builder: (context, state) => const GroupScreen(),
+    ),
+    GoRoute(
+      name: 'group_make',
+      path: '/group_make',
+      builder: (context, state) => const GroupMakeScreen(),
+    ),
+    GoRoute(
+      name: 'homework_list',
+      path: '/homework_list',
+      builder: (context, state) => const HomeworkListScreen(),
+    ),
+    GoRoute(
+      name: 'notice_list',
+      path: '/notice_list',
+      builder: (context, state) => const NoticeListScreen(),
+    ),
+    GoRoute(
+      name: 'post_list',
+      path: '/post_list',
+      builder: (context, state) => const PostListScreen(),
+    ),
+    GoRoute(
+      name: 'post',
+      path: '/post',
+      builder: (context, state) {
+        final Map<String, dynamic> extraData =
+            state.extra as Map<String, dynamic>;
+        final String postTitle = extraData['title'] as String;
+        final String postBody = extraData['body'] as String;
+
+        return PostScreen(title: postTitle, body: postBody);
+      },
     ),
   ],
 );
