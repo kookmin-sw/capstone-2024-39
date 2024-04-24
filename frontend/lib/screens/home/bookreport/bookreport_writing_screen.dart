@@ -30,6 +30,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   bool _answer2 = false;
   bool _answer3 = false;
   bool _answer4 = false;
+  final TextEditingController _answerController1 = TextEditingController();
+  final TextEditingController _answerController2 = TextEditingController();
+  final TextEditingController _answerController3 = TextEditingController();
+  final TextEditingController _answerController4 = TextEditingController();
 
   // Predefined values for author and publisher
   final String _author = "작가";
@@ -72,22 +76,25 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   @override
   Widget build(BuildContext context) {
     final bookInfoProvider = Provider.of<BookInfoProvider>(context);
-    // Get the book info
-    final book = bookInfoProvider.books[widget.index];
-    if (widget.index != 0) {
+
+    if (widget.index != 0 && widget.index < bookInfoProvider.books.length) {
+      final book = bookInfoProvider.books[widget.index];
       _bookTitleController.text = book.title;
       _startDate = book.startDate;
       _endDate = book.endDate;
       _isPublic = book.isPublic;
       _template = book.template;
-    } else if (widget.index == 999) {
-      _template = "퀴즈";
-    } else if (widget.index == 998) {
-      _template = "인용문구";
-    } else if (widget.index == 997) {
-      _template = "한줄평";
-    } else if (widget.index == 996) {
-      _template = "독후감";
+    } else {
+      // 책이 없는 경우에 대한 처리
+      _template = widget.index == 999
+          ? "퀴즈"
+          : widget.index == 998
+              ? "인용문구"
+              : widget.index == 997
+                  ? "한줄평"
+                  : widget.index == 996
+                      ? "독후감"
+                      : ""; // 혹은 적절한 기본값 설정
     }
 
     return Scaffold(
@@ -275,7 +282,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Expanded(
-                child: _buildTemplateUI(book.template),
+                child: _buildTemplateUI(_template),
               ),
             ),
             const SizedBox(height: 15),
@@ -480,7 +487,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                         style: const TextStyle(fontSize: 14),
                         controller: _answerController,
                         decoration: const InputDecoration(
-                          hintText: '답을 입력해주세요.1',
+                          hintText: '답을 입력해주세요.',
                           border: InputBorder.none,
                         ),
                       ),
@@ -630,111 +637,231 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             ),
             const SizedBox(height: 15),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _answer1 = true;
-                        _answer2 = false;
-                        _answer3 = false;
-                        _answer4 = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _answer1 = true;
+                            _answer2 = false;
+                            _answer3 = false;
+                            _answer4 = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(0),
+                          child: _answer1
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : const Icon(Icons.check, color: Colors.grey),
                         ),
-                        color: _answer1 ? Colors.green : Colors.white,
                       ),
-                      width: 320,
-                      height: 24,
-                      alignment: Alignment.center,
-                      child: const Text('Answer 1',
-                          style: TextStyle(color: Colors.black)),
-                    ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
+                            color: _answer1 ? Colors.green : Colors.white,
+                          ),
+                          height: 24,
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              const Text('A: '),
+                              Expanded(
+                                child: SizedBox(
+                                  width: _screenWidth * 0.7,
+                                  child: TextField(
+                                    style: const TextStyle(fontSize: 10),
+                                    controller: _answerController1,
+                                    decoration: const InputDecoration(
+                                      hintText: '답을 입력해주세요.',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _answer1 = false;
-                        _answer2 = true;
-                        _answer3 = false;
-                        _answer4 = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _answer1 = false;
+                            _answer2 = true;
+                            _answer3 = false;
+                            _answer4 = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(0),
+                          child: _answer2
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : const Icon(Icons.check, color: Colors.grey),
                         ),
-                        color: _answer2 ? Colors.green : Colors.white,
                       ),
-                      width: 320,
-                      height: 24,
-                      alignment: Alignment.center,
-                      child: const Text('Answer 2',
-                          style: TextStyle(color: Colors.black)),
-                    ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
+                            color: _answer2 ? Colors.green : Colors.white,
+                          ),
+                          height: 24,
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              const Text('A: '),
+                              Expanded(
+                                child: SizedBox(
+                                  width: _screenWidth * 0.7,
+                                  child: TextField(
+                                    style: const TextStyle(fontSize: 10),
+                                    controller: _answerController2,
+                                    decoration: const InputDecoration(
+                                      hintText: '답을 입력해주세요.',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _answer1 = false;
-                        _answer2 = false;
-                        _answer3 = true;
-                        _answer4 = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _answer1 = false;
+                            _answer2 = false;
+                            _answer3 = true;
+                            _answer4 = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(0),
+                          child: _answer3
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : const Icon(Icons.check, color: Colors.grey),
                         ),
-                        color: _answer3 ? Colors.green : Colors.white,
                       ),
-                      width: 320,
-                      height: 24,
-                      alignment: Alignment.center,
-                      child: const Text('Answer 3',
-                          style: TextStyle(color: Colors.black)),
-                    ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
+                            color: _answer3 ? Colors.green : Colors.white,
+                          ),
+                          height: 24,
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              const Text('A: '),
+                              Expanded(
+                                child: SizedBox(
+                                  width: _screenWidth * 0.7,
+                                  child: TextField(
+                                    style: const TextStyle(fontSize: 10),
+                                    controller: _answerController3,
+                                    decoration: const InputDecoration(
+                                      hintText: '답을 입력해주세요.',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _answer1 = false;
-                        _answer2 = false;
-                        _answer3 = false;
-                        _answer4 = true;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _answer1 = false;
+                            _answer2 = false;
+                            _answer3 = false;
+                            _answer4 = true;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(0),
+                          child: _answer4
+                              ? const Icon(Icons.check, color: Colors.green)
+                              : const Icon(Icons.check, color: Colors.grey),
                         ),
-                        color: _answer4 ? Colors.green : Colors.white,
                       ),
-                      width: 320,
-                      height: 24,
-                      alignment: Alignment.center,
-                      child: const Text('Answer 4',
-                          style: TextStyle(color: Colors.black)),
-                    ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.5,
+                            ),
+                            color: _answer4 ? Colors.green : Colors.white,
+                          ),
+                          height: 24,
+                          alignment: Alignment.center,
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              const Text('A: '),
+                              Expanded(
+                                child: SizedBox(
+                                  width: _screenWidth * 0.7,
+                                  child: TextField(
+                                    style: const TextStyle(fontSize: 10),
+                                    controller: _answerController4,
+                                    decoration: const InputDecoration(
+                                      hintText: '답을 입력해주세요.',
+                                      contentPadding: EdgeInsets.all(10),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

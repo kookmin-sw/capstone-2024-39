@@ -3,15 +3,11 @@ import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:frontend/screens/home/shorts/shorts_screen.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/bookreport/bookreport_screen.dart';
-import 'package:frontend/screens/home/mypage/mypage_screen.dart';
-import 'package:frontend/screens/home/group/group_info_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
