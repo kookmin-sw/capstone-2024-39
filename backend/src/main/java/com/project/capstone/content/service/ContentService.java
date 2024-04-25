@@ -9,8 +9,12 @@ import com.project.capstone.club.domain.ClubRepository;
 import com.project.capstone.club.exception.ClubException;
 import com.project.capstone.club.exception.ClubExceptionType;
 import com.project.capstone.content.controller.dto.ContentCreateRequest;
+import com.project.capstone.content.controller.dto.ContentResponse;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.content.domain.ContentRepository;
+import com.project.capstone.content.domain.ContentType;
+import com.project.capstone.content.exception.ContentException;
+import com.project.capstone.content.exception.ContentExceptionType;
 import com.project.capstone.member.domain.Member;
 import com.project.capstone.member.domain.MemberRepository;
 import com.project.capstone.member.exception.MemberException;
@@ -19,10 +23,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.club.exception.ClubExceptionType.CLUB_NOT_FOUND;
+import static com.project.capstone.content.exception.ContentExceptionType.CONTENT_NOT_FOUND;
+import static com.project.capstone.content.exception.ContentExceptionType.TYPE_NOT_FOUND;
 import static com.project.capstone.member.exception.MemberExceptionType.MEMBER_NOT_FOUND;
 
 @Service
@@ -68,5 +77,25 @@ public class ContentService {
         if (club != null) {
             club.getContents().add(saved);
         }
+    }
+
+    public ContentResponse getContent(Long id) {
+        Content content = contentRepository.findContentById(id).orElseThrow(
+                () -> new ContentException(CONTENT_NOT_FOUND)
+        );
+
+        return new ContentResponse(content);
+    }
+
+    public List<ContentResponse> getContents(String type) {
+        for (ContentType contentType : ContentType.values()) {
+            if (contentType.equals(ContentType.valueOf(type))) {
+                List<Content> contentsByType = contentRepository.findContentsByType(ContentType.valueOf(type));
+                return contentsByType.stream()
+                        .map(ContentResponse::new)
+                        .toList();
+            }
+        }
+        throw new ContentException(TYPE_NOT_FOUND);
     }
 }
