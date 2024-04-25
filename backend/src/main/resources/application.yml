@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/bm?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: 12345678
+    url: jdbc:mysql://${DB_ENDPOINT}:${DB_PORT}/${DB_NAME}?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -15,4 +15,4 @@ spring:
       mode: always
 
 jwt:
-  secret: gDpXHGuTSnwn6IkHoQE0TyrHT4qGDsbAm6L21qSbzUe8s/Nvo2JsiJyawX8fvUD6 Nh4CdIeQxAqnAzysgk+nUw==
+  secret: ${JWT_SECRET}
