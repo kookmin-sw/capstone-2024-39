@@ -20,10 +20,13 @@ public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "content_type")
+    private ContentType type;
     private String title;
     private String body;
-    private String likes;
+    private int likes;
 
     @ManyToOne
     private Member member;
