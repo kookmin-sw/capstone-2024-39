@@ -6,6 +6,7 @@ import com.project.capstone.book.domain.Book;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.post.domain.Post;
+import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,6 +54,10 @@ public class Club {
     @JsonManagedReference
     @OneToMany(mappedBy = "club")
     private List<Content> contents = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "club")
+    private List<Quiz> quizzes = new ArrayList<>();
 
     @ManyToOne
     private Book book;

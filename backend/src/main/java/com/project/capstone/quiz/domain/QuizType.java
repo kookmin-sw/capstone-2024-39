@@ -8,14 +8,14 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum QuizType {
-    Multiple_Choice("객관식"),
-    Short_Answer("단답식"),
+    MultipleChoice("객관식"),
+    ShortAnswer("단답식"),
     OX("OX")
     ;
 
     private final String type;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static QuizType from(String type) {
         for (QuizType quizType : QuizType.values()) {
             if (quizType.getType().equals(type)) {

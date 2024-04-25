@@ -21,6 +21,8 @@ public class Quiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Enumerated(EnumType.STRING)
     private QuizType type;
     private String description;
     private String answer;
