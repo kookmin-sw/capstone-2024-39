@@ -8,11 +8,11 @@ import java.util.UUID;
 public record CommentResponse(
         Long id,
         Long postId,
-        UUID memberId,
+        String writer,
         String body,
         LocalDateTime createdAt
 ) {
     public CommentResponse(Comment comment) {
-        this(comment.getId(), comment.getPost().getId(), comment.getMember().getId(), comment.getBody(), comment.getCreatedAt());
+        this(comment.getId(), comment.getPost().getId(), comment.getMember().getName(), comment.getBody(), comment.getCreatedAt());
     }
 }

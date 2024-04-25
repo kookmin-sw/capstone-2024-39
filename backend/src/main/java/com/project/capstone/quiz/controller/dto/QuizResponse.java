@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record QuizResponse (
         Long id,
-        UUID memberId,
+        String writer,
         Long bookId,
         Long clubId,
         QuizType type,
@@ -19,7 +19,7 @@ public record QuizResponse (
         String example4
 ) {
     public QuizResponse(Quiz quiz) {
-        this(quiz.getId(), quiz.getMember().getId(), quiz.getBook().getId(), quiz.getClub() == null ? null : quiz.getClub().getId(), quiz.getType(),
+        this(quiz.getId(), quiz.getMember().getName(), quiz.getBook().getId(), quiz.getClub() == null ? null : quiz.getClub().getId(), quiz.getType(),
                 quiz.getDescription(), quiz.getAnswer(), quiz.getExample1(), quiz.getExample2(), quiz.getExample3(), quiz.getExample4());
     }
 }

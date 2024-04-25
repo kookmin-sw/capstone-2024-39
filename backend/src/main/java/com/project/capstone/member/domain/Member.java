@@ -2,6 +2,7 @@ package com.project.capstone.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.auth.controller.dto.SignupRequest;
+import com.project.capstone.club.domain.Club;
 import com.project.capstone.comment.domain.Comment;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
@@ -35,7 +36,8 @@ public class Member {
     private String email;
     private String name;
     private int age;
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -64,4 +66,5 @@ public class Member {
         this(null, request.email(), request.name(), request.age(), request.gender(), null,
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
+
 }

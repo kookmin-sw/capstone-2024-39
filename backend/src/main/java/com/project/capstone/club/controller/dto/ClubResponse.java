@@ -3,9 +3,11 @@ package com.project.capstone.club.controller.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.PublicStatus;
+import com.project.capstone.post.controller.dto.PostResponse;
 import com.project.capstone.post.domain.Post;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public record ClubResponse (
@@ -16,10 +18,19 @@ public record ClubResponse (
         LocalDateTime createdAt,
         int maximum,
         PublicStatus publicstatus,
-        List<Post> posts
+        List<PostResponse> posts
 
 ) {
     public ClubResponse(Club club) {
-        this(club.getId(), club.getBook() == null ? null : club.getBook().getId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(), club.getPublicStatus(), club.getPosts());
+        this(club.getId(), club.getBook() == null ? null : club.getBook().getId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(),
+                club.getPublicStatus(), createPostResponseList(club.getPosts()));
+    }
+
+    private static List<PostResponse> createPostResponseList(List<Post> postList) {
+        List<PostResponse> postResponseList = new ArrayList<>();
+        for (Post post : postList) {
+            postResponseList.add(new PostResponse(post));
+        }
+        return postResponseList;
     }
 }

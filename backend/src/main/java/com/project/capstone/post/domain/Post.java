@@ -27,6 +27,7 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String writer;
     private String title;
     private String body;
     @CreatedDate
@@ -46,4 +47,6 @@ public class Post {
     @JsonBackReference
     @ManyToOne
     private Club club;
+
+
 }

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public record ContentResponse(
         Long id,
-        UUID memberId,
+        String writer,
         Long bookId,
         Long clubId,
         ContentType type,
@@ -16,7 +16,7 @@ public record ContentResponse(
         int likes
 ) {
     public ContentResponse(Content content) {
-        this(content.getId(), content.getMember().getId(), content.getBook().getId(),
+        this(content.getId(), content.getMember().getName(), content.getBook().getId(),
                 content.getClub() == null ? null : content.getClub().getId(), content.getType(), content.getTitle(), content.getBody(), content.getLikes());
     }
 }

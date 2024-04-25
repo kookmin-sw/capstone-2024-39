@@ -3,15 +3,13 @@ package com.project.capstone.club.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.book.domain.Book;
+import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.post.domain.Post;
 import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -26,6 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Builder
+@ToString
 public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,5 +60,10 @@ public class Club {
 
     @ManyToOne
     private Book book;
+
+    public Club(ClubCreateRequest request, UUID memberId) {
+        this(null, memberId, request.topic(), request.name(), null, request.maximum(), request.publicStatus(), request.password(),
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
+    }
 
 }
