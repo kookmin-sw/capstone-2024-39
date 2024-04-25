@@ -13,7 +13,7 @@ public enum PublicStatus {
     private final String description;
 
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PublicStatus from(String status) {
         for (PublicStatus publicStatus : PublicStatus.values()) {
             if (publicStatus.getDescription().equals(status)) {
