@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/App.framework/App</key>
 		<data>
-		ayWmS6s8h/h5lqQikNu6dJbnB4g=
+		eB2o3wzTVyR/XxpazdNW34y2QRI=
 		</data>
 		<key>Frameworks/App.framework/Info.plist</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/App.framework/_CodeSignature/CodeResources</key>
 		<data>
-		HbB/o3iwjFQK3CTszc6aBjcWB34=
+		YIQL7XKlMqRbL2h1U1hLFgW73lQ=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
 		<data>
@@ -70,7 +70,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/NOTICES.Z</key>
 		<data>
-		eUvGA914ZqqJ40CJNOu4m7R2BmY=
+		jcHpwyCFFY6/8IM2nJ/6QQEkcEI=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
 		<data>
@@ -82,7 +82,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/kernel_blob.bin</key>
 		<data>
-		CV7hfQiBiirqDRxF57FCkCJAoeU=
+		FHgMN+3mVYXHAj6fLh8eC0mhIWc=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -269,7 +269,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			6kLjAt9dZVo/6sguanQpkWhJoc9Is2tPvs1SSRMtfFg=
+			bevQJNQmNWqcQyV7OBYzsziycDuz3D8CTfK+IVfNzls=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/Info.plist</key>
@@ -283,7 +283,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			A7KvAVdXMUlJUJ0Rn9YGYML+gLhjsOc4UpqHyRUmdCs=
+			PyDR7oGS5jCKdayDhaYNapG6EdCbKIyjp6SVHY6728I=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.bin</key>
@@ -311,7 +311,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			95avnYTrMv575U6Z3ut/hm0i8gy3R81v7EPSVNHmV3A=
+			8dS+F71h7xhtUmeD3YSTa39SFDenrjqM+2AdcGRhFNY=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/fonts/MaterialIcons-Regular.otf</key>
@@ -332,7 +332,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			8k6FzDY9MS+XgEjFprTooWmf6yTM8/zw0Hs2/3i0S98=
+			0u2oq7H28jFpS1DjlEWGtsJ08vN/BQq+k79YxuY7/ww=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

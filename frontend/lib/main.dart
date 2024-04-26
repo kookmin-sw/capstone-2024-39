@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
@@ -101,9 +100,10 @@ final GoRouter router = GoRouter(
       builder: (context, state){
         final Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
         final String postTitle = extraData['title'] as String;
+        final String kindOf = extraData['kindOf'] as String;
         final String postBody = extraData['body'] as String;
 
-        return PostScreen(title: postTitle, body: postBody);
+        return PostScreen(title: postTitle, body: postBody, kindOf: kindOf,);
       },
     ),
   ],
