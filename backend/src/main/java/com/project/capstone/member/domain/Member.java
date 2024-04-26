@@ -2,9 +2,11 @@ package com.project.capstone.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.project.capstone.auth.controller.dto.SignupRequest;
+import com.project.capstone.club.domain.Club;
 import com.project.capstone.comment.domain.Comment;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
+import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.post.domain.Post;
 import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
@@ -35,7 +37,8 @@ public class Member {
     private String email;
     private String name;
     private int age;
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -60,8 +63,13 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Quiz> quizzes = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "member")
+    private List<MyBook> myBooks = new ArrayList<>();
+
     public Member(SignupRequest request) {
         this(null, request.email(), request.name(), request.age(), request.gender(), null,
-                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
+
 }

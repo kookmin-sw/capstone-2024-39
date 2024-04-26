@@ -53,15 +53,7 @@ public class ClubService {
 
     @Transactional
     public void createClub(ClubCreateRequest request, String memberId) {
-        Club savedClub = clubRepository.save(Club.builder()
-                .managerId(UUID.fromString(memberId))
-                .topic(request.topic())
-                .name(request.name())
-                .maximum(request.maximum())
-                .publicStatus(request.publicStatus())
-                .password(request.password())
-                .build());
-
+        Club savedClub = clubRepository.save(new Club(request, UUID.fromString(memberId)));
         join(memberId, savedClub.getId());
     }
 
@@ -75,7 +67,9 @@ public class ClubService {
         if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(UUID.fromString(memberId), clubId).isPresent()) {
             throw new MemberClubException(ALREADY_JOIN);
         }
-        memberClubRepository.save(new MemberClub(null, member, club));
+        MemberClub saved = memberClubRepository.save(new MemberClub(null, member, club));
+        member.getClubs().add(saved);
+        club.getMembers().add(saved);
     }
 
     @Transactional
