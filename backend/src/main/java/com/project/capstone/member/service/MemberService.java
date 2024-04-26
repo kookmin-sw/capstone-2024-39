@@ -1,10 +1,8 @@
 package com.project.capstone.member.service;
 
+import com.project.capstone.book.controller.AddBookRequest;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
-import com.project.capstone.book.exception.BookException;
-import com.project.capstone.book.exception.BookExceptionType;
-import com.project.capstone.member.controller.dto.AddMyBookRequest;
 import com.project.capstone.member.controller.dto.MemberResponse;
 import com.project.capstone.member.controller.dto.MyBookResponse;
 import com.project.capstone.member.domain.Member;
@@ -13,17 +11,14 @@ import com.project.capstone.member.exception.MemberException;
 import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.mybook.domain.MyBookRepository;
 import com.project.capstone.mybook.exception.MyBookException;
-import com.project.capstone.mybook.exception.MyBookExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.member.exception.MemberExceptionType.MEMBER_NOT_FOUND;
 import static com.project.capstone.mybook.exception.MyBookExceptionType.ALREADY_EXIST_MYBOOK;
 
@@ -54,7 +49,7 @@ public class MemberService {
         return books;
     }
 
-    public void addMyBook(String userId, AddMyBookRequest request) {
+    public void addMyBook(String userId, AddBookRequest request) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
