@@ -155,14 +155,19 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             child: Column(
               children: [
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async{
                     // 모임장일땐 설정 버튼이 보이도록
                     if (_isGroupManager){
-                      _showOptionsDialog(context);
+                      _showKickedDialog(context);
                     }
                     // 그냥 모임원이면 나가기 버튼이 있도록
                     else{
-
+                      bool check = await _showExitDialog(context);
+                      if(check){
+                        // 나가기 요청
+                        print('checking');
+                        _isGroupMember = false;
+                      }
                     }
                   },
                   icon: _isGroupManager ? const Icon(Icons.settings) : const Icon(Icons.logout)
@@ -212,7 +217,20 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   }
                   // 모임장 위임할 때
                   else{
-                    
+                    setState(() {
+                      for (int i = 0; i < _memberCheckStates.length; i++) {
+                        if (_memberCheckStates[i]) {
+                          _targetIndex = i;
+                          break;
+                        }
+                      }
+                      // 서버에 요청하는 함수
+                      _member.removeAt(_targetIndex);
+                      _memberCheckStates.removeAt(_targetIndex);
+                      // print(_memberCheckStates.length);
+                      _isKicked = false;
+                      _isManage = false;
+                    });
                   }
                   // 원래대로 초기화
                   
@@ -228,8 +246,35 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     );
   }
 
+  // 나가기 구현
+  Future<bool> _showExitDialog(BuildContext context) async{
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("마지막으로 확인하시겠습니까?"),
+          content: Text("나가시겠습니까?"),
+          actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pop(false); // 취소 버튼 클릭 시 false 반환
+              },
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: (){
+                Navigator.of(context).pop(true); // 확인 버튼 클릭 시 true 반환
+              },
+              child: Text("확인"),
+            ),
+          ],
+        );
+      },
+    ) ?? false; // showDialog의 기본값은 false로 설정
+  }
+
   //추방 & 임명 구분하기
-  void _showOptionsDialog(BuildContext context) {
+  void _showKickedDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
