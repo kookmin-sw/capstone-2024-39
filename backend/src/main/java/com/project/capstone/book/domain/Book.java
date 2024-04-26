@@ -1,6 +1,8 @@
 package com.project.capstone.book.domain;
 
 import com.project.capstone.club.domain.Club;
+import com.project.capstone.content.domain.Content;
+import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,4 +34,10 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private List<Club> clubs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book")
+    private List<Content> contents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book")
+    private List<Quiz> quizzes = new ArrayList<>();
 }
