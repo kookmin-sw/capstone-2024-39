@@ -1,6 +1,8 @@
 package com.project.capstone.club.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.capstone.book.controller.dto.BookResponse;
+import com.project.capstone.book.domain.Book;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.PublicStatus;
 import com.project.capstone.post.controller.dto.PostResponse;
@@ -12,7 +14,7 @@ import java.util.List;
 
 public record ClubResponse (
         Long id,
-        Long bookId,
+        BookResponse book,
         String topic,
         String name,
         LocalDateTime createdAt,
@@ -22,7 +24,7 @@ public record ClubResponse (
 
 ) {
     public ClubResponse(Club club) {
-        this(club.getId(), club.getBook() == null ? null : club.getBook().getId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(),
+        this(club.getId(), club.getBook() == null ? null : createBookResponse(club.getBook()), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(),
                 club.getPublicStatus(), createPostResponseList(club.getPosts()));
     }
 
@@ -32,5 +34,9 @@ public record ClubResponse (
             postResponseList.add(new PostResponse(post));
         }
         return postResponseList;
+    }
+
+    private static BookResponse createBookResponse(Book book) {
+        return new BookResponse(book);
     }
 }

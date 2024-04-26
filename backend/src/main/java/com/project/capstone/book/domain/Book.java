@@ -1,7 +1,7 @@
 package com.project.capstone.book.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.project.capstone.book.controller.AddBookRequest;
+import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.content.domain.Content;
 import com.project.capstone.mybook.domain.MyBook;

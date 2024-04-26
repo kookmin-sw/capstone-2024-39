@@ -1,7 +1,7 @@
 package com.project.capstone.member.controller;
 
 import com.project.capstone.auth.domain.PrincipalDetails;
-import com.project.capstone.book.controller.AddBookRequest;
+import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.member.controller.dto.MemberResponse;
 import com.project.capstone.member.controller.dto.MyBookResponse;
 import com.project.capstone.member.service.MemberService;

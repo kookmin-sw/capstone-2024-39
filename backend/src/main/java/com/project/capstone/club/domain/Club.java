@@ -23,6 +23,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 @ToString
 public class Club {
@@ -59,6 +60,7 @@ public class Club {
     private List<Quiz> quizzes = new ArrayList<>();
 
     @ManyToOne
+    @JoinColumn(name = "book_id")
     private Book book;
 
     public Club(ClubCreateRequest request, UUID memberId) {

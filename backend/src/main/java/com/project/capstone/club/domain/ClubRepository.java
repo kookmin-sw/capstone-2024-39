@@ -1,5 +1,6 @@
 package com.project.capstone.club.domain;
 
+import com.project.capstone.book.domain.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,8 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Club c set c.managerId = :id")
     void updateManager(UUID id);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Club c set c.book = :book where c.id = :id")
+    void updateBook(Book book, Long id);
 }

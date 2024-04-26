@@ -1,6 +1,7 @@
 package com.project.capstone.club.controller;
 
 import com.project.capstone.auth.domain.PrincipalDetails;
+import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.club.controller.dto.ClubResponse;
 import com.project.capstone.club.service.ClubService;
@@ -60,14 +61,22 @@ public class ClubController {
     @PutMapping("/delegate")
     public ResponseEntity<?> delegateManager(@AuthenticationPrincipal PrincipalDetails details,
                                              @RequestParam UUID memberId, @RequestParam Long clubId) {
-        clubService.delegateManager(details, memberId, clubId);
+        clubService.delegateManager(details.getUserId(), memberId, clubId);
         return ResponseEntity.ok().body("위임 완료");
     }
     // 멤버 추방하기
     @GetMapping("/expel")
     public ResponseEntity<?> expelMember(@AuthenticationPrincipal PrincipalDetails details,
                                          @RequestParam UUID memberId, @RequestParam Long clubId) {
-        clubService.expelMember(details, memberId, clubId);
+        clubService.expelMember(details.getUserId(), memberId, clubId);
         return ResponseEntity.ok().body("추방 완료");
+    }
+
+    // 대표책 선정하기
+    @PostMapping("/book")
+    public ResponseEntity<?> setBook(@AuthenticationPrincipal PrincipalDetails details,
+                                     @RequestBody AddBookRequest request, @RequestParam Long clubId) {
+        clubService.setBook(details.getUserId(), request, clubId);
+        return ResponseEntity.ok().body("선정 완료");
     }
 }

@@ -13,7 +13,8 @@ public enum ClubExceptionType implements ExceptionType {
 
     CLUB_NOT_FOUND(NOT_FOUND, 101, "해당 모임을 찾을 수 없습니다."),
     EXIT_WITHOUT_DELEGATION(BAD_REQUEST, 102, "모임장은 위임 후 모임을 나갈 수 있습니다."),
-    UNAUTHORIZED_ACTION(UNAUTHORIZED, 103, "모임장만 할 수 있는 기능입니다.")
+    UNAUTHORIZED_ACTION(UNAUTHORIZED, 103, "모임장만 할 수 있는 기능입니다."),
+    INVALID_TARGET(BAD_REQUEST, 104, "모임장을 추방 또는 위임할 수 없습니다.")
     ;
 
     private final HttpStatus status;
