@@ -45,15 +45,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     for (int i = 0; i < entryCase; i++) {
       tasks.add(_buildTaskEntry(context, i, postName));
       tasks.add(Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                ));
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey,
+              width: 1,
+            ),
+          ),
+        ),
+      ));
     }
     return tasks;
   }
@@ -432,7 +432,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: () {
-                      context.push('/post_list');
+                      context.push('/homework_list');
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -470,100 +470,112 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   height: 38.h,
                 ),
                 //공지사항
-                Container(
+                Ink(
                   width: 350.w,
                   height: 120.h,
                   decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      shadows: const [
-                          BoxShadow(
-                              color: Color(0x3F000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 4),
-                              spreadRadius: 0,
-                          ),
-                      ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 5.0,
-                          top: 3.0,
-                        ),
-                        child: Text(
-                          '공지사항',
-                          style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontFamily: 'Noto Sans KR',
-                          fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                          children: _buildTaskList(context, 10, '공지사항'),
-                        ),
-                      ),
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shadows: const [
+                        BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 6,
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                        )
                     ],
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      context.push('/notice_list');
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(
+                            left: 5.0,
+                            top: 3.0,
+                          ),
+                          child: Text(
+                            '공지사항',
+                            style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: 'Noto Sans KR',
+                            fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 5.h,
+                        ),
+                        Expanded(
+                          child: ListView(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                            children: _buildTaskList(context, 10, '공지사항'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: 38.h,
                 ),
                 //게시판
-                Container(
+                Ink(
                   width: 350.w,
                   height: 120.h,
                   decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      shadows: const[
-                          BoxShadow(
-                              color: Color(0x3F000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 4),
-                              spreadRadius: 0,
-                          ),
-                      ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(
-                          left: 5.0,
-                          top: 3.0,
-                        ),
-                        child: Text(
-                          '게시판',
-                          style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontFamily: 'Noto Sans KR',
-                          fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          children: _buildTaskList(context, 10, '게시판'),
-                        ),
-                      ),
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shadows: const [
+                        BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 6,
+                            offset: Offset(0, 4),
+                            spreadRadius: 0,
+                        )
                     ],
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(6),
+                    onTap: () {
+                      context.push('/post_list');
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(
+                            left: 5.0,
+                            top: 3.0,
+                          ),
+                          child: Text(
+                            '게시판',
+                            style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: 'Noto Sans KR',
+                            fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 5.h,
+                        ),
+                        Expanded(
+                          child: ListView(
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                            children: _buildTaskList(context, 10, '게시판'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
