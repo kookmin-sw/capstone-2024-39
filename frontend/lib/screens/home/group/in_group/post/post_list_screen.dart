@@ -11,9 +11,6 @@ List<String> R_data = [];
 
 
 Future<List<String>> fetchDataFromDatabase() async {
-  // 여기에 데이터베이스에서 데이터를 가져오는 비동기 작업 수행
-  // 예를 들어, 데이터베이스 쿼리를 실행하여 데이터를 가져옴
-  // 가져온 데이터는 List<String> 형태로 반환
   return ['route1', 'route2', 'route3'];
 }
 
@@ -34,14 +31,21 @@ List<Widget> _buildPostListView(BuildContext context, List<String> postTitles) {
                     '/post',
                     extra: {
                       'title': postTitle,
+                      'kindOf': '게시판',
                       'body': postTitle,
                     }
                   );
                 },
-                child: Text(
-                  postTitle,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    postTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Noto Sans KR',
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.17,
+                    ),
                   ),
                 ),
               ),
@@ -52,7 +56,7 @@ List<Widget> _buildPostListView(BuildContext context, List<String> postTitles) {
               border: Border(
                 bottom: BorderSide(
                   color: Colors.grey,
-                  width: 1,
+                  width: 0.5,
                 ),
               ),
             ),
@@ -83,7 +87,7 @@ class _PostListScreenState extends State<PostListScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
           title: const Text(
-            '과제',
+            '게시판',
             style: TextStyle(
               color: Colors.white,
               fontSize: 25,
