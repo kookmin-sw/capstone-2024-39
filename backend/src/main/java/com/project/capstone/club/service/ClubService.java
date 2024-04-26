@@ -1,6 +1,8 @@
 package com.project.capstone.club.service;
 
-import com.project.capstone.auth.domain.PrincipalDetails;
+import com.project.capstone.book.controller.dto.AddBookRequest;
+import com.project.capstone.book.domain.Book;
+import com.project.capstone.book.domain.BookRepository;
 import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.club.controller.dto.ClubResponse;
 import com.project.capstone.club.domain.Club;
@@ -32,6 +34,7 @@ public class ClubService {
     private final ClubRepository clubRepository;
     private final MemberClubRepository memberClubRepository;
     private final MemberRepository memberRepository;
+    private final BookRepository bookRepository;
 
     public List<ClubResponse> searchByTopic(String topic) {
         List<ClubResponse> clubResponseList = new ArrayList<>();
@@ -84,25 +87,39 @@ public class ClubService {
     }
 
     @Transactional
-    public void delegateManager(PrincipalDetails details, UUID memberId, Long clubId) {
-        checkIsManagerAndTargetIsClubMember(details, memberId, clubId);
+    public void delegateManager(String managerId, UUID memberId, Long clubId) {
+        if (managerId.equals(memberId.toString())) {
+            throw new ClubException(INVALID_TARGET);
+        }
+        checkIsManagerAndTargetIsClubMember(managerId, memberId, clubId);
         clubRepository.updateManager(memberId);
     }
 
     @Transactional
-    public void expelMember(PrincipalDetails details, UUID memberId, Long clubId) {
-        checkIsManagerAndTargetIsClubMember(details, memberId, clubId);
+    public void expelMember(String managerId, UUID memberId, Long clubId) {
+        if (managerId.equals(memberId.toString())) {
+            throw new ClubException(INVALID_TARGET);
+        }
+        checkIsManagerAndTargetIsClubMember(managerId, memberId, clubId);
         memberClubRepository.deleteMemberClubByClub_IdAndMember_Id(clubId, memberId);
     }
 
-    private void checkIsManagerAndTargetIsClubMember(PrincipalDetails details, UUID memberId, Long clubId) {
-        Club club = findClubById(clubId);
-        if (!club.getManagerId().toString().equals(details.getUserId())) {
-            throw new ClubException(UNAUTHORIZED_ACTION);
-        }
-        if (memberClubRepository.findMemberClubByMember_IdAndClub_Id(memberId, clubId).isEmpty()) {
+    private void checkIsManagerAndTargetIsClubMember(String managerId, UUID memberId, Long clubId) {
+        Member member = memberRepository.findMemberById(memberId).orElseThrow(
+                () -> new MemberException(MEMBER_NOT_FOUND)
+        );
+        Club club = checkIsManager(managerId, clubId);
+        if (memberClubRepository.findMemberClubByMemberAndClub(member, club).isEmpty()) {
             throw new MemberClubException(MEMBERCLUB_NOT_FOUND);
         }
+    }
+
+    private Club checkIsManager(String managerId, Long clubId) {
+        Club club = findClubById(clubId);
+        if (!club.getManagerId().toString().equals(managerId)) {
+            throw new ClubException(UNAUTHORIZED_ACTION);
+        }
+        return club;
     }
 
     private Club findClubById(Long clubId) {
@@ -114,5 +131,15 @@ public class ClubService {
     public ClubResponse getClub(Long clubId) {
         Club club = findClubById(clubId);
         return new ClubResponse(club);
+    }
+
+    @Transactional
+    public void setBook(String managerId, AddBookRequest request, Long clubId) {
+        Club club = checkIsManager(managerId, clubId);
+        Book book = bookRepository.findBookByIsbn(request.isbn()).orElseGet(
+                () -> bookRepository.save(new Book(request))
+        );
+        club.setBook(book);
+        clubRepository.updateBook(book, clubId);
     }
 }

@@ -1,4 +1,4 @@
-package com.project.capstone.book.controller;
+package com.project.capstone.book.controller.dto;
 
 public record AddBookRequest(
         String isbn,

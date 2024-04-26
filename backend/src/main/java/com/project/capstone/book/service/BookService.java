@@ -1,6 +1,6 @@
 package com.project.capstone.book.service;
 
-import com.project.capstone.book.controller.AddBookRequest;
+import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
 import com.project.capstone.book.exception.BookException;
