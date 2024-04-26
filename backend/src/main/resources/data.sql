@@ -41,3 +41,15 @@ insert into club (id, manager_id, topic, name, created_at, maximum, public_statu
 insert into club (id, manager_id, topic, name, created_at, maximum, public_status, password, book_id) values
 (8, UNHEX(REPLACE("8fbcec63-e527-10ee-bd3d-0242ac120002", "-","")), '사회', '길동4의 모임', '2023-05-26 15:48:57.450179', 10, 'PUBLIC', null, 3);
 
+insert into member_club (id, member_id, club_id) values
+(1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), 1);
+
+insert into post (id, club_id, member_id, title, body, created_at, is_sticky) values
+(1, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), '게시글 제목 1', '게시글 내용 1', '2023-05-26 15:48:57.450179', true);
+
+insert into comment (id, post_id, member_id, body, created_at) values
+(1, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 1", "2023-05-26 15:48:57.450179");
+insert into comment (id, post_id, member_id, body, created_at) values
+    (2, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 2", "2023-05-26 15:48:57.450179");
+insert into comment (id, post_id, member_id, body, created_at) values
+    (3, 1, UNHEX(REPLACE("3f06af63-a93c-11e4-9797-00505690773f", "-","")), "댓글 3", "2023-05-26 15:48:57.450179");
