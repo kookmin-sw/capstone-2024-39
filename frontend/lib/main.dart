@@ -98,10 +98,9 @@ final GoRouter router = GoRouter(
         final Map<String, dynamic> extraData =
             state.extra as Map<String, dynamic>;
         final String postTitle = extraData['title'] as String;
-        final String kindOf = extraData['kindOf'] as String;
         final String postBody = extraData['body'] as String;
 
-        return PostScreen(title: postTitle, body: postBody, kindOf: kindOf,);
+        return PostScreen(title: postTitle, body: postBody);
       },
     ),
   ],

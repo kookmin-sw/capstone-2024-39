@@ -45,15 +45,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     for (int i = 0; i < entryCase; i++) {
       tasks.add(_buildTaskEntry(context, i, postName));
       tasks.add(Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey,
-              width: 1,
-            ),
-          ),
-        ),
-      ));
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                ));
     }
     return tasks;
   }
@@ -155,19 +155,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             child: Column(
               children: [
                 IconButton(
-                  onPressed: () async{
+                  onPressed: () {
                     // 모임장일땐 설정 버튼이 보이도록
                     if (_isGroupManager){
-                      _showKickedDialog(context);
+                      _showOptionsDialog(context);
                     }
                     // 그냥 모임원이면 나가기 버튼이 있도록
                     else{
-                      bool check = await _showExitDialog(context);
-                      if(check){
-                        // 나가기 요청
-                        print('checking');
-                        _isGroupMember = false;
-                      }
+
                     }
                   },
                   icon: _isGroupManager ? const Icon(Icons.settings) : const Icon(Icons.logout)
@@ -217,20 +212,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   }
                   // 모임장 위임할 때
                   else{
-                    setState(() {
-                      for (int i = 0; i < _memberCheckStates.length; i++) {
-                        if (_memberCheckStates[i]) {
-                          _targetIndex = i;
-                          break;
-                        }
-                      }
-                      // 서버에 요청하는 함수
-                      _member.removeAt(_targetIndex);
-                      _memberCheckStates.removeAt(_targetIndex);
-                      // print(_memberCheckStates.length);
-                      _isKicked = false;
-                      _isManage = false;
-                    });
+                    
                   }
                   // 원래대로 초기화
                   
@@ -246,35 +228,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     );
   }
 
-  // 나가기 구현
-  Future<bool> _showExitDialog(BuildContext context) async{
-    return await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("마지막으로 확인하시겠습니까?"),
-          content: Text("나가시겠습니까?"),
-          actions: [
-            TextButton(
-              onPressed: (){
-                Navigator.of(context).pop(false); // 취소 버튼 클릭 시 false 반환
-              },
-              child: Text("취소"),
-            ),
-            TextButton(
-              onPressed: (){
-                Navigator.of(context).pop(true); // 확인 버튼 클릭 시 true 반환
-              },
-              child: Text("확인"),
-            ),
-          ],
-        );
-      },
-    ) ?? false; // showDialog의 기본값은 false로 설정
-  }
-
   //추방 & 임명 구분하기
-  void _showKickedDialog(BuildContext context) {
+  void _showOptionsDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -477,7 +432,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(6),
                     onTap: () {
-                      context.push('/homework_list');
+                      context.push('/post_list');
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -515,112 +470,100 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   height: 38.h,
                 ),
                 //공지사항
-                Ink(
+                Container(
                   width: 350.w,
                   height: 120.h,
                   decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    shadows: const [
-                        BoxShadow(
-                            color: Color(0x3F000000),
-                            blurRadius: 6,
-                            offset: Offset(0, 4),
-                            spreadRadius: 0,
-                        )
-                    ],
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      context.push('/notice_list');
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(
-                            left: 5.0,
-                            top: 3.0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shadows: const [
+                          BoxShadow(
+                              color: Color(0x3F000000),
+                              blurRadius: 6,
+                              offset: Offset(0, 4),
+                              spreadRadius: 0,
                           ),
-                          child: Text(
-                            '공지사항',
-                            style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontFamily: 'Noto Sans KR',
-                            fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5.h,
-                        ),
-                        Expanded(
-                          child: ListView(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                            children: _buildTaskList(context, 10, '공지사항'),
-                          ),
-                        ),
                       ],
-                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(
+                          left: 5.0,
+                          top: 3.0,
+                        ),
+                        child: Text(
+                          '공지사항',
+                          style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontFamily: 'Noto Sans KR',
+                          fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      Expanded(
+                        child: ListView(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                          children: _buildTaskList(context, 10, '공지사항'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
                   height: 38.h,
                 ),
                 //게시판
-                Ink(
+                Container(
                   width: 350.w,
                   height: 120.h,
                   decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    shadows: const [
-                        BoxShadow(
-                            color: Color(0x3F000000),
-                            blurRadius: 6,
-                            offset: Offset(0, 4),
-                            spreadRadius: 0,
-                        )
-                    ],
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      context.push('/post_list');
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(
-                            left: 5.0,
-                            top: 3.0,
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shadows: const[
+                          BoxShadow(
+                              color: Color(0x3F000000),
+                              blurRadius: 6,
+                              offset: Offset(0, 4),
+                              spreadRadius: 0,
                           ),
-                          child: Text(
-                            '게시판',
-                            style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontFamily: 'Noto Sans KR',
-                            fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5.h,
-                        ),
-                        Expanded(
-                          child: ListView(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                            children: _buildTaskList(context, 10, '게시판'),
-                          ),
-                        ),
                       ],
-                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(
+                          left: 5.0,
+                          top: 3.0,
+                        ),
+                        child: Text(
+                          '게시판',
+                          style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontFamily: 'Noto Sans KR',
+                          fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      Expanded(
+                        child: ListView(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          children: _buildTaskList(context, 10, '게시판'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
