@@ -33,7 +33,9 @@ dependencies:
   
   go_router: ^13.2.3
   flutter_screenutil: ^5.9.0
+
   http: ^1.2.1
+  provider: ^6.1.2
 
 
   # The following adds the Cupertino Icons font to your application.
