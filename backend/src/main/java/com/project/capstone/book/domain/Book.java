@@ -1,9 +1,9 @@
 package com.project.capstone.book.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.project.capstone.book.controller.AddBookRequest;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.content.domain.Content;
-import com.project.capstone.member.controller.dto.AddMyBookRequest;
 import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
@@ -53,8 +53,9 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<MyBook> membersAddThisBook = new ArrayList<>();
 
-    public Book(AddMyBookRequest request) {
+    public Book(AddBookRequest request) {
         this(null, request.isbn(), request.title(), request.category1d(), request.category2d(), request.category3d(),
                 request.author(), request.publisher(), request.publishDate(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
+
 }
