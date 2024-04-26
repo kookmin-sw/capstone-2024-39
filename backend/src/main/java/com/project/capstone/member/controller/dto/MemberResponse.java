@@ -8,6 +8,7 @@ import com.project.capstone.content.domain.Content;
 import com.project.capstone.member.domain.Gender;
 import com.project.capstone.member.domain.Member;
 import com.project.capstone.memberclub.domain.MemberClub;
+import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.post.controller.dto.PostResponse;
 import com.project.capstone.post.controller.dto.SimplePostResponse;
 import com.project.capstone.post.domain.Post;
@@ -30,12 +31,13 @@ public record MemberResponse (
     List<SimplePostResponse> postList,
     List<CommentResponse> commentList,
     List<ContentResponse> contentList,
-    List<QuizResponse> quizList
+    List<QuizResponse> quizList,
+    List<MyBookResponse> myBookList
 ) {
     public MemberResponse(Member member) {
         this(member.getId(), member.getEmail(), member.getName(), member.getAge(), member.getGender(), member.getCreatedAt(),
                 member.getClubs(), createSimplePostResponseList(member.getPosts()), createCommentResponseList(member.getComments()),
-                createContentResponseList(member.getContents()), createQuizResponseList(member.getQuizzes()));
+                createContentResponseList(member.getContents()), createQuizResponseList(member.getQuizzes()), createMyBookResponseList(member.getMyBooks()));
     }
 
     private static List<SimplePostResponse> createSimplePostResponseList(List<Post> postList) {
@@ -69,6 +71,11 @@ public record MemberResponse (
         return quizResponseList;
     }
 
-
-
+    private static List<MyBookResponse> createMyBookResponseList(List<MyBook> myBookList) {
+        List<MyBookResponse> myBookResponseList = new ArrayList<>();
+        for (MyBook myBook : myBookList) {
+            myBookResponseList.add(new MyBookResponse(myBook));
+        }
+        return myBookResponseList;
+    }
 }

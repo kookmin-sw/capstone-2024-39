@@ -1,6 +1,7 @@
 package com.project.capstone.member.controller;
 
 import com.project.capstone.auth.domain.PrincipalDetails;
+import com.project.capstone.member.controller.dto.AddMyBookRequest;
 import com.project.capstone.member.controller.dto.MemberResponse;
 import com.project.capstone.member.controller.dto.MyBookResponse;
 import com.project.capstone.member.service.MemberService;
@@ -33,8 +34,9 @@ public class MemberController {
     }
 
     // 나만의 서재 추가
-//    @PostMapping("/my-book/add")
-//    public ResponseEntity<?> addMyBook() {
-//
-//    }
+    @PostMapping("/my-book/add")
+    public ResponseEntity<?> addMyBook(@AuthenticationPrincipal PrincipalDetails details, @RequestBody AddMyBookRequest request) {
+        memberService.addMyBook(details.getUserId(), request);
+        return ResponseEntity.ok().body("추가 완료");
+    }
 }
