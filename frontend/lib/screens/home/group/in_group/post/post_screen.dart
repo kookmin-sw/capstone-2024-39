@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/http.dart';
 
 //게시글 
 
@@ -14,11 +15,13 @@ bool _isFieldEmpty(TextEditingController controller) {
 
 class PostScreen extends StatefulWidget {
   final String title;
-  final dynamic body;
+  final String kindOf;
+  final String body;
 
   const PostScreen({
     super.key,
     required this.title,
+    required this.kindOf,
     required this.body,
   });
 
@@ -30,6 +33,8 @@ class _PostScreenState extends State<PostScreen> {
   
   final TextEditingController _commentController = TextEditingController();
   List<String> comments = ['hi', '이미 존재하는 댓글임', '생성 될까?', '나도 모르겠음'];
+  // List<String> Real_comments = [];
+  
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +44,9 @@ class _PostScreenState extends State<PostScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
-            '게시판',
-            style: TextStyle(
+          title: Text(
+            widget.kindOf,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 25,
               fontFamily: 'Noto Sans KR',
@@ -147,6 +152,8 @@ class _PostScreenState extends State<PostScreen> {
                           _commentController.clear();
                         }
                         print(comments.length);
+                        // sendData();
+                        
                       });
                     },
                   ),
