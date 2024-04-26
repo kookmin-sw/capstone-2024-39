@@ -6,6 +6,7 @@ import com.project.capstone.club.domain.Club;
 import com.project.capstone.comment.domain.Comment;
 import com.project.capstone.memberclub.domain.MemberClub;
 import com.project.capstone.content.domain.Content;
+import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.post.domain.Post;
 import com.project.capstone.quiz.domain.Quiz;
 import jakarta.persistence.*;
@@ -62,9 +63,13 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Quiz> quizzes = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "member")
+    private List<MyBook> myBooks = new ArrayList<>();
+
     public Member(SignupRequest request) {
         this(null, request.email(), request.name(), request.age(), request.gender(), null,
-                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
 }
