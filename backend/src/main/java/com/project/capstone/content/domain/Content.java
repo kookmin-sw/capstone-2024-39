@@ -1,5 +1,6 @@
 package com.project.capstone.content.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.member.domain.Member;
@@ -20,21 +21,23 @@ public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;
-    @Column(name = "quiz_type")
-    private String quizType;
-    @Column(name = "quiz_answer")
-    private String quizAnswer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "content_type")
+    private ContentType type;
     private String title;
     private String body;
-    private String likes;
+    private int likes;
 
+    @JsonBackReference
     @ManyToOne
     private Member member;
 
+    @JsonBackReference
     @ManyToOne
     private Book book;
 
+    @JsonBackReference
     @ManyToOne
     private Club club;
 }

@@ -1,5 +1,6 @@
 package com.project.capstone.comment.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.capstone.member.domain.Member;
 import com.project.capstone.post.domain.Post;
 import jakarta.persistence.*;
@@ -27,9 +28,11 @@ public class Comment {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @JsonBackReference
     @ManyToOne
     private Member member;
 
+    @JsonBackReference
     @ManyToOne
     private Post post;
 }
