@@ -15,6 +15,7 @@ import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.d
 import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
+import 'package:frontend/screens/book/book_info_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -104,6 +105,15 @@ final GoRouter router = GoRouter(
         return PostScreen(title: postTitle, body: postBody, kindOf: kindOf,);
       },
     ),
+    GoRoute(
+        name: 'book_info',
+        path: '/book_info',
+        builder: (context, state) {
+          String bookName = state.extra.toString();
+          return BookInfoScreen(
+            bookName: bookName,
+          );
+        }),
   ],
 );
 
