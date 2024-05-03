@@ -29,6 +29,12 @@ public class Content {
     private String body;
     private int likes;
 
+    @Column(name = "start_date")
+    private String startDate;
+
+    @Column(name = "end_date")
+    private String endDate;
+
     @JsonBackReference
     @ManyToOne
     private Member member;

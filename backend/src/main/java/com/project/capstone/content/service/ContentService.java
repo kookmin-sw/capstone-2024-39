@@ -4,6 +4,7 @@ import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
 import com.project.capstone.book.exception.BookException;
 import com.project.capstone.book.exception.BookExceptionType;
+import com.project.capstone.book.service.BookService;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.ClubRepository;
 import com.project.capstone.club.exception.ClubException;
@@ -44,13 +45,21 @@ public class ContentService {
     private final ClubRepository clubRepository;
     private final MemberRepository memberRepository;
 
-    public void createContent(String userId, ContentCreateRequest request, Long bookId, Long clubId) {
+    public void createContent(String userId, ContentCreateRequest request, Long clubId) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
-        Book book = bookRepository.findBookById(bookId).orElseThrow(
-                () -> new BookException(BOOK_NOT_FOUND)
-        );
+
+        Book book;
+        if (bookRepository.findBookByIsbn(request.addBookRequest().isbn()).isEmpty()) {
+            book = bookRepository.save(new Book(request.addBookRequest()));
+        }
+        else {
+            book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElseThrow(
+                    () -> new BookException(BOOK_NOT_FOUND)
+            );
+        }
+
         Club club;
         if (clubId == null) {
             club = null;
