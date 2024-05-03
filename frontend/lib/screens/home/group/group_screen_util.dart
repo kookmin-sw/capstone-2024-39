@@ -6,10 +6,16 @@ import 'package:go_router/go_router.dart';
 
 class GroupListItem extends StatefulWidget {
   final String groupName;
+  final int groupCnt;
+  final String publicState;
+  final String topic;
 
   const GroupListItem({
     super.key,
     required this.groupName,
+    required this.groupCnt,
+    required this.publicState,
+    required this.topic,
   });
 
   @override
@@ -24,7 +30,7 @@ class _GroupListItemState extends State<GroupListItem> {
       children: [
         Ink(
           width: 170.w,
-          height: 90.h,
+          height: 95.h,
           decoration: ShapeDecoration(
             color: Colors.white,
             shape: RoundedRectangleBorder(
@@ -77,7 +83,7 @@ class _GroupListItemState extends State<GroupListItem> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '주제:${widget.groupName}', 
+                        '주제:${widget.topic}', 
                         style: TextStyle(
                           fontSize: 13.sp
                         )
@@ -86,7 +92,7 @@ class _GroupListItemState extends State<GroupListItem> {
                       Text(
                         widget.groupName, 
                         style: TextStyle(
-                          fontSize: 15.sp, 
+                          fontSize:15.sp, 
                           fontWeight: FontWeight.bold
                         )
                       ),
@@ -103,7 +109,7 @@ class _GroupListItemState extends State<GroupListItem> {
                             width: 3.w
                           ),
                           Text(
-                            '현재 인원수', 
+                            '${widget.groupCnt}',
                             style: TextStyle(
                               fontSize: 14.sp
                             )
@@ -114,7 +120,7 @@ class _GroupListItemState extends State<GroupListItem> {
                         height: 3.h
                       ),
                       Text(
-                        '공개/비공개', 
+                        (widget.publicState == 'PUBLIC') ? '공개':'비공개', 
                         style: TextStyle(
                           fontSize: 13.sp
                         )

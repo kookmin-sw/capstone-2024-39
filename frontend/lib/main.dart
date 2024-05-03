@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
+import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:frontend/screens/home/shorts/shorts_screen.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:provider/provider.dart';
 import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.dart';
@@ -18,6 +19,8 @@ import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
 
 void main() async {
+  // WidgetsFlutterBinding.ensureInitialized(); 
+  // GroupListProvider().makeGroupList(); 
   runApp(const App());
 }
 
@@ -122,11 +125,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => BookInfoProvider()),
-        // 다른 프로바이더도 여기에 추가
-      ],
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => BookInfoProvider()),
+          // ChangeNotifierProvider(create: (context) => GroupListProvider()),
+          // 다른 프로바이더도 여기에 추가
+        ],
       child: MaterialApp.router(
         routerConfig: router,
         theme: ThemeData(
