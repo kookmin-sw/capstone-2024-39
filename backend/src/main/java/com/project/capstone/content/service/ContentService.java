@@ -50,15 +50,9 @@ public class ContentService {
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
 
-        Book book;
-        if (bookRepository.findBookByIsbn(request.addBookRequest().isbn()).isEmpty()) {
-            book = bookRepository.save(new Book(request.addBookRequest()));
-        }
-        else {
-            book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElseThrow(
-                    () -> new BookException(BOOK_NOT_FOUND)
-            );
-        }
+        Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElseGet(
+                () -> bookRepository.save(new Book(request.addBookRequest()))
+        );
 
         Club club;
         if (clubId == null) {
