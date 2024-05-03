@@ -57,57 +57,57 @@ class _MypageScreenState extends State<MypageScreen>
   // Example list of books
   List<Book> books = [
     Book(
-      title: '원씽(The One Thing)',
+      title: '�썝�뵿(The One Thing)',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.02.13',
       endDate: '2024.02.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     Book(
-      title: '원씽(The One Thing)2',
+      title: '�썝�뵿(The One Thing)2',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.01.13',
       endDate: '2024.01.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     Book(
-      title: '원씽(The One Thing)',
+      title: '�썝�뵿(The One Thing)',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.02.13',
       endDate: '2024.02.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     Book(
-      title: '원씽(The One Thing)2',
+      title: '�썝�뵿(The One Thing)2',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.01.13',
       endDate: '2024.01.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     Book(
-      title: '원씽(The One Thing)',
+      title: '�썝�뵿(The One Thing)',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.02.13',
       endDate: '2024.02.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     Book(
-      title: '원씽(The One Thing)2',
+      title: '�썝�뵿(The One Thing)2',
       author: 'Gary Keller, Jay Papasan',
       publisher: 'Business Books',
       startDate: '2024.01.13',
       endDate: '2024.01.29',
-      type: '독후감',
+      type: '�룆�썑媛�',
       imageUrl: 'https://via.placeholder.com/60x86',
     ),
     // Add more books here as needed
@@ -115,28 +115,28 @@ class _MypageScreenState extends State<MypageScreen>
 
   List<Library> libraries = [
     Library(
-      name: '즐겨찾기',
+      name: '利먭꺼李얘린',
       books: [
         LibraryBook(
-          title: '원씽',
+          title: '�썝�뵿',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
         ),
         LibraryBook(
-          title: '원씽2',
+          title: '�썝�뵿2',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
         ),
         LibraryBook(
-          title: '원씽',
+          title: '�썝�뵿',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
         ),
         LibraryBook(
-          title: '원씽2',
+          title: '�썝�뵿2',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
@@ -144,16 +144,16 @@ class _MypageScreenState extends State<MypageScreen>
       ],
     ),
     Library(
-      name: '읽고 싶은 책',
+      name: '�씫怨� �떢��� 梨�',
       books: [
         LibraryBook(
-          title: '원씽(The One Thing)',
+          title: '�썝�뵿(The One Thing)',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
         ),
         LibraryBook(
-          title: '원씽(The One Thing)2',
+          title: '�썝�뵿(The One Thing)2',
           author: 'Gary Keller, Jay Papasan',
           publisher: 'Business Books',
           imageUrl: 'https://via.placeholder.com/70x100',
@@ -176,7 +176,7 @@ class _MypageScreenState extends State<MypageScreen>
       designSize: const Size(390, 675),
       builder: (context, _) => Scaffold(
         appBar: AppBar(
-          title: const Text('마이페이지'),
+          title: const Text('留덉씠�럹�씠吏�'),
           titleTextStyle: const TextStyle(
             color: Colors.white,
             fontFamily: 'Noto Sans KR',
@@ -198,8 +198,8 @@ class _MypageScreenState extends State<MypageScreen>
               overlayColor: MaterialStateProperty.all(Colors.transparent),
               controller: _tabController,
               tabs: const [
-                Tab(text: '독후감'),
-                Tab(text: '나만의 서재'),
+                Tab(text: '�룆�썑媛�'),
+                Tab(text: '�굹留뚯쓽 �꽌�옱'),
               ],
             ),
             Expanded(
@@ -247,7 +247,7 @@ class LoggedWidget extends StatelessWidget {
               SizedBox(width: 65.w),
               ElevatedButton(
                 onPressed: () {},
-                child: const Text('회원 정보 수정'),
+                child: const Text('�쉶�썝 �젙蹂� �닔�젙'),
               ),
             ],
           ),
@@ -277,7 +277,7 @@ class LoginWidget extends StatelessWidget {
                 width: 140.w,
                 height: 37.h,
                 child: Text(
-                  '로그인하고 독후감을 작성해보세요!',
+                  '濡쒓렇�씤�븯怨� �룆�썑媛먯쓣 �옉�꽦�빐蹂댁꽭�슂!',
                   style:
                       TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.visible,
@@ -288,7 +288,7 @@ class LoginWidget extends StatelessWidget {
                 onPressed: () {
                   context.push('/login');
                 },
-                child: const Text('로그인'),
+                child: const Text('濡쒓렇�씤'),
               ),
             ],
           ),

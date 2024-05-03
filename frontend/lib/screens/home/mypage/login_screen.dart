@@ -53,7 +53,7 @@ class _LoginState extends State<LoginScreen> {
                     children: [
                       SizedBox(height: 33.h),
                       Text(
-                        '계정 로그인',
+                        '怨꾩젙 濡쒓렇?씤',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -92,7 +92,7 @@ class _LoginState extends State<LoginScreen> {
                                     style: const TextStyle(fontSize: 14),
                                     controller: _emailController,
                                     decoration: const InputDecoration(
-                                      hintText: '이메일',
+                                      hintText: '?씠硫붿씪',
                                       border: InputBorder.none,
                                     ),
                                   ),
@@ -132,7 +132,7 @@ class _LoginState extends State<LoginScreen> {
                                     style: const TextStyle(fontSize: 14),
                                     controller: _passwordController,
                                     decoration: const InputDecoration(
-                                      hintText: '비밀번호',
+                                      hintText: '鍮꾨??踰덊샇',
                                       border: InputBorder.none,
                                     ),
                                   ),
@@ -152,7 +152,7 @@ class _LoginState extends State<LoginScreen> {
                           child: Padding(
                             padding: EdgeInsets.only(right: 50.w),
                             child: Text(
-                              '비밀번호 찾기',
+                              '鍮꾨??踰덊샇 李얘린',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: const Color(0xFF747474),
@@ -179,7 +179,7 @@ class _LoginState extends State<LoginScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              '로그인',
+                              '濡쒓렇?씤',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.white,
@@ -193,12 +193,12 @@ class _LoginState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 15.h),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start, // 왼쪽 정렬
+                        mainAxisAlignment: MainAxisAlignment.start, // ?쇊履? ?젙?젹
                         children: [
                           Padding(
                             padding: EdgeInsets.only(left: 50.w),
                             child: Text(
-                              '계정이 없으신가요?',
+                              '怨꾩젙?씠 ?뾾?쑝?떊媛??슂?',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 10.sp,
@@ -212,7 +212,7 @@ class _LoginState extends State<LoginScreen> {
                               context.push('/signup');
                             },
                             child: Text(
-                              '회원가입',
+                              '?쉶?썝媛??엯',
                               style: TextStyle(
                                 color: const Color(0xFF0E9913),
                                 fontSize: 10.sp,
@@ -255,7 +255,7 @@ class _LoginState extends State<LoginScreen> {
                               ),
                               SizedBox(width: 10.w),
                               Text(
-                                '구글로 로그인하기',
+                                '援ш??濡? 濡쒓렇?씤?븯湲?',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18.sp,
