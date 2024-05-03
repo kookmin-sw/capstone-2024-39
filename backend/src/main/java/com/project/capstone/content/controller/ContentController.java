@@ -22,8 +22,8 @@ public class ContentController {
     @PostMapping("/create")
     public ResponseEntity<?> createContent(@AuthenticationPrincipal PrincipalDetails details,
                                            @RequestBody ContentCreateRequest request,
-                                           @RequestParam Long bookId, @RequestParam(required = false) Long clubId) {
-        contentService.createContent(details.getUserId(), request, bookId, clubId);
+                                           @RequestParam(required = false) Long clubId) {
+        contentService.createContent(details.getUserId(), request, clubId);
         return ResponseEntity.ok().body("컨텐츠 생성 완료");
     }
 
