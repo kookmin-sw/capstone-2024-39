@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/http.dart';
+
+List<dynamic> token = [];
+
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -56,6 +60,24 @@ class _SearchState extends State<SearchScreen> {
                           );
                         }, 
                         child: Text('test'),
+                      ),
+                      ElevatedButton(
+                        onPressed: ()async{
+                          token = [];
+                          token.add(singup("test4@gmail.com", "최연습", 33, "여자"));
+                          token.add(singup("test5@gmail.com", "한연습", 37, "남자"));
+                          token.add(singup("test6@gmail.com", "석연습", 46, "여자"));
+                        }, 
+                        child: Text('회원가입'),
+                      ),
+                      ElevatedButton(
+                        onPressed: ()async{
+                          token = [];
+                          token.add(login("test4@gmail.com"));
+                          token.add(login("test5@gmail.com"));
+                          token.add(login("test6@gmail.com"));
+                        }, 
+                        child: Text('로그인'),
                       ),
                     ],
                   ),

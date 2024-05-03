@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/http.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
+import 'package:frontend/screens/home/search/search_screen.dart';
+
 
 //모임 생성 페이지
 
@@ -22,9 +25,9 @@ class _GroupMakeState extends State<GroupMakeScreen> {
   //공개, 비공개
   final List<bool> _isPublic = [true, false];
   //각 항목을 입력했는지 확인
-  final List<bool> _enableCreateGroup = [false, true, false, false, false];
+  final List<bool> _enableCreateGroup = [false, false, false, false];
 
-  final List<TextEditingController> _textControllers = List.generate(5, (index) => TextEditingController(),); 
+  final List<TextEditingController> _textControllers = List.generate(4, (index) => TextEditingController(),); 
   
   @override
   void dispose() {
@@ -110,22 +113,22 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                 )).toList(),
                 onChanged: (value){
                   setState(() {
-                    _textControllers[2].text = value.toString();
-                    _enableCreateGroup[2] = !_isFieldEmpty(_textControllers[2]);
+                    _textControllers[1].text = value.toString();
+                    _enableCreateGroup[1] = !_isFieldEmpty(_textControllers[1]);
                   });
                 },
               ),
               const SizedBox(height: 16.0),
               // 모임 제한 인원
               TextField(
-                controller: _textControllers[3],
+                controller: _textControllers[2],
                 decoration: const InputDecoration(
                   labelText: '모임 제한인원',
                 ),
                 keyboardType: TextInputType.number,
                 onChanged: (value){
                   setState(() {
-                    _enableCreateGroup[3] = !_isFieldEmpty(_textControllers[3]);
+                    _enableCreateGroup[2] = !_isFieldEmpty(_textControllers[2]);
                   });
                 },
               ),
@@ -146,6 +149,8 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                     borderRadius: BorderRadius.circular(10),
                     onPressed: (index){
                       setState(() {
+                        _textControllers[3].clear();
+                        _enableCreateGroup[3] = !_isFieldEmpty(_textControllers[3]);
                         for (int buttonIndex = 0; buttonIndex < _isPublic.length; buttonIndex++) {
                           if (buttonIndex == index) {
                             _isPublic[buttonIndex] = !_isPublic[buttonIndex];
@@ -172,7 +177,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
               // 비밀번호 
               if (_isPublic[1])
                 TextField(
-                  controller: _textControllers[4],
+                  controller: _textControllers[3],
                   decoration: const InputDecoration(
                     labelText: '비밀번호',
                     border: OutlineInputBorder(),
@@ -181,20 +186,52 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   keyboardType: TextInputType.number,
                   onChanged: (value){
                     setState(() {
-                      _enableCreateGroup[4] = !_isFieldEmpty(_textControllers[4]);  
+                      _enableCreateGroup[3] = !_isFieldEmpty(_textControllers[3]);  
                     });
                   },
                 ),
               const SizedBox(height: 16.0),
               // 생성하기 버튼
               ElevatedButton(
-                onPressed: _isCreateButtonEnabled() ? (){
+                onPressed: _isCreateButtonEnabled() ? () async {
                   //모임 목록을 백으로 보내는 코드 작성
+                  String publication;
+                  dynamic result;
+                  if(_isPublic[0]){
+                    publication = '공개';
+                    dynamic changu_token = await token[0];
+                    result = await groupCreate(changu_token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, null);
+                  }
+                  else{
+                    publication = '비공개';
+                    dynamic changu_token = await token[0];
+                    result = await groupCreate(changu_token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, int.parse(_textControllers[3].text));
+                  }
+
+                  if(result.toString() == "모임 생성 완료"){
+                    context.pop();
+                  }
+                  else{
+                    // 모임 생성 실패시 코드 작성
+                  }
                 } : null,
                 child: const Text(
                   '생성하기',
                 ),
               ),
+              ElevatedButton(
+                onPressed: (){
+                  print(token.length);
+                  print(_textControllers[0].text);
+                  print(_textControllers[1].text);
+                  print(_textControllers[2].text);
+                  print(_textControllers[3].text);
+                },
+                child: const Text(
+                  'test',
+                ),
+              ),
+
             ],
           ),
         ),
