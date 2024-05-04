@@ -29,8 +29,8 @@ class _GroupListItemState extends State<GroupListItem> {
     return Row(
       children: [
         Ink(
-          width: 170.w,
-          height: 95.h,
+          width: ScreenUtil().setWidth(170),
+          height: ScreenUtil().setHeight(95),
           decoration: ShapeDecoration(
             color: Colors.white,
             shape: RoundedRectangleBorder(

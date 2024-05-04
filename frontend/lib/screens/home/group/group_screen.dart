@@ -3,10 +3,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
-import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
-import 'package:provider/provider.dart';
+
+
+final List<String> Thema = ['역사', '경제', '종교', '사회', '시집'];
+List<List<dynamic>> _GroupList = [[], [], [], [], []];
 
 class GroupScreen extends StatefulWidget {
   const GroupScreen({super.key});
@@ -15,23 +17,13 @@ class GroupScreen extends StatefulWidget {
   State<GroupScreen> createState() => _GroupState();
 }
 
-final List<String> Thema = ['역사', '경제', '종교', '사회', '시집'];
-List<List<dynamic>> _GroupList = [[],[],[],[],[]];
-
 class _GroupState extends State<GroupScreen> {
   ScrollController _scrollController = ScrollController();
+  late Future<void> _makeGroupListFuture;
 
-  // @override
-  // Future<void> setState(VoidCallback fn) async {
-  //   // TODO: implement setState
-  //   super.setState;
-  //   _makeGroupList();
-  // }
-
-  void _makeGroupList() async {
-    for (int i = 0; i < Thema.length; i++) {
-      _GroupList[i] = await groupSerachforTopic(Thema[i]);
-    }
+  Future<void> _makeGroupList() async {
+    _GroupList = await groupSerachforTopic(Thema);
+    setState(() {});
   }
 
   @override
@@ -39,11 +31,12 @@ class _GroupState extends State<GroupScreen> {
     _scrollController.dispose();
     super.dispose();
   }
+  
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    _makeGroupList();
+     _makeGroupListFuture = _makeGroupList();
     _scrollController.addListener(() {});
   }
 
@@ -108,7 +101,7 @@ class _GroupState extends State<GroupScreen> {
               child: Row(
                 children: List.generate(_GroupList[index].length, (int i) {
                   return GroupListItem(
-                    groupName: _GroupList[index][i]['name'], 
+                    groupName: _GroupList[index][i]['name'],
                     groupCnt: _GroupList[index][i]['maximum'],
                     publicState: _GroupList[index][i]['publicstatus'],
                     topic: _GroupList[index][i]['topic'],
@@ -119,7 +112,7 @@ class _GroupState extends State<GroupScreen> {
           ],
         ),
         SizedBox(
-          height: (index != 4)? 10.h : 500.h,
+          height: (index != 4) ? 10.h : 500.h,
         ),
       ],
     );

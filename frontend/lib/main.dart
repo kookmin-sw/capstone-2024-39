@@ -112,9 +112,9 @@ final GoRouter router = GoRouter(
         name: 'book_info',
         path: '/book_info',
         builder: (context, state) {
-          String bookName = state.extra.toString();
+          Map<String, dynamic> data = state.extra as Map<String, dynamic>;
           return BookInfoScreen(
-            bookName: bookName,
+            data: data,
           );
         }),
   ],

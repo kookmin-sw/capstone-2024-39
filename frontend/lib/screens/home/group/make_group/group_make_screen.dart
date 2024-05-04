@@ -7,6 +7,7 @@ import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
 
 
+
 //모임 생성 페이지
 
 class GroupMakeScreen extends StatefulWidget {
