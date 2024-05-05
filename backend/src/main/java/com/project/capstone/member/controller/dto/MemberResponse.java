@@ -8,6 +8,7 @@ import com.project.capstone.content.domain.Content;
 import com.project.capstone.member.domain.Gender;
 import com.project.capstone.member.domain.Member;
 import com.project.capstone.memberclub.domain.MemberClub;
+import com.project.capstone.memberclub.dto.MemberClubResponse;
 import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.post.controller.dto.PostResponse;
 import com.project.capstone.post.controller.dto.SimplePostResponse;
@@ -27,7 +28,7 @@ public record MemberResponse (
     int age,
     Gender gender,
     LocalDateTime createdAt,
-    List<MemberClub> clubsList,
+    List<MemberClubResponse> clubsList,
     List<SimplePostResponse> postList,
     List<CommentResponse> commentList,
     List<ContentResponse> contentList,
@@ -36,8 +37,16 @@ public record MemberResponse (
 ) {
     public MemberResponse(Member member) {
         this(member.getId(), member.getEmail(), member.getName(), member.getAge(), member.getGender(), member.getCreatedAt(),
-                member.getClubs(), createSimplePostResponseList(member.getPosts()), createCommentResponseList(member.getComments()),
+                createMemberClubResponseList(member.getClubs()), createSimplePostResponseList(member.getPosts()), createCommentResponseList(member.getComments()),
                 createContentResponseList(member.getContents()), createQuizResponseList(member.getQuizzes()), createMyBookResponseList(member.getMyBooks()));
+    }
+
+    private static List<MemberClubResponse> createMemberClubResponseList(List<MemberClub> memberClubList) {
+        List<MemberClubResponse> memberClubResponseList = new ArrayList<>();
+        for (MemberClub memberClub : memberClubList) {
+            memberClubResponseList.add(new MemberClubResponse(memberClub));
+        }
+        return memberClubResponseList;
     }
 
     private static List<SimplePostResponse> createSimplePostResponseList(List<Post> postList) {
