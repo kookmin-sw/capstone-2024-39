@@ -26,6 +26,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @ToString
+@Table(name = "club")
 public class Club {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
