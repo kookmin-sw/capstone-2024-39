@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "quiz")
 public class Quiz {
 
     @Id

@@ -28,6 +28,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "member")
 public class Member {
 
     @Id

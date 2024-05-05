@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name = "content")
 public class Content {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
