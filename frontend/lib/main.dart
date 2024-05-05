@@ -3,6 +3,9 @@ import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
+import 'package:frontend/screens/home/mypage/login_screen.dart';
+import 'package:frontend/screens/home/mypage/mypage_screen.dart';
+import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -19,8 +22,8 @@ import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized(); 
-  // GroupListProvider().makeGroupList(); 
+  // WidgetsFlutterBinding.ensureInitialized();
+  // GroupListProvider().makeGroupList();
   runApp(const App());
 }
 
@@ -73,7 +76,17 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'mypage',
       path: '/mypage',
-      builder: (context, state) => const GroupScreen(),
+      builder: (context, state) => const MypageScreen(),
+    ),
+    GoRoute(
+      name: 'login',
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      name: 'signup',
+      path: '/signup',
+      builder: (context, state) => const SignupScreen(),
     ),
     GoRoute(
       name: 'group_make',
@@ -105,7 +118,11 @@ final GoRouter router = GoRouter(
         final String kindOf = extraData['kindOf'] as String;
         final String postBody = extraData['body'] as String;
 
-        return PostScreen(title: postTitle, body: postBody, kindOf: kindOf,);
+        return PostScreen(
+          title: postTitle,
+          body: postBody,
+          kindOf: kindOf,
+        );
       },
     ),
     GoRoute(
@@ -125,12 +142,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => BookInfoProvider()),
-          // ChangeNotifierProvider(create: (context) => GroupListProvider()),
-          // 다른 프로바이더도 여기에 추가
-        ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BookInfoProvider()),
+        // ChangeNotifierProvider(create: (context) => GroupListProvider()),
+        // 다른 프로바이더도 여기에 추가
+      ],
       child: MaterialApp.router(
         routerConfig: router,
         theme: ThemeData(
