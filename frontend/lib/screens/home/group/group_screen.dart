@@ -101,6 +101,7 @@ class _GroupState extends State<GroupScreen> {
               child: Row(
                 children: List.generate(_GroupList[index].length, (int i) {
                   return GroupListItem(
+                    id: _GroupList[index][i]['id'],
                     groupName: _GroupList[index][i]['name'],
                     groupCnt: _GroupList[index][i]['maximum'],
                     publicState: _GroupList[index][i]['publicstatus'],

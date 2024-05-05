@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/http.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:provider/provider.dart';
 
 //그룹 상세 페이지
 //setState가 필요한 함수들은 클래스 안에 있어야 함
 
 class GroupInfoScreen extends StatefulWidget {
+  final int clubId;
   final String groupName;
 
   const GroupInfoScreen({
     super.key,
+    required this.clubId,
     required this.groupName,
   });
 
@@ -23,19 +28,34 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   //drawer 상태관리
   bool _isDrawerOpen = false;
   //그룹의 모임원 여부
-  bool _isGroupMember = true;
+  bool _isGroupMember = false;
   //그룹의 모임장 여부
   bool _isGroupManager = true;
   //그룹원(모임원, 모임장)이 설정을 누른지 확인
   bool _isManage = false;
   //모임장의 기능 확인 (true - 추방, flase - 권한 위임)
   bool _isKicked = false;
-  //예시 멤버
-  List<String> _member = ['홍길동', '최창연', '정지환', '이현준'];
   // 멤버들의 체크 상태를 저장하는 리스트
-  List<bool> _memberCheckStates = [false, false, false, false];
+  List<bool> _memberCheckStates = [];
   // 체크박스 타켓 인덱스
   int _targetIndex = 0;
+  // 기본 환경변수
+  var id;
+  var token;
+  var clubData;
+
+  //그룹 멤버인지 확인
+  Future<bool> userState(var id, var token) async {
+    var Userdata = await getUserInfo(id, token);
+    print(widget.clubId);
+    for (int i = 0; i < Userdata['clubsList'].length; i++) {
+      print(Userdata['clubsList'][i]['id']);
+      if (Userdata['clubsList'][i]['id'] == widget.clubId) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   //각 게시판의 글들을 리스트로 형성
   List<Widget> _buildTaskList(
@@ -83,22 +103,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     );
   }
 
-  // _member 리스트를 이용하여 _memberCheckStates 초기화
-  void _initializeMemberCheckStates() {
-    _memberCheckStates = List.filled(_member.length, false);
-  }
-
-  // 모임 목록을 만드는 함수
-  List<Widget> _generateMemberList(BuildContext context) {
-    List<Widget> memberList = [];
-
-    for (int i = 0; i < _member.length; i++) {
-      memberList.add(_generateMember(context, _member[i], i));
-      memberList.add(const Divider());
-    }
-
-    return memberList;
-  }
+  
 
   // 모임원 한명씩 생성
   Widget _generateMember(BuildContext context, String memName, int index) {
@@ -165,6 +170,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         bool check = await _showExitDialog(context);
                         if (check) {
                           // 나가기 요청
+                          groupOut("dd", widget.clubId);
                           print('checking');
                           _isGroupMember = false;
                         }
@@ -184,7 +190,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             ),
           ),
           // 모임원 리스트 생성(list <Widget>)
-          ..._generateMemberList(context),
+          for(int i = 0; i < clubData['memberList'].length; i++)
+            _generateMember(context, clubData['memberList'][i]['name'], i),
           // 모임원의 상태 적용 - 모임장만 보이도록
           Visibility(
             visible: _isManage && _isGroupManager,
@@ -206,7 +213,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                             break;
                           }
                         }
-                        _member.removeAt(_targetIndex);
+                        // _member.removeAt(_targetIndex);
                         _memberCheckStates.removeAt(_targetIndex);
                         // print(_memberCheckStates.length);
                         _isKicked = false;
@@ -226,7 +233,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         }
                       }
                       // 서버에 요청하는 함수
-                      _member.removeAt(_targetIndex);
+                      // _member.removeAt(_targetIndex);
                       _memberCheckStates.removeAt(_targetIndex);
                       // print(_memberCheckStates.length);
                       _isKicked = false;
@@ -340,6 +347,35 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _initUserState();
+  }
+
+  // _member 리스트를 이용하여 _memberCheckStates 초기화
+  void _initializeMemberCheckStates() {
+    _memberCheckStates = List.filled(clubData['memberList'].length, false);
+  }
+
+  Future<void> _initUserState() async {
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false);
+
+    id = await secureStorage.readData("id");
+    token = await secureStorage.readData("token");
+    bool isGroupMember = await userState(id, token);
+    print(isGroupMember);
+
+    clubData = await groupSerachforId(widget.clubId);
+    
+
+    setState(() {
+      _isGroupMember = isGroupMember;
+      _initializeMemberCheckStates();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(390, 675),
@@ -370,11 +406,16 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                       ),
                     ),
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
                         // 회원 가입 동작
-                        setState(() {
-                          _isGroupMember = true;
-                        });
+                        print(widget.clubId);
+                        String result = await groupJoin(token, widget.clubId);
+                        print(result);
+                        if (result == "모임 가입 완료") {
+                          setState(() {
+                            _isGroupMember = true;
+                          });
+                        }
                       },
                       borderRadius: BorderRadius.circular(15),
                       child: const Center(
@@ -563,7 +604,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                     shrinkWrap: true,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 50.0),
-                                    children: _buildTaskList(context, 10, '공지사항'),
+                                    children:
+                                        _buildTaskList(context, 10, '공지사항'),
                                   ),
                                 ),
                               ],
@@ -621,7 +663,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                     shrinkWrap: true,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 50.0),
-                                    children: _buildTaskList(context, 10, '게시판'),
+                                    children:
+                                        _buildTaskList(context, 10, '게시판'),
                                   ),
                                 ),
                               ],

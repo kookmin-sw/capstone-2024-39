@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
-import 'package:frontend/screens/home/search/search_screen_util.dart'
-    as SearchUtil;
+import 'package:frontend/screens/home/search/search_screen_util.dart' as SearchUtil;
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:provider/provider.dart';
 
-List<dynamic> token = [];
 List<dynamic> BookData = [];
 
 class SearchScreen extends StatefulWidget {
@@ -49,6 +49,8 @@ class _SearchState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => Scaffold(
@@ -120,25 +122,33 @@ class _SearchState extends State<SearchScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () async {
-                          token = [];
-                          token.add(singup("test4@gmail.com", "최연습", 33, "여자"));
-                          token.add(singup("test5@gmail.com", "한연습", 37, "남자"));
-                          token.add(singup("test6@gmail.com", "석연습", 46, "여자"));
+                          dynamic userInfo = await login("test5@gmail.com");
+                          print(userInfo['token']);
+                          print(userInfo['id']);
+                          await secureStorage.saveData("token", userInfo['token']);
+                          await secureStorage.saveData("id", userInfo['id']);
                         },
                         child: Text('회원가입'),
                       ),
                       ElevatedButton(
-                        onPressed: () async {
-                          token = [];
-                          token.add(login("test4@gmail.com"));
-                          token.add(login("test5@gmail.com"));
-                          token.add(login("test6@gmail.com"));
+                        onPressed: ()async{
+                          var token = await secureStorage.readData("token");
+                          var id = await secureStorage.readData("id");
+                          print(token);
+                          print(id);
                         },
-                        child: Text('로그인'),
+                        child: Text('토큰 확인'),
+                      ),
+                      ElevatedButton(
+                        onPressed: ()async{
+                          await secureStorage.deleteData("token");
+                          await secureStorage.deleteData("id");
+                        },
+                        child: Text('토큰 삭제'),
                       ),
                       if (BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)
-                          SearchUtil.SearchListItem(data:BookData[i])
+                          SearchUtil.SearchListItem(data:BookData[i]),
                     ],
                   ),
                 ),

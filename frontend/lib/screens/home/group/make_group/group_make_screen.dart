@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/search/search_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
 
 
 
@@ -64,6 +66,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder:(context, child) => Scaffold(
@@ -198,15 +201,14 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   //모임 목록을 백으로 보내는 코드 작성
                   String publication;
                   dynamic result;
+                  var token = await secureStorage.readData("token");
                   if(_isPublic[0]){
                     publication = '공개';
-                    dynamic changu_token = await token[0];
-                    result = await groupCreate(changu_token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, null);
+                    result = await groupCreate(token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, null);
                   }
                   else{
                     publication = '비공개';
-                    dynamic changu_token = await token[0];
-                    result = await groupCreate(changu_token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, int.parse(_textControllers[3].text));
+                    result = await groupCreate(token,  _textControllers[0].text, _textControllers[1].text, int.parse(_textControllers[2].text), publication, int.parse(_textControllers[3].text));
                   }
 
                   if(result.toString() == "모임 생성 완료"){
@@ -222,7 +224,6 @@ class _GroupMakeState extends State<GroupMakeScreen> {
               ),
               ElevatedButton(
                 onPressed: (){
-                  print(token.length);
                   print(_textControllers[0].text);
                   print(_textControllers[1].text);
                   print(_textControllers[2].text);

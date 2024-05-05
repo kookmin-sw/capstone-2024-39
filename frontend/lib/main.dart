@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/grouplist_provider.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -19,8 +20,6 @@ import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized(); 
-  // GroupListProvider().makeGroupList(); 
   runApp(const App());
 }
 
@@ -49,9 +48,13 @@ final GoRouter router = GoRouter(
         name: 'group_info',
         path: '/group_info',
         builder: (context, state) {
-          String groupname = state.extra.toString();
+          final Map<String, dynamic> groupData =
+            state.extra as Map<String, dynamic>;
+          final int id = groupData['id'] as int;
+          final String groupName = groupData['groupName'] as String;
           return GroupInfoScreen(
-            groupName: groupname,
+            clubId: id,
+            groupName: groupName,
           );
         }),
     GoRoute(
@@ -128,7 +131,7 @@ class App extends StatelessWidget {
       return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => BookInfoProvider()),
-          // ChangeNotifierProvider(create: (context) => GroupListProvider()),
+          ChangeNotifierProvider(create: (_) => SecureStorageService()),
           // 다른 프로바이더도 여기에 추가
         ],
       child: MaterialApp.router(
