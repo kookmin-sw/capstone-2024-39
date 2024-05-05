@@ -18,6 +18,12 @@ class _BookReportState extends State<BookReportScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('글쓰기'),
+            titleTextStyle: const TextStyle(
+              color: Colors.white,
+              fontFamily: 'Noto Sans KR',
+              fontWeight: FontWeight.w700,
+            ),
+            backgroundColor: const Color(0xFF0E9913),
             centerTitle: true,
           ),
           body: ListView.builder(
