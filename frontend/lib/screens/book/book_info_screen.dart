@@ -5,11 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class BookInfoScreen extends StatefulWidget {
-  final String bookName;
+  final Map<String, dynamic> data;
 
   const BookInfoScreen({
     super.key,
-    required this.bookName,
+    required this.data,
   });
 
   @override
@@ -66,7 +66,7 @@ class _BookInfoState extends State<BookInfoScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
           title: Text(
-            widget.bookName,
+            widget.data['title'],
             style: const TextStyle(
               color: Colors.white,
               fontSize: 25,
@@ -91,25 +91,50 @@ class _BookInfoState extends State<BookInfoScreen> {
               child: Container(
                 child: Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 20.0
-                      ),
-                      child: Container(
-                        width: 90,
-                        height: 120,
-                        decoration: ShapeDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                "https://via.placeholder.com/90x120"),
-                            fit: BoxFit.fill,
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: Container(
+                            width: ScreenUtil().setWidth(80),
+                            height: ScreenUtil().setHeight(105),
+                            decoration: ShapeDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(widget.data['image']),
+                                fit: BoxFit.fill,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3)),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3)),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 10.0,
+                          right: 10.0,
+                          bottom: 20.0,
+                        ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Container(
+                            child: Text(
+                              widget.data['description'],
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontFamily: 'Noto Sans KR',
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    
                   ],
                 ),
               ),
