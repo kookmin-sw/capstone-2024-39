@@ -122,7 +122,8 @@ class _SearchState extends State<SearchScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () async {
-                          dynamic userInfo = await login("test5@gmail.com");
+                          dynamic userInfo = await login("test6@gmail.com");
+                          // dynamic userInfo = await singup("test6@gmail.com", "최창연", 22, "남자");
                           print(userInfo['token']);
                           print(userInfo['id']);
                           await secureStorage.saveData("token", userInfo['token']);

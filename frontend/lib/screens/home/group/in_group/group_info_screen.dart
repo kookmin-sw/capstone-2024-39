@@ -37,6 +37,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   bool _isKicked = false;
   // 멤버들의 체크 상태를 저장하는 리스트
   List<bool> _memberCheckStates = [];
+  // 멤버 목록
+  List<String> _member = [];
   // 체크박스 타켓 인덱스
   int _targetIndex = 0;
   // 기본 환경변수
@@ -47,10 +49,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   //그룹 멤버인지 확인
   Future<bool> userState(var id, var token) async {
     var Userdata = await getUserInfo(id, token);
-    print(widget.clubId);
     for (int i = 0; i < Userdata['clubsList'].length; i++) {
-      print(Userdata['clubsList'][i]['id']);
-      if (Userdata['clubsList'][i]['id'] == widget.clubId) {
+      if (Userdata['clubsList'][i]['clubId'] == widget.clubId) {
         return true;
       }
     }
@@ -190,8 +190,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             ),
           ),
           // 모임원 리스트 생성(list <Widget>)
-          for(int i = 0; i < clubData['memberList'].length; i++)
-            _generateMember(context, clubData['memberList'][i]['name'], i),
+          ..._makeGroupList(),
           // 모임원의 상태 적용 - 모임장만 보이도록
           Visibility(
             visible: _isManage && _isGroupManager,
@@ -352,9 +351,23 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     _initUserState();
   }
 
-  // _member 리스트를 이용하여 _memberCheckStates 초기화
+  // _memberCheckStates 초기화
   void _initializeMemberCheckStates() {
     _memberCheckStates = List.filled(clubData['memberList'].length, false);
+  }
+
+  void _memberinitialize(){
+    _member = [];
+    for(var member in clubData['memberList']){
+        _member.add(member['name']);
+    }
+  }
+
+  List<Widget> _makeGroupList(){
+    List<Widget> temp = [];
+    for(int i = 0; i < _member.length; i++)
+        temp.add(_generateMember(context, _member[i], i));
+    return temp;
   }
 
   Future<void> _initUserState() async {
@@ -364,7 +377,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     id = await secureStorage.readData("id");
     token = await secureStorage.readData("token");
     bool isGroupMember = await userState(id, token);
-    print(isGroupMember);
 
     clubData = await groupSerachforId(widget.clubId);
     
@@ -372,6 +384,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     setState(() {
       _isGroupMember = isGroupMember;
       _initializeMemberCheckStates();
+      _memberinitialize();
     });
   }
 
@@ -414,6 +427,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         if (result == "모임 가입 완료") {
                           setState(() {
                             _isGroupMember = true;
+                            _memberinitialize();
                           });
                         }
                       },
