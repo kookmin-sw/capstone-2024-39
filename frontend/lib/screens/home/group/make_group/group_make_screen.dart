@@ -10,6 +10,7 @@ import 'package:frontend/provider/secure_storage_provider.dart';
 
 
 
+
 //모임 생성 페이지
 
 class GroupMakeScreen extends StatefulWidget {

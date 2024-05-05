@@ -4,6 +4,9 @@ import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
+import 'package:frontend/screens/home/mypage/login_screen.dart';
+import 'package:frontend/screens/home/mypage/mypage_screen.dart';
+import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -76,7 +79,17 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'mypage',
       path: '/mypage',
-      builder: (context, state) => const GroupScreen(),
+      builder: (context, state) => const MypageScreen(),
+    ),
+    GoRoute(
+      name: 'login',
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      name: 'signup',
+      path: '/signup',
+      builder: (context, state) => const SignupScreen(),
     ),
     GoRoute(
       name: 'group_make',
@@ -108,7 +121,11 @@ final GoRouter router = GoRouter(
         final String kindOf = extraData['kindOf'] as String;
         final String postBody = extraData['body'] as String;
 
-        return PostScreen(title: postTitle, body: postBody, kindOf: kindOf,);
+        return PostScreen(
+          title: postTitle,
+          body: postBody,
+          kindOf: kindOf,
+        );
       },
     ),
     GoRoute(

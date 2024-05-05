@@ -100,12 +100,17 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_template),
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontFamily: 'Noto Sans KR',
+          fontWeight: FontWeight.w700,
+        ),
+        backgroundColor: const Color(0xFF0E9913),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
