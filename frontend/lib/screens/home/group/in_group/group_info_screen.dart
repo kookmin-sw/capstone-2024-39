@@ -423,7 +423,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         // 회원 가입 동작
                         print(widget.clubId);
                         String result = await groupJoin(token, widget.clubId);
-                        print(result);
                         if (result == "모임 가입 완료") {
                           setState(() {
                             _isGroupMember = true;
