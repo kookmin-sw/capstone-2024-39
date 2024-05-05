@@ -28,7 +28,7 @@ public class AuthService {
     public TokenResponse login(String email) {
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new AuthException(EMAIL_NOT_FOUND));
-        return new TokenResponse(generateToken(member));
+        return new TokenResponse(generateToken(member), member.getId());
     }
 
     private String generateToken(Member member) {
