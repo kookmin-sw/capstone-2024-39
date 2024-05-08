@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/http.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
+import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:provider/provider.dart';
 
 class BookReportWritingScreen extends StatefulWidget {
@@ -94,7 +96,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   ? "한줄평"
                   : widget.index == 996
                       ? "독후감"
-                      : ""; // 혹은 적절한 기본값 설정
+                      : "";
     }
 
     return Scaffold(
@@ -303,6 +305,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             child: ElevatedButton(
               onPressed: () {
                 // 글 저장 기능 추가
+                contentCreate(token[0], 1, 3, '독후감', '제목', '내용', '2021-10-10',
+                    '2021-10-10');
               },
               child: const Text('저장'),
             ),

@@ -9,30 +9,30 @@ const String NaverBookSearchURL =
 Future<List<dynamic>> SearchBook(String SearchString) async {
   List<dynamic> bookData = [];
   int cnt = 0, iter = 0;
-  var address = Uri.parse(NaverBookSearchURL + "?query=$SearchString&display=100");
+  var address =
+      Uri.parse(NaverBookSearchURL + "?query=$SearchString&display=100");
   http.Response res = await http.get(address, headers: {
     "Content-Type": "application/json",
     "X-Naver-Client-Id": NaverClientID,
     "X-Naver-Client-Secret": NaverSecret,
   });
   final data = json.decode(utf8.decode(res.bodyBytes));
-  // for(int i = 0; i < 10; i++){  
+  // for(int i = 0; i < 10; i++){
   //   bookData.add(data['items'][i]);
   //   print(data['items'][i]);
   // }
-  while(cnt != 10){
-    if(data['items'][iter]['title'].toString().contains('시리즈')){
+  while (cnt != 10) {
+    if (data['items'][iter]['title'].toString().contains('시리즈')) {
       iter++;
       continue;
-    }
-    else{
+    } else {
       bookData.add(data['items'][iter]);
       // print(data['items'][iter]);
       iter++;
       cnt++;
     }
   }
-  
+
   return bookData;
 }
 
@@ -118,4 +118,52 @@ Future<dynamic> groupCreate(dynamic token, String name, String topic,
   // print(res.body);
 
   return data;
+}
+
+//컨텐츠 생성하기
+Future<dynamic> contentCreate(
+    dynamic token,
+    int bookId,
+    int clubId,
+    String contentType,
+    String title,
+    String body,
+    String startDate,
+    String endDate) async {
+  var address =
+      Uri.parse("$BASE_URL/content/create?bookId=$bookId&clubId=$clubId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "contentType": contentType,
+      "title": title,
+      "body": body,
+      "startDate": startDate,
+      "endDate": endDate,
+    }),
+  );
+  final data = res.body;
+  return data;
+}
+
+//컨텐츠 불러오기
+Future<List<dynamic>> contentLoad(dynamic token, int id) async {
+  List<dynamic> contentList = [];
+  var address = Uri.parse("$BASE_URL/content/$id");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    contentList.add(data[i]);
+  }
+  return contentList;
 }

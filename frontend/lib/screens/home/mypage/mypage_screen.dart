@@ -413,69 +413,81 @@ class MyLibraryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: libraries.length,
-      itemBuilder: (context, index) {
-        var library = libraries[index];
-        return Padding(
-          padding: EdgeInsets.all(15.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                library.name,
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 5.h),
-              SizedBox(
-                height: 154.h,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: library.books.length,
-                  itemBuilder: (context, bookIndex) {
-                    var book = library.books[bookIndex];
-                    return Padding(
-                      padding: EdgeInsets.only(right: 5.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 90.w,
-                            height: 128.52.h,
-                            decoration: ShapeDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(book.imageUrl),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 5.h),
-                          SizedBox(
-                            width: 90.w,
-                            height: 20.h,
-                            child: Text(
-                              book.title,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13.sp,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+    return Scaffold(
+      body: ListView.builder(
+        itemCount: libraries.length,
+        itemBuilder: (context, index) {
+          var library = libraries[index];
+          return Padding(
+            padding: EdgeInsets.all(15.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  library.name,
+                  style:
+                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+                SizedBox(height: 5.h),
+                SizedBox(
+                  height: 154.h,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: library.books.length,
+                    itemBuilder: (context, bookIndex) {
+                      var book = library.books[bookIndex];
+                      return Padding(
+                        padding: EdgeInsets.only(right: 5.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 90.w,
+                              height: 128.52.h,
+                              decoration: ShapeDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(book.imageUrl),
+                                  fit: BoxFit.fill,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 5.h),
+                            SizedBox(
+                              width: 90.w,
+                              height: 20.h,
+                              child: Text(
+                                book.title,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13.sp,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.push('/make_library');
+        },
+        backgroundColor: Colors.green,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
