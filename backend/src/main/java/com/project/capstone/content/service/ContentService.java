@@ -90,11 +90,15 @@ public class ContentService {
         return new ContentResponse(content);
     }
 
-    public List<ContentResponse> getContents(String type) {
+    public List<ContentResponse> getContents(String type, Long clubId) {
+        Club club = clubRepository.findClubById(clubId).orElseThrow(
+                () -> new ClubException(CLUB_NOT_FOUND)
+        );
+
         for (ContentType contentType : ContentType.values()) {
             if (contentType.equals(ContentType.valueOf(type))) {
-                List<Content> contentsByType = contentRepository.findContentsByType(ContentType.valueOf(type));
-                return contentsByType.stream()
+                List<Content> contentsByTypeAndClub = contentRepository.findContentsByTypeAndClub(ContentType.valueOf(type), club);
+                return contentsByTypeAndClub.stream()
                         .map(ContentResponse::new)
                         .toList();
             }

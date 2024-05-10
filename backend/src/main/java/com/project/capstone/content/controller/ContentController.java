@@ -36,8 +36,8 @@ public class ContentController {
 
     // 컨텐츠 종류별 조회
     @GetMapping("/get")
-    public ResponseEntity<List<ContentResponse>> getContents(@RequestParam String type) {
-        List<ContentResponse> contentResponseList = contentService.getContents(type);
+    public ResponseEntity<List<ContentResponse>> getContents(@RequestParam String type, @RequestParam Long clubId) {
+        List<ContentResponse> contentResponseList = contentService.getContents(type, clubId);
         return ResponseEntity.ok().body(contentResponseList);
     }
 }
