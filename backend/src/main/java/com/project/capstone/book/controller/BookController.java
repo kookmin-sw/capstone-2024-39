@@ -3,6 +3,7 @@ package com.project.capstone.book.controller;
 import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.book.controller.dto.BookResponse;
 import com.project.capstone.book.service.BookService;
+import com.project.capstone.content.controller.dto.ContentResponse;
 import com.project.capstone.quiz.controller.dto.QuizResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,12 @@ public class BookController {
         return ResponseEntity.ok(quizResponseList);
     }
 
-    // 해당 책의 컨텐츠 타입별로 불러오기
+    // 해당 책의 컨텐츠 불러오기
+    @GetMapping("/{isbn}/content")
+    public ResponseEntity<List<ContentResponse>> getContentsByBook(@PathVariable String isbn, @RequestParam String type) {
+        List<ContentResponse> contentResponseList = bookService.getContentsByBook(isbn, type);
+        return ResponseEntity.ok(contentResponseList);
+    }
+
 
 }
