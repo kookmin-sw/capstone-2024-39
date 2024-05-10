@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/http.dart';
-import 'package:frontend/screens/home/search/search_screen.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
   const BookReportViewingScreen({super.key});
@@ -19,9 +20,11 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   String _body = '';
   final String _author = "작가";
   final String _publisher = "출판사";
+  // ignore: prefer_typing_uninitialized_variables
+  var token;
 
   void initializeContentData(dynamic token) async {
-    _contentData = await contentLoad(token[0], 1);
+    _contentData = await contentLoad(token, 2);
     _template = _contentData[0]['type'] as String;
     _title = _contentData[0]['title'] as String;
     _body = _contentData[0]['body'] as String;
@@ -30,7 +33,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   @override
   void initState() {
     super.initState();
+    _initUserState();
     initializeContentData(token);
+  }
+
+  Future<void> _initUserState() async {
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false);
+    token = await secureStorage.readData("token");
   }
 
   @override
@@ -47,6 +57,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
           color: Colors.white,
           fontFamily: 'Noto Sans KR',
           fontWeight: FontWeight.w700,
+          fontSize: 20,
         ),
         backgroundColor: const Color(0xFF0E9913),
         centerTitle: true,

@@ -246,3 +246,4 @@ fabric.properties
 
 #select file
 lib/secret.dart
+android\app\google-service.json

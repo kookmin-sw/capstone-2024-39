@@ -93,7 +93,7 @@ Future<dynamic> login(String email) async {
 
 //유저 정보 가져오기
 Future<dynamic> getUserInfo(String id, String token) async {
-  var address = Uri.parse(BASE_URL + "/member/$id");
+  var address = Uri.parse("$BASE_URL/member/$id");
   http.Response res = await http.get(
     address,
     headers: {
@@ -211,4 +211,81 @@ Future<List<dynamic>> contentLoad(dynamic token, int id) async {
     contentList.add(data[i]);
   }
   return contentList;
+}
+
+// 모임 가입하기
+Future<String> groupJoin(String token, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/club/join?clubId=$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = res.body;
+
+  return data;
+}
+
+//모임 나가기
+Future<String> groupOut(String token, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/club/out?clubId=$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = res.body;
+
+  return data;
+}
+
+//서재 불러오기
+Future<List<dynamic>> getLibrary(String token) async {
+  List<dynamic> libraryList = [];
+  var address = Uri.parse("$BASE_URL/library");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    libraryList.add(data[i]);
+  }
+  return libraryList;
+}
+
+//서재에 책 추가하기
+Future<String> addBookToLibrary(
+    String token,
+    String isbn,
+    String title,
+    String author,
+    String publisher,
+    String publishDate,
+    String imageUrl) async {
+  var address = Uri.parse("$BASE_URL/library/add");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "isbn": isbn,
+      "title": title,
+      "author": author,
+      "publisher": publisher,
+      "publishDate": publishDate,
+      "imageUrl": imageUrl,
+    }),
+  );
+  final data = res.body;
+  return data;
 }

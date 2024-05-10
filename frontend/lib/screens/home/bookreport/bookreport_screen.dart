@@ -22,6 +22,7 @@ class _BookReportState extends State<BookReportScreen> {
               color: Colors.white,
               fontFamily: 'Noto Sans KR',
               fontWeight: FontWeight.w700,
+              fontSize: 20,
             ),
             backgroundColor: const Color(0xFF0E9913),
             centerTitle: true,
