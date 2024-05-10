@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/http.dart';
 import 'package:go_router/go_router.dart';
 
 //그룹 탭의 리스트 아이템 템플릿
 
 class GroupListItem extends StatefulWidget {
+  final int id;
   final String groupName;
   final int groupCnt;
   final String publicState;
@@ -12,6 +14,7 @@ class GroupListItem extends StatefulWidget {
 
   const GroupListItem({
     super.key,
+    required this.id,
     required this.groupName,
     required this.groupCnt,
     required this.publicState,
@@ -46,9 +49,13 @@ class _GroupListItemState extends State<GroupListItem> {
             onTap: () {
               // 나중엔 눌렀을 각 정보를 불러와서 그걸 푸쉬하는 방식으로
               if (LoginCheck){
+                // groupSerachforId(widget.id);
                 context.push(
                   '/group_info',
-                  extra: widget.groupName,
+                  extra: {
+                    'groupName':widget.groupName,
+                    'id':widget.id,
+                  }
                 );
               }
               else{ //로그인 화면으로 넘어가는 go_route 푸쉬

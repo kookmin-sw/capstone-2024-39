@@ -1,9 +1,13 @@
 import 'package:http/http.dart' as http;
+import 'package:xml/xml.dart' as xml;
+import 'package:xml2json/xml2json.dart';
 import 'package:frontend/secret.dart';
 import 'dart:convert';
 
 const String NaverBookSearchURL =
     "https://openapi.naver.com/v1/search/book.json";
+const String NaverBookISBNSearchURL =
+    "https://openapi.naver.com/v1/search/book_adv.xml";
 
 //네이버 책 검색
 Future<List<dynamic>> SearchBook(String SearchString) async {
@@ -17,17 +21,12 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
     "X-Naver-Client-Secret": NaverSecret,
   });
   final data = json.decode(utf8.decode(res.bodyBytes));
-  // for(int i = 0; i < 10; i++){
-  //   bookData.add(data['items'][i]);
-  //   print(data['items'][i]);
-  // }
   while (cnt != 10) {
     if (data['items'][iter]['title'].toString().contains('시리즈')) {
       iter++;
       continue;
     } else {
       bookData.add(data['items'][iter]);
-      // print(data['items'][iter]);
       iter++;
       cnt++;
     }
@@ -36,8 +35,25 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
   return bookData;
 }
 
+//네이버 책 상세검색(ISBN 검색)
+Future<dynamic> SearchISBNBook(String ISBN) async {
+  var address = Uri.parse(NaverBookISBNSearchURL + "?d_isbn=$ISBN");
+  http.Response res = await http.get(address, headers: {
+    "X-Naver-Client-Id": NaverClientID,
+    "X-Naver-Client-Secret": NaverSecret,
+  });
+
+  final responseBody = res.body;
+  final xml2Json = Xml2Json();
+  xml2Json.parse(responseBody);
+  final data = jsonDecode(xml2Json.toParker());
+
+  return data['rss']['channel']['item'];
+}
+
 //회원 가입
-Future<String> singup(String email, String name, int age, String gender) async {
+Future<dynamic> singup(
+    String email, String name, int age, String gender) async {
   var address = Uri.parse(BASE_URL + "/auth/signup");
   http.Response res = await http.post(
     address,
@@ -52,13 +68,13 @@ Future<String> singup(String email, String name, int age, String gender) async {
     }),
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
-  print(data);
+  // print(data);
 
-  return data['token'];
+  return data;
 }
 
 //로그인
-Future<String> login(String email) async {
+Future<dynamic> login(String email) async {
   var address = Uri.parse(BASE_URL + "/auth/login");
   http.Response res = await http.post(
     address,
@@ -70,9 +86,24 @@ Future<String> login(String email) async {
     }),
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
-  print(data);
+  // print(data);
 
-  return data['token'];
+  return data;
+}
+
+//유저 정보 가져오기
+Future<dynamic> getUserInfo(String id, String token) async {
+  var address = Uri.parse(BASE_URL + "/member/$id");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+
+  return data;
 }
 
 //모임 목록 가져오기(주제를 기반으로)›
@@ -94,6 +125,20 @@ Future<List<List<dynamic>>> groupSerachforTopic(List<String> topic) async {
   }
 
   return groupList;
+}
+
+//모임 목록 가져오기(id를 기반으로)
+Future<dynamic> groupSerachforId(int clubId) async {
+  var address = Uri.parse(BASE_URL + "/club/search/$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
 }
 
 //모임 생성하기
