@@ -4,6 +4,7 @@ import com.project.capstone.auth.domain.PrincipalDetails;
 import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.club.controller.dto.ClubResponse;
+import com.project.capstone.club.controller.dto.SimpleClubResponse;
 import com.project.capstone.club.service.ClubService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,5 +79,12 @@ public class ClubController {
                                      @RequestBody AddBookRequest request, @RequestParam Long clubId) {
         clubService.setBook(details.getUserId(), request, clubId);
         return ResponseEntity.ok().body("선정 완료");
+    }
+
+    // 대표책으로 모임 조회
+    @GetMapping("/search/book")
+    public ResponseEntity<List<SimpleClubResponse>> getClubByBookName(@RequestParam String title) {
+        List<SimpleClubResponse> clubResponseList = clubService.getClubByBookTitle(title);
+        return ResponseEntity.ok().body(clubResponseList);
     }
 }

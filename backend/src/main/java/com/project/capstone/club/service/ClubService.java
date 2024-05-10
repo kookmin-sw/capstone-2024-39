@@ -5,6 +5,7 @@ import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
 import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.club.controller.dto.ClubResponse;
+import com.project.capstone.club.controller.dto.SimpleClubResponse;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.club.domain.ClubRepository;
 import com.project.capstone.club.exception.ClubException;
@@ -141,5 +142,17 @@ public class ClubService {
         );
         club.setBook(book);
         clubRepository.updateBook(book, clubId);
+    }
+
+    public List<SimpleClubResponse> getClubByBookTitle(String title) {
+        List<Book> booksContainingTitle = bookRepository.findBooksByTitleContaining(title);
+        List<SimpleClubResponse> clubResponseList = new ArrayList<>();
+        for (Book book : booksContainingTitle) {
+            List<Club> clubList = clubRepository.findClubsByBook(book);
+            for (Club club : clubList) {
+                clubResponseList.add(new SimpleClubResponse(club));
+            }
+        }
+        return clubResponseList;
     }
 }

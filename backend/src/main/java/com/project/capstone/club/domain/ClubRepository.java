@@ -20,4 +20,6 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     @Modifying(clearAutomatically = true)
     @Query("update Club c set c.book = :book where c.id = :id")
     void updateBook(Book book, Long id);
+
+    List<Club> findClubsByBook(Book book);
 }
