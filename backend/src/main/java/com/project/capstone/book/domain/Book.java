@@ -27,16 +27,12 @@ public class Book {
     private Long id;
     private String isbn;
     private String title;
-    @Column(name = "category_1d")
-    private String category1d;
-    @Column(name = "category_2d")
-    private String category2d;
-    @Column(name = "category_3d")
-    private String category3d;
     private String author;
     private String publisher;
     @Column(name = "publish_date")
     private String publishDate;
+    @Column(name = "image_url")
+    private String imageUrl;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "book")
@@ -55,8 +51,8 @@ public class Book {
     private List<MyBook> membersAddThisBook = new ArrayList<>();
 
     public Book(AddBookRequest request) {
-        this(null, request.isbn(), request.title(), request.category1d(), request.category2d(), request.category3d(),
-                request.author(), request.publisher(), request.publishDate(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        this(null, request.isbn(), request.title(), request.author(), request.publisher(), request.publishDate(),
+                request.imageUrl(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
 }

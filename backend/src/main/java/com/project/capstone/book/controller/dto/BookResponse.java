@@ -7,9 +7,10 @@ public record BookResponse(
         String isbn,
         String title,
         String author,
-        String publisher
+        String publisher,
+        String imageUrl
 ) {
     public BookResponse(Book book) {
-        this(book.getId(), book.getIsbn(), book.getTitle(), book.getAuthor(), book.getPublisher());
+        this(book.getId(), book.getIsbn(), book.getTitle(), book.getAuthor(), book.getPublisher(), book.getImageUrl());
     }
 }
