@@ -9,10 +9,11 @@ public record SimpleClubResponse(
         String name,
         int memberCnt,
         int maximum,
-        PublicStatus publicStatus
-        // String imageUrl
+        PublicStatus publicStatus,
+        String imageUrl
 ) {
     public SimpleClubResponse(Club club) {
-        this(club.getId(), club.getTopic(), club.getName(), club.getMembers().size(), club.getMaximum(), club.getPublicStatus());
+        this(club.getId(), club.getTopic(), club.getName(), club.getMembers().size(),
+                club.getMaximum(), club.getPublicStatus(), club.getBook() == null ? null : club.getBook().getImageUrl());
     }
 }
