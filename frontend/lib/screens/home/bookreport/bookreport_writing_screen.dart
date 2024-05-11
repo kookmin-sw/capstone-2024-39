@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/http.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class BookReportWritingScreen extends StatefulWidget {
@@ -34,6 +38,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _answerController2 = TextEditingController();
   final TextEditingController _answerController3 = TextEditingController();
   final TextEditingController _answerController4 = TextEditingController();
+  var token;
 
   // Predefined values for author and publisher
   final String _author = "작가";
@@ -46,6 +51,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   void initState() {
     super.initState();
 
+    _initUserState();
     // Initialize _keyboardVisibilityObserver and _keyboardVisibilityObserverWrapper
     final keyboardVisibilityObserver =
         _KeyboardVisibilityObserver((bool visible) {
@@ -62,6 +68,12 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
 
     // Add listener for keyboard visibility
     WidgetsBinding.instance.addObserver(_keyboardVisibilityObserverWrapper);
+  }
+
+  Future<void> _initUserState() async {
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false);
+    token = await secureStorage.readData("token");
   }
 
   @override
@@ -94,7 +106,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   ? "한줄평"
                   : widget.index == 996
                       ? "독후감"
-                      : ""; // 혹은 적절한 기본값 설정
+                      : "";
     }
 
     return Scaffold(
@@ -104,6 +116,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           color: Colors.white,
           fontFamily: 'Noto Sans KR',
           fontWeight: FontWeight.w700,
+          fontSize: 20,
         ),
         backgroundColor: const Color(0xFF0E9913),
         centerTitle: true,
@@ -303,6 +316,16 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             child: ElevatedButton(
               onPressed: () {
                 // 글 저장 기능 추가
+                contentCreate(
+                    token,
+                    1,
+                    3,
+                    _template,
+                    _bookTitleController.text,
+                    _writingController.text,
+                    _startDate.toString(),
+                    _endDate.toString());
+                context.pop();
               },
               child: const Text('저장'),
             ),

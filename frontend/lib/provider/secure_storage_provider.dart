@@ -23,7 +23,7 @@ class SecureStorageService extends ChangeNotifier {
 class SecureStorageProvider extends StatelessWidget {
   final Widget child;
 
-  const SecureStorageProvider({required this.child});
+  const SecureStorageProvider({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

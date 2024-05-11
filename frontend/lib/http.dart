@@ -98,7 +98,7 @@ Future<dynamic> login(String email) async {
 
 //유저 정보 가져오기
 Future<dynamic> getUserInfo(String id, String token) async {
-  var address = Uri.parse(BASE_URL + "/member/$id");
+  var address = Uri.parse("$BASE_URL/member/$id");
   http.Response res = await http.get(
     address,
     headers: {
@@ -195,6 +195,54 @@ Future<dynamic> groupCreate(dynamic token, String name, String topic,
   final data = res.body;
 
   return data;
+}
+
+//컨텐츠 생성하기
+Future<dynamic> contentCreate(
+    dynamic token,
+    int bookId,
+    int clubId,
+    String contentType,
+    String title,
+    String body,
+    String startDate,
+    String endDate) async {
+  var address =
+      Uri.parse("$BASE_URL/content/create?bookId=$bookId&clubId=$clubId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "contentType": contentType,
+      "title": title,
+      "body": body,
+      "startDate": startDate,
+      "endDate": endDate,
+    }),
+  );
+  final data = res.body;
+  return data;
+}
+
+//컨텐츠 불러오기
+Future<List<dynamic>> contentLoad(dynamic token, int id) async {
+  List<dynamic> contentList = [];
+  var address = Uri.parse("$BASE_URL/content/$id");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    contentList.add(data[i]);
+  }
+  return contentList;
 }
 
 // 모임 가입하기
@@ -368,5 +416,52 @@ Future<String> commentCreate(dynamic token, int postId, String body) async {
   );
   final data = res.body;
 
+  return data;
+}
+
+//서재 불러오기
+Future<List<dynamic>> getLibrary(String token) async {
+  List<dynamic> libraryList = [];
+  var address = Uri.parse("$BASE_URL/library");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    libraryList.add(data[i]);
+  }
+  return libraryList;
+}
+
+//서재에 책 추가하기
+Future<String> addBookToLibrary(
+    String token,
+    String isbn,
+    String title,
+    String author,
+    String publisher,
+    String publishDate,
+    String imageUrl) async {
+  var address = Uri.parse("$BASE_URL/library/add");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "isbn": isbn,
+      "title": title,
+      "author": author,
+      "publisher": publisher,
+      "publishDate": publishDate,
+      "imageUrl": imageUrl,
+    }),
+  );
+  final data = res.body;
   return data;
 }
