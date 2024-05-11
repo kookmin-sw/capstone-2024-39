@@ -35,8 +35,9 @@ public class MemberController {
 
     // 나만의 서재 추가
     @PostMapping("/my-book/add")
-    public ResponseEntity<?> addMyBook(@AuthenticationPrincipal PrincipalDetails details, @RequestBody AddBookRequest request) {
-        memberService.addMyBook(details.getUserId(), request);
+    public ResponseEntity<?> addMyBook(@AuthenticationPrincipal PrincipalDetails details,
+                                       @RequestBody AddBookRequest request, @RequestParam String groupName) {
+        memberService.addMyBook(details.getUserId(), request, groupName);
         return ResponseEntity.ok().body("추가 완료");
     }
 }

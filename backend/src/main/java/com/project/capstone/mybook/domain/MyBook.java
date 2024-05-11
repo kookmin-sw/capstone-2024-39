@@ -19,6 +19,9 @@ public class MyBook {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "group_name")
+    private String groupName;
+
     @JsonBackReference
     @ManyToOne
     private Member member;
