@@ -3,8 +3,10 @@ import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
 import 'package:frontend/screens/home/mypage/login_screen.dart';
+import 'package:frontend/screens/home/mypage/makelibrary_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -77,6 +79,11 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
+      name: 'bookreport_viewing',
+      path: '/bookreport_viewing',
+      builder: (context, state) => const BookReportViewingScreen(),
+    ),
+    GoRoute(
       name: 'mypage',
       path: '/mypage',
       builder: (context, state) => const MypageScreen(),
@@ -90,6 +97,11 @@ final GoRouter router = GoRouter(
       name: 'signup',
       path: '/signup',
       builder: (context, state) => const SignupScreen(),
+    ),
+    GoRoute(
+      name: 'make_library',
+      path: '/make_library',
+      builder: (context, state) => const MakeLibraryScreen(),
     ),
     GoRoute(
       name: 'group_make',

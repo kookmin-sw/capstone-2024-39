@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/http.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -10,27 +14,12 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupState extends State<SignupScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
 
   String? _validateName(String? value) {
     if (value == null || value.isEmpty) {
       return '이름을 입력하세요';
-    }
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty || !value.contains('@')) {
-      return '유효한 이메일을 입력하세요';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return '비밀번호를 입력하세요';
     }
     return null;
   }
@@ -42,6 +31,13 @@ class _SignupState extends State<SignupScreen> {
     int? age = int.tryParse(value);
     if (age == null || age < 1 || age > 99) {
       return '나이는 1에서 99 사이여야 합니다';
+    }
+    return null;
+  }
+
+  String? _validateGender(String? value) {
+    if (value == null || value.isEmpty) {
+      return '성별을 입력하세요';
     }
     return null;
   }
@@ -135,88 +131,7 @@ class _SignupState extends State<SignupScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 20.h),
-                      SizedBox(
-                        width: 330.w,
-                        height: 39.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0.w,
-                              top: 0.h,
-                              child: Container(
-                                width: 330.w,
-                                height: 39.h,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        width: 1, color: Color(0xFFA8AFB6)),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: Expanded(
-                                child: SizedBox(
-                                  width: 330.w,
-                                  child: TextFormField(
-                                    style: const TextStyle(fontSize: 14),
-                                    controller: _emailController,
-                                    decoration: const InputDecoration(
-                                      hintText: '이메일',
-                                      border: InputBorder.none,
-                                    ),
-                                    validator: _validateEmail,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      SizedBox(
-                        width: 330.w,
-                        height: 39.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0.w,
-                              top: 0.h,
-                              child: Container(
-                                width: 330.w,
-                                height: 39.h,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        width: 1, color: Color(0xFFA8AFB6)),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: Expanded(
-                                child: SizedBox(
-                                  width: 330.w,
-                                  child: TextField(
-                                    style: const TextStyle(fontSize: 14),
-                                    controller: _passwordController,
-                                    decoration: const InputDecoration(
-                                      hintText: '비밀번호',
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 30.h),
                       SizedBox(
                         width: 330.w,
                         height: 39.h,
@@ -258,15 +173,69 @@ class _SignupState extends State<SignupScreen> {
                           ],
                         ),
                       ),
+                      SizedBox(height: 30.h),
+                      SizedBox(
+                        width: 330.w,
+                        height: 39.h,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 0.w,
+                              top: 0.h,
+                              child: Container(
+                                width: 330.w,
+                                height: 39.h,
+                                decoration: ShapeDecoration(
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                        width: 1, color: Color(0xFFA8AFB6)),
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 20.w,
+                              child: Expanded(
+                                child: SizedBox(
+                                  width: 330.w,
+                                  child: TextFormField(
+                                    style: const TextStyle(fontSize: 14),
+                                    controller: _genderController,
+                                    decoration: const InputDecoration(
+                                      hintText: '성별',
+                                      border: InputBorder.none,
+                                    ),
+                                    validator: _validateAge,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 50.h),
                       GestureDetector(
-                        onTap: () {
-                          if (_validateEmail(_emailController.text) == null &&
-                              _validateAge(_ageController.text) == null &&
+                        onTap: () async {
+                          if (_validateAge(_ageController.text) == null &&
                               _validateName(_nameController.text) == null &&
-                              _validatePassword(_passwordController.text) ==
-                                  null) {
+                              _validateGender(_genderController.text) == null) {
                             print("성공");
+                            final secureStorage =
+                                Provider.of<SecureStorageService>(context,
+                                    listen: false);
+                            await singup(
+                                (await secureStorage.readData("userID")) ?? '',
+                                _nameController.text,
+                                int.parse(_ageController.text),
+                                _genderController.text);
+                            await secureStorage.saveData(
+                                'name', _nameController.text);
+                            await secureStorage.saveData(
+                                'age', _ageController.text);
+                            await secureStorage.saveData(
+                                'gender', _genderController.text);
+                            context.pop();
                           } else {
                             print("실패");
                           }
@@ -289,48 +258,6 @@ class _SignupState extends State<SignupScreen> {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 30.h),
-                      GestureDetector(
-                        onTap: () {
-                          // Handle Google signup action
-                        },
-                        child: Container(
-                          width: 330.w,
-                          height: 45.h,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(width: 1.5),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 28.w,
-                                height: 28.h,
-                                child: AspectRatio(
-                                  aspectRatio: 28.0 / 28.0,
-                                  child: Image.network(
-                                    'https://via.placeholder.com/28x28',
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10.w),
-                              Text(
-                                '구글로 회원가입하기',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18.sp,
-                                  fontFamily: 'Noto Sans KR',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ),
