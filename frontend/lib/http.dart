@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:xml/xml.dart' as xml;
+import 'package:intl/intl.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:frontend/secret.dart';
 import 'dart:convert';
@@ -12,7 +12,7 @@ const String NaverBookISBNSearchURL =
 //네이버 책 검색
 Future<List<dynamic>> SearchBook(String SearchString) async {
   List<dynamic> bookData = [];
-  int cnt = 0, iter = 0;
+  int iter = 0;
   var address =
       Uri.parse(NaverBookSearchURL + "?query=$SearchString&display=100");
   http.Response res = await http.get(address, headers: {
@@ -21,15 +21,20 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
     "X-Naver-Client-Secret": NaverSecret,
   });
   final data = json.decode(utf8.decode(res.bodyBytes));
-  while (cnt != 10) {
-    if (data['items'][iter]['title'].toString().contains('시리즈')) {
-      iter++;
-      continue;
-    } else {
-      bookData.add(data['items'][iter]);
-      iter++;
-      cnt++;
+  while (iter != 100) {
+    if(data['total'] <= iter){
+      break;
     }
+    else if(data['items'][iter]['title'].toString().contains('시리즈')) {
+      
+    }
+    else if(data['items'][iter]['title'].toString().contains('세트')) {
+      
+    }
+    else{
+      bookData.add(data['items'][iter]);
+    }
+    iter++;
   }
 
   return bookData;
@@ -108,7 +113,7 @@ Future<dynamic> getUserInfo(String id, String token) async {
 
 //모임 목록 가져오기(주제를 기반으로)›
 Future<List<List<dynamic>>> groupSerachforTopic(List<String> topic) async {
-  List<List<dynamic>> groupList = [[], [], [], [], []];
+  List<List<dynamic>> groupList = [[], [], [], [], [], []];
   for (int i = 0; i < topic.length; i++) {
     String temp = topic[i];
     var address = Uri.parse(BASE_URL + "/club/search/topic?topic=$temp");
@@ -141,6 +146,34 @@ Future<dynamic> groupSerachforId(int clubId) async {
   return data;
 }
 
+//모임 목록 가져오기(이름을 기반으로)
+Future<dynamic> groupSerachforName(String name) async {
+  var address = Uri.parse(BASE_URL + "/club/search/name?name=$name");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
+}
+
+//모임 목록 가져오기(대표책을 기반으로)
+Future<List<dynamic>> groupSerachforBook(String title) async {
+  var address = Uri.parse(BASE_URL + "/club/search/book?title=$title");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
+}
+
 //모임 생성하기
 Future<dynamic> groupCreate(dynamic token, String name, String topic,
     int maximum, String publication, var password) async {
@@ -160,7 +193,6 @@ Future<dynamic> groupCreate(dynamic token, String name, String topic,
     }),
   );
   final data = res.body;
-  // print(res.body);
 
   return data;
 }
@@ -189,6 +221,150 @@ Future<String> groupOut(String token, int clubId) async {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",
     },
+  );
+  final data = res.body;
+
+  return data;
+}
+
+//모임 추방하기
+Future<String> groupExpel(String token, String memberId, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/club/expel?memberId=$memberId&clubId=$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = res.body;
+  return data;
+}
+
+//모임장 임명하기
+Future<String> groupDelegate(String token, String memberId, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/club/delegate?memberId=$memberId&clubId=$clubId");
+  http.Response res = await http.put(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = res.body;
+  return data;
+}
+
+//대표 책 선정
+Future<String> groupBookSelect(dynamic token, Map<String, dynamic> bookdata, int clubId) async {
+  String originalDate = bookdata['pubdate'];
+  DateTime parsedDate = DateTime.parse(originalDate.replaceAllMapped(
+      RegExp(r'(\d{4})(\d{2})(\d{2})'), (Match m) => '${m[1]}-${m[2]}-${m[3]}'));
+  String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+
+  var address = Uri.parse(BASE_URL + "/club/book?clubId=$clubId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "isbn": "i-${bookdata['isbn']}",
+      "title": bookdata['title'],
+      "category1d": null,
+      "category2d": null,
+      "category3d": null,
+      "author": bookdata['author'],
+      "publisher": bookdata['publisher'],
+      "publishDate": formattedDate,
+      "imageUrl": bookdata['image'],
+    }),
+  );
+  final data = res.body;
+
+  return data;
+}
+
+//책 추가하기
+Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
+  String originalDate = bookdata['pubdate'];
+  DateTime parsedDate = DateTime.parse(originalDate.replaceAllMapped(
+      RegExp(r'(\d{4})(\d{2})(\d{2})'), (Match m) => '${m[1]}-${m[2]}-${m[3]}'));
+  String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+  // print(bookdata['image']);
+  var address = Uri.parse(BASE_URL + "/book/add");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "isbn": "i-${bookdata['isbn']}",
+      "title": bookdata['title'],
+      "author": bookdata['author'],
+      "publisher": bookdata['publisher'],
+      "publishDate": formattedDate,
+      "imageUrl": bookdata['image'],
+    }),
+  );
+
+  if(res.contentLength == 20){
+    final data = res.body;
+    return data;
+  }
+  else{
+    final data = json.decode(utf8.decode(res.bodyBytes));
+    return data['message'];
+  } 
+}
+
+//책 기본 정보 불러오기
+Future<dynamic> getBookInfo(dynamic token, String isbn) async {
+  print(isbn);
+  var address = Uri.parse(BASE_URL + "/book/search/i-$isbn");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+
+  print(data);
+  return data;
+}
+
+//게시글 불러오기
+Future<dynamic> getPost(String token, int postId, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/post/$postId?clubId=$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+
+  return data;
+}
+
+//댓글 작성
+Future<String> commentCreate(dynamic token, int postId, String body) async {
+
+  var address = Uri.parse(BASE_URL + "/comment/create?postId=$postId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "body": body,
+    }),
   );
   final data = res.body;
 

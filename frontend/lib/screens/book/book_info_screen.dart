@@ -58,6 +58,13 @@ class _BookInfoState extends State<BookInfoScreen> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // print(widget.data);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(390, 675),

@@ -6,9 +6,12 @@ import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 
-
-final List<String> Thema = ['역사', '경제', '종교', '사회', '시집'];
-List<List<dynamic>> _GroupList = [[], [], [], [], []];
+// final List<String> Thema = ['역사', '경제', '종교', '사회', '시집'];
+final List<String> Thema = ['예술과 문학', '금융/경제/투자', '과학과 철학', '자기개발', '역사', '취미'];
+//수정 전 - 역사, 경제, 종교, 사회, 시집
+//수정 - 예술과 문학, 금융/경제/투자, 과학과 철학, 자기개발, 역사, 취미
+//삭제 - 시집
+List<List<dynamic>> _GroupList = [[], [], [], [], [], []];
 
 class GroupScreen extends StatefulWidget {
   const GroupScreen({super.key});
@@ -19,7 +22,6 @@ class GroupScreen extends StatefulWidget {
 
 class _GroupState extends State<GroupScreen> {
   ScrollController _scrollController = ScrollController();
-  late Future<void> _makeGroupListFuture;
 
   Future<void> _makeGroupList() async {
     _GroupList = await groupSerachforTopic(Thema);
@@ -31,12 +33,11 @@ class _GroupState extends State<GroupScreen> {
     _scrollController.dispose();
     super.dispose();
   }
-  
 
   @override
   void initState() {
     super.initState();
-     _makeGroupListFuture = _makeGroupList();
+    _makeGroupList();
     _scrollController.addListener(() {});
   }
 
@@ -47,36 +48,46 @@ class _GroupState extends State<GroupScreen> {
   ) {
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: Row(
-        children: List.generate(Thema.length, (int i) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0.5),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(
-                          // borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
-                          ),
-                      elevation: 5,
-                      shadowColor: Colors.grey,
+      child: Column(
+        children: List.generate((Thema.length / 3).ceil(), (int i) {
+          int startIndex = i * 3;
+          int endIndex = (i + 1) * 3;
+          if (endIndex > Thema.length) endIndex = Thema.length;
+
+          List<Widget> rowButtons = [];
+          for (int j = startIndex; j < endIndex; j++) {
+            rowButtons.add(
+              SizedBox(
+                height: ScreenUtil().setHeight(100),
+                width: ScreenUtil().setWidth(100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        elevation: 5,
+                        shadowColor: Colors.grey,
+                      ),
+                      onPressed: () {
+                        print('${Thema[j]} 눌렸습니다.');
+                        final buttonOffset = j * 180.0;
+                        _scrollController.animateTo(buttonOffset,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut);
+                      },
+                      child: Text('${j + 1}'),
                     ),
-                    onPressed: () {
-                      // print(group[i].length);
-                      print(Thema[i] + ' 눌렸습니다.');
-                      final buttonOffset =
-                          i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.
-                      _scrollController.animateTo(buttonOffset,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut);
-                    },
-                    child: Text('${i + 1}'),
-                  ),
-                  Text(Thema[i]),
-                ],
+                    Text(Thema[j]),
+                  ],
+                ),
               ),
+            );
+          }
+          return Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: rowButtons,
             ),
           );
         }),
@@ -113,7 +124,9 @@ class _GroupState extends State<GroupScreen> {
           ],
         ),
         SizedBox(
-          height: (index != 4) ? 10.h : 500.h,
+          height: (index != 5)
+              ? ScreenUtil().setHeight(10)
+              : ScreenUtil().setHeight(500),
         ),
       ],
     );
@@ -149,8 +162,8 @@ class _GroupState extends State<GroupScreen> {
           child: Column(
             children: [
               Container(
-                width: double.infinity,
-                height: 120.h,
+                height: ScreenUtil().setHeight(150),
+                width: ScreenUtil().setWidth(390),
                 decoration: const BoxDecoration(
                   color: Color(0xFF0E9913),
                   borderRadius: BorderRadius.only(
@@ -158,34 +171,36 @@ class _GroupState extends State<GroupScreen> {
                     bottomRight: Radius.circular(50),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _ThemaList(context, Thema),
-                      ],
-                    ),
-                  ],
+                child: SizedBox(
+                  width: ScreenUtil().setWidth(390),
+                  child: _ThemaList(context, Thema),
                 ),
+                
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      //0
-                      groupList(0),
-                      //1
-                      groupList(1),
-                      //2
-                      groupList(2),
-                      //3
-                      groupList(3),
-                      //4
-                      groupList(4),
-                    ],
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    _makeGroupList();
+                  },
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        //0
+                        groupList(0),
+                        //1
+                        groupList(1),
+                        //2
+                        groupList(2),
+                        //3
+                        groupList(3),
+                        //4
+                        groupList(4),
+                        //5
+                        groupList(5),
+                      ],
+                    ),
                   ),
                 ),
               ),

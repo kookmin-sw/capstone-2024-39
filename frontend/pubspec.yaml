@@ -36,10 +36,14 @@ dependencies:
 
   http: ^1.2.1
   provider: ^6.1.2
-  xml: ^6.5.0
   xml2json: ^5.3.1
+  intl: ^0.19.0
 
   flutter_secure_storage: ^9.0.0
+
+  agora_rtc_engine: ^6.3.1
+  permission_handler: ^11.3.1
+  agora_rtm: ^1.5.9
 
 
   # The following adds the Cupertino Icons font to your application.

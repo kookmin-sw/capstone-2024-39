@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
-import 'package:frontend/screens/home/search/search_screen_util.dart' as SearchUtil;
+import 'package:frontend/screens/home/search/search_screen_util.dart'
+    as SearchUtil;
+import 'package:frontend/screens/home/group/group_screen_util.dart'
+    as GroupUtil;
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 List<dynamic> BookData = [];
+List<dynamic> GroupData = [];
+bool check = false;
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -17,9 +23,11 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchState extends State<SearchScreen> {
   final TextEditingController _textControllers = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   void _SearchData(String text) async {
     BookData = await SearchBook(text);
+    GroupData = await groupSerachforBook(text);
     setState(() {});
   }
 
@@ -29,18 +37,22 @@ class _SearchState extends State<SearchScreen> {
 
   void initiate() {
     //초기화 함수
+    _scrollController.addListener(() {});
     setState(() {
       BookData = [];
+      GroupData = [];
       _textControllers.clear();
+      check = false;
     });
   }
 
   @override
   void dispose() {
     _textControllers.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
-
+  
   @override
   void initState() {
     super.initState();
@@ -49,8 +61,8 @@ class _SearchState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final secureStorage = Provider.of<SecureStorageService>(context, listen: false);
-
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false); 
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => Scaffold(
@@ -84,12 +96,14 @@ class _SearchState extends State<SearchScreen> {
                   child: Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Expanded(
+                          SizedBox(
+                            width: ScreenUtil().setWidth(280),
                             child: TextField(
                               controller: _textControllers,
                               decoration: const InputDecoration(
-                                hintText: '책 제목',
+                                hintText: '검색어',
                               ),
                               onChanged: (value) {
                                 setState(() {});
@@ -98,16 +112,18 @@ class _SearchState extends State<SearchScreen> {
                           ),
                           IconButton(
                             onPressed: () {
-                              if(_isFieldEmpty(_textControllers)){
+                              if (_isFieldEmpty(_textControllers)) {
                                 // 검색 x
                                 // BookData = [];
-                              }
-                              else{
+                              } else {
                                 _SearchData(_textControllers.text);
+                                _scrollController.animateTo(0,
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.easeInOut);
+                                setState(() {
+                                  check = true;
+                                });
                               }
-                              setState(() {
-                                
-                              });
                             },
                             icon: const Icon(Icons.search),
                           )
@@ -118,21 +134,38 @@ class _SearchState extends State<SearchScreen> {
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
+                  controller: _scrollController,
                   child: Column(
                     children: [
+                      if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
                       ElevatedButton(
                         onPressed: () async {
-                          dynamic userInfo = await login("test6@gmail.com");
-                          // dynamic userInfo = await singup("test6@gmail.com", "최창연", 22, "남자");
+                          dynamic userInfo = await login(
+                              "test13@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                          // dynamic userInfo = await singup("test16@gmail.com", "랑데부", 24, "남자");
                           print(userInfo['token']);
                           print(userInfo['id']);
-                          await secureStorage.saveData("token", userInfo['token']);
+                          await secureStorage.saveData(
+                              "token", userInfo['token']);
                           await secureStorage.saveData("id", userInfo['id']);
                         },
-                        child: Text('회원가입'),
+                        child: Text('한지민'),
                       ),
                       ElevatedButton(
-                        onPressed: ()async{
+                        onPressed: () async {
+                          dynamic userInfo = await login(
+                              "test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                          // dynamic userInfo = await singup("test16@gmail.com", "랑데부", 24, "남자");
+                          print(userInfo['token']);
+                          print(userInfo['id']);
+                          await secureStorage.saveData(
+                              "token", userInfo['token']);
+                          await secureStorage.saveData("id", userInfo['id']);
+                        },
+                        child: Text('최창연'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
                           var token = await secureStorage.readData("token");
                           var id = await secureStorage.readData("id");
                           print(token);
@@ -141,15 +174,39 @@ class _SearchState extends State<SearchScreen> {
                         child: Text('토큰 확인'),
                       ),
                       ElevatedButton(
-                        onPressed: ()async{
+                        onPressed: () async {
                           await secureStorage.deleteData("token");
                           await secureStorage.deleteData("id");
                         },
                         child: Text('토큰 삭제'),
                       ),
+                      if (GroupData.isNotEmpty)
+                        SizedBox(
+                          height: 200, // 높이 조정
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: GroupData.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: GroupUtil.GroupListItem(
+                                  id: GroupData[index]['id'],
+                                  groupName: GroupData[index]['name'],
+                                  groupCnt: GroupData[index]['maximum'],
+                                  publicState: GroupData[index]['publicStatus'],
+                                  topic: GroupData[index]['topic'],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       if (BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)
-                          SearchUtil.SearchListItem(data:BookData[i]),
+                          SearchUtil.SearchListItem(
+                            data: BookData[i],
+                            type: "search",
+                            clubId: 0,
+                          ),
                     ],
                   ),
                 ),
