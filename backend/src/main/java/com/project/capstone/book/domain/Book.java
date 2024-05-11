@@ -54,5 +54,4 @@ public class Book {
         this(null, request.isbn(), request.title(), request.author(), request.publisher(), request.publishDate(),
                 request.imageUrl(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
-
 }

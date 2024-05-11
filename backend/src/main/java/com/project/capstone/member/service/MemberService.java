@@ -49,7 +49,7 @@ public class MemberService {
         return books;
     }
 
-    public void addMyBook(String userId, AddBookRequest request) {
+    public void addMyBook(String userId, AddBookRequest request, String groupName) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
@@ -60,7 +60,7 @@ public class MemberService {
             throw new MyBookException(ALREADY_EXIST_MYBOOK);
         }
 
-        MyBook saved = myBookRepository.save(new MyBook(null, member, book));
+        MyBook saved = myBookRepository.save(new MyBook(null, groupName, member, book));
         member.getMyBooks().add(saved);
         book.getMembersAddThisBook().add(saved);
     }
