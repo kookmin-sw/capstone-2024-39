@@ -66,7 +66,7 @@ public class ClubController {
         return ResponseEntity.ok().body("위임 완료");
     }
     // 멤버 추방하기
-    @GetMapping("/expel")
+    @DeleteMapping("/expel")
     public ResponseEntity<?> expelMember(@AuthenticationPrincipal PrincipalDetails details,
                                          @RequestParam UUID memberId, @RequestParam Long clubId) {
         clubService.expelMember(details.getUserId(), memberId, clubId);
