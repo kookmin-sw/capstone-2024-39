@@ -1,14 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
 
 //그룹 상세 페이지
-//setState가 필요한 함수들은 클래스 안에 있어야 함
+
+//회원가입, 모임 나가기, 동적 멤버 리스트, 추방, 임명 - 완
+//미로그인시(토큰이 없을시) 회원 가입 눌렀을 때 알림창이 뜨도록 구현하기
 
 class GroupInfoScreen extends StatefulWidget {
   final int clubId;
@@ -25,12 +30,14 @@ class GroupInfoScreen extends StatefulWidget {
 }
 
 class _GroupInfoState extends State<GroupInfoScreen> {
+  // loading 관리
+  bool _isLoading = true;
   //drawer 상태관리
   bool _isDrawerOpen = false;
   //그룹의 모임원 여부
   bool _isGroupMember = false;
   //그룹의 모임장 여부
-  bool _isGroupManager = true;
+  bool _isGroupManager = false;
   //그룹원(모임원, 모임장)이 설정을 누른지 확인
   bool _isManage = false;
   //모임장의 기능 확인 (true - 추방, flase - 권한 위임)
@@ -39,18 +46,23 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   List<bool> _memberCheckStates = [];
   // 멤버 목록
   List<String> _member = [];
+  List<String> _memberId = [];
   // 체크박스 타켓 인덱스
   int _targetIndex = 0;
   // 기본 환경변수
-  var id;
-  var token;
-  var clubData;
+  var id; // 유저 uuid
+  var token; // 유저 token
+  var clubData; // 현재 모임의 데이터
+  var userdata; // 유저 정보
 
   //그룹 멤버인지 확인
   Future<bool> userState(var id, var token) async {
-    var Userdata = await getUserInfo(id, token);
-    for (int i = 0; i < Userdata['clubsList'].length; i++) {
-      if (Userdata['clubsList'][i]['clubId'] == widget.clubId) {
+    if (id == null || token == null) {
+      return false;
+    }
+    userdata = await getUserInfo(id, token);
+    for (int i = 0; i < userdata['clubsList'].length; i++) {
+      if (userdata['clubsList'][i]['clubId'] == widget.clubId) {
         return true;
       }
     }
@@ -103,10 +115,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     );
   }
 
-  
-
   // 모임원 한명씩 생성
-  Widget _generateMember(BuildContext context, String memName, int index) {
+  Widget _generateMember(String memName, int index) {
     return ListTile(
       title: Text(memName),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -143,7 +153,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     });
     if (!_isDrawerOpen) {
       _isManage = false;
-      _initializeMemberCheckStates();
+      updateGroupList();
     }
   }
 
@@ -159,6 +169,13 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             ),
             child: Column(
               children: [
+                Text(
+                  userdata['name'],
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 24,
+                  ),
+                ),
                 IconButton(
                     onPressed: () async {
                       // 모임장일땐 설정 버튼이 보이도록
@@ -170,27 +187,24 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         bool check = await _showExitDialog(context);
                         if (check) {
                           // 나가기 요청
-                          groupOut("dd", widget.clubId);
-                          print('checking');
-                          _isGroupMember = false;
+                          String result = await groupOut(token, widget.clubId);
+                          if (result == "모임 탈퇴 완료") {
+                            _isGroupMember = false;
+                            await _clubGetInfo();
+                          }
                         }
                       }
                     },
                     icon: _isGroupManager
                         ? const Icon(Icons.settings)
                         : const Icon(Icons.logout)),
-                const Text(
-                  'Side Menu',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                  ),
-                ),
               ],
             ),
           ),
           // 모임원 리스트 생성(list <Widget>)
-          ..._makeGroupList(),
+          for (int i = 0; i < _member.length; i++)
+            _generateMember(_member[i], i),
+
           // 모임원의 상태 적용 - 모임장만 보이도록
           Visibility(
             visible: _isManage && _isGroupManager,
@@ -199,47 +213,48 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               padding: const EdgeInsets.only(right: 16.0),
               child: ElevatedButton(
                 onPressed: () async {
+                  bool result =
+                      await _showLastConfirmationDialog(context, _isKicked);
+                  for (int i = 0; i < _memberCheckStates.length; i++) {
+                    if (_memberCheckStates[i]) {
+                      _targetIndex = i;
+                      break;
+                    }
+                  }
+                  String target = _memberId[_targetIndex];
                   // 추방할 때
-                  bool result = await _showLastConfirmationDialog(context);
-
                   if (_isKicked) {
                     if (result) {
                       //추방 O
-                      setState(() {
-                        for (int i = 0; i < _memberCheckStates.length; i++) {
-                          if (_memberCheckStates[i]) {
-                            _targetIndex = i;
-                            break;
-                          }
-                        }
-                        // _member.removeAt(_targetIndex);
-                        _memberCheckStates.removeAt(_targetIndex);
-                        // print(_memberCheckStates.length);
-                        _isKicked = false;
-                        _isManage = false;
-                      });
+                      String response =
+                          await groupExpel(token, target, clubData['id']);
+                      if (response == "추방 완료") {
+                        await _clubGetInfo();
+                        updateGroupList();
+                      }
                     } else {
                       //추방 취소
                     }
                   }
                   // 모임장 위임할 때
                   else {
-                    setState(() {
-                      for (int i = 0; i < _memberCheckStates.length; i++) {
-                        if (_memberCheckStates[i]) {
-                          _targetIndex = i;
-                          break;
-                        }
+                    if (result) {
+                      String response =
+                          await groupDelegate(token, target, clubData['id']);
+                      if (response == "위임 완료") {
+                        await _clubGetInfo();
+                        updateGroupList();
+                        setState(() {
+                          _isGroupManager = false;
+                        });
                       }
-                      // 서버에 요청하는 함수
-                      // _member.removeAt(_targetIndex);
-                      _memberCheckStates.removeAt(_targetIndex);
-                      // print(_memberCheckStates.length);
-                      _isKicked = false;
-                      _isManage = false;
-                    });
+                    } else {}
                   }
                   // 원래대로 초기화
+                  setState(() {
+                    _isKicked = false;
+                    _isManage = false;
+                  });
                 },
                 child: const Text(
                   '확인',
@@ -258,7 +273,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("마지막으로 확인하시겠습니까?"),
+              title: Text("마지막으로 확인하겠습니다"),
               content: Text("나가시겠습니까?"),
               actions: [
                 TextButton(
@@ -295,6 +310,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     setState(() {
                       _isKicked = true;
                       _isManage = true;
+                      updateGroupList();
                     });
                     Navigator.pop(context);
                   },
@@ -305,6 +321,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     setState(() {
                       _isKicked = false;
                       _isManage = true;
+                      updateGroupList();
                     });
                     Navigator.pop(context);
                   },
@@ -318,13 +335,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   }
 
   // 마지막으로 확인하는 알림 창을 표시
-  Future<bool> _showLastConfirmationDialog(BuildContext context) async {
+  Future<bool> _showLastConfirmationDialog(
+      BuildContext context, bool kickState) async {
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("마지막으로 확인하시겠습니까?"),
-              content: Text("추방하시겠습니까?"),
+              title: Text("마지막으로 확인하겠습니다"),
+              content: (kickState) ? Text("추방하시겠습니까?") : Text("임명하시겠습니까?"),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -345,47 +363,154 @@ class _GroupInfoState extends State<GroupInfoScreen> {
         false; // showDialog의 기본값은 false로 설정
   }
 
+  final TextEditingController _textControllers = TextEditingController();
+
+  bool _isFieldEmpty(TextEditingController controller) {
+    return controller.text.trim().isEmpty;
+  }
+
+  @override
+  void dispose() {
+    _textControllers.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     _initUserState();
+    _loadData();
   }
 
-  // _memberCheckStates 초기화
+  Future<void> _loadData() async {
+    // 일정 시간이 지난 후에 로딩 상태를 변경하여 화면을 업데이트
+    Timer(Duration(milliseconds: 800), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
+  Future<void> _clubGetInfo() async {
+    clubData = await groupSerachforId(widget.clubId);
+    setState(() {});
+    // print(clubData);
+  }
+
+  // // _memberCheckStates 초기화
   void _initializeMemberCheckStates() {
     _memberCheckStates = List.filled(clubData['memberList'].length, false);
   }
 
-  void _memberinitialize(){
-    _member = [];
-    for(var member in clubData['memberList']){
+  void _memberinitialize() {
+    setState(() {
+      _member = [];
+      _memberId = [];
+      for (var member in clubData['memberList']) {
+        if (member['id'] == id) {
+          continue;
+        }
         _member.add(member['name']);
-    }
+        _memberId.add(member['id']);
+      }
+    });
   }
 
-  List<Widget> _makeGroupList(){
-    List<Widget> temp = [];
-    for(int i = 0; i < _member.length; i++)
-        temp.add(_generateMember(context, _member[i], i));
-    return temp;
+  void updateGroupList() {
+    _initializeMemberCheckStates();
+    _memberinitialize();
   }
 
   Future<void> _initUserState() async {
     final secureStorage =
         Provider.of<SecureStorageService>(context, listen: false);
-
+    bool isGroupManager = false;
     id = await secureStorage.readData("id");
     token = await secureStorage.readData("token");
     bool isGroupMember = await userState(id, token);
+    await _clubGetInfo();
 
-    clubData = await groupSerachforId(widget.clubId);
-    
+    if (id == clubData['managerId']) {
+      isGroupManager = true;
+    }
 
     setState(() {
+      _textControllers.clear();
       _isGroupMember = isGroupMember;
-      _initializeMemberCheckStates();
-      _memberinitialize();
+      _isGroupManager = isGroupManager;
+      updateGroupList();
+      print(clubData['book']);
     });
+  }
+
+  Widget _searchWidget(int width, bool where) {
+    return Row(
+      mainAxisAlignment:
+          (where) ? MainAxisAlignment.center : MainAxisAlignment.start,
+      children: [
+        (!where) ? Padding(padding: EdgeInsets.only(left: 20.0)) : Container(),
+        SizedBox(
+          width: ScreenUtil().setWidth(width),
+          child: TextField(
+            controller: _textControllers,
+            decoration: const InputDecoration(
+              hintText: '대표책 선정',
+            ),
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            if (_isFieldEmpty(_textControllers)) {
+              // 검색 x
+              // BookData = [];
+            } else {
+              context.push('/groupbook_select', extra: {
+                "title": _textControllers.text,
+                "clubId": clubData['id'],
+              }).then((result) async {
+                if (result == true) {
+                  await _clubGetInfo();
+                  setState(() {
+                    print(clubData['book']);
+                  });
+                }
+              });
+              _textControllers.clear();
+            }
+            setState(() {});
+          },
+          icon: const Icon(Icons.search),
+        ),
+      ],
+    );
+  }
+
+  Widget _bookWidget() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 20.0, left: 20.0),
+          child: Container(
+            width: ScreenUtil().setWidth(80),
+            height: ScreenUtil().setHeight(105),
+            decoration: ShapeDecoration(
+              image: DecorationImage(
+                // image: NetworkImage(clubData['image']),
+                image: NetworkImage('https://via.placeholder.com/60x86'),
+                fit: BoxFit.fill,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3)),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -421,12 +546,12 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     child: InkWell(
                       onTap: () async {
                         // 회원 가입 동작
-                        print(widget.clubId);
                         String result = await groupJoin(token, widget.clubId);
+                        await _clubGetInfo();
                         if (result == "모임 가입 완료") {
                           setState(() {
                             _isGroupMember = true;
-                            _memberinitialize();
+                            updateGroupList();
                           });
                         }
                       },
@@ -464,253 +589,269 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               }),
             ],
           ),
-          endDrawer: _isGroupMember ? _buildGroupList(context) : null,
+          endDrawer: (_isGroupMember) ? _buildGroupList(context) : null,
           onEndDrawerChanged: _handleDrawerStateChanged,
-          body: Center(
-            child: Column(
-              children: [
-                Container(
-                  // width: ,
-                  height: 295,
-                  decoration: const ShapeDecoration(
-                    color: Color(0xFF0E9913),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(50),
-                        bottomRight: Radius.circular(50),
-                      ),
-                    ),
-                  ),
-                  child: const Column(
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(), // 로딩 애니매이션
+                )
+              : Center(
+                  child: Column(
                     children: [
-                      Padding(
-                        padding: EdgeInsets.all(30.0),
-                        child: Center(
-                          child: SizedBox(
-                            child: Text(
-                              '원씽(The One Thing)',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontFamily: 'Noto Sans KR',
-                                fontWeight: FontWeight.w700,
-                                height: 0.06,
-                              ),
+                      Container(
+                        height: (clubData["book"] == null)
+                            ? ScreenUtil().setHeight(80)
+                            : ScreenUtil().setHeight(170),
+                        width: ScreenUtil().setWidth(390),
+                        decoration: const ShapeDecoration(
+                          color: Color(0xFF0E9913),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(50),
+                              bottomRight: Radius.circular(50),
                             ),
+                          ),
+                        ),
+                        child: Container(
+                            child: (_isGroupManager)
+                                ? (clubData["book"] != null)
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _bookWidget(),
+                                          _searchWidget(100, false),
+                                        ],
+                                      )
+                                    : _searchWidget(280, true)
+                                : (clubData["book"] != null)
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _bookWidget(),
+                                        ],
+                                      )
+                                    : null),
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 38.h,
+                              ),
+                              //과제
+                              Ink(
+                                width: 350.w,
+                                height: 120.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  shadows: const [
+                                    BoxShadow(
+                                      color: Color(0x3F000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () {
+                                    context.push('/homework_list');
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 5.0,
+                                          top: 3.0,
+                                        ),
+                                        child: Text(
+                                          '과제',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontFamily: 'Noto Sans KR',
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Expanded(
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 50.0),
+                                          children:
+                                              _buildTaskList(context, 10, '과제'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 38.h,
+                              ),
+                              //공지사항
+                              Ink(
+                                width: 350.w,
+                                height: 120.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  shadows: const [
+                                    BoxShadow(
+                                      color: Color(0x3F000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () {
+                                    context.push(
+                                      '/notice_list',
+                                      extra: clubData['posts'],
+                                    );
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 5.0,
+                                          top: 3.0,
+                                        ),
+                                        child: Text(
+                                          '공지사항',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontFamily: 'Noto Sans KR',
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Expanded(
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 50.0),
+                                          children: _buildTaskList(
+                                              context, 10, '공지사항'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 38.h,
+                              ),
+                              //게시판
+                              Ink(
+                                width: 350.w,
+                                height: 120.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  shadows: const [
+                                    BoxShadow(
+                                      color: Color(0x3F000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () {
+                                    context.push(
+                                      '/post_list',
+                                      extra: clubData['posts'],
+                                    );
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 5.0,
+                                          top: 3.0,
+                                        ),
+                                        child: Text(
+                                          '게시판',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontFamily: 'Noto Sans KR',
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5.h,
+                                      ),
+                                      Expanded(
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 50.0),
+                                          children: _buildTaskList(
+                                              context, 10, '게시판'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 38.h,
+                              ),
+                              Container(
+                                width: 350.w,
+                                height: 120.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  shadows: const [
+                                    BoxShadow(
+                                      color: Color(0x3F000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 38.h,
-                        ),
-                        //과제
-                        Ink(
-                          width: 350.w,
-                          height: 120.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x3F000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(6),
-                            onTap: () {
-                              context.push('/homework_list');
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.0,
-                                    top: 3.0,
-                                  ),
-                                  child: Text(
-                                    '과제',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontFamily: 'Noto Sans KR',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5.h,
-                                ),
-                                Expanded(
-                                  child: ListView(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    children: _buildTaskList(context, 10, '과제'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 38.h,
-                        ),
-                        //공지사항
-                        Ink(
-                          width: 350.w,
-                          height: 120.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x3F000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(6),
-                            onTap: () {
-                              context.push('/notice_list');
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.0,
-                                    top: 3.0,
-                                  ),
-                                  child: Text(
-                                    '공지사항',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontFamily: 'Noto Sans KR',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5.h,
-                                ),
-                                Expanded(
-                                  child: ListView(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    children:
-                                        _buildTaskList(context, 10, '공지사항'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 38.h,
-                        ),
-                        //게시판
-                        Ink(
-                          width: 350.w,
-                          height: 120.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x3F000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(6),
-                            onTap: () {
-                              context.push('/post_list');
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 5.0,
-                                    top: 3.0,
-                                  ),
-                                  child: Text(
-                                    '게시판',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontFamily: 'Noto Sans KR',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5.h,
-                                ),
-                                Expanded(
-                                  child: ListView(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 50.0),
-                                    children:
-                                        _buildTaskList(context, 10, '게시판'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 38.h,
-                        ),
-                        Container(
-                          width: 350.w,
-                          height: 120.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x3F000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )),
+                )),
     );
   }
 }

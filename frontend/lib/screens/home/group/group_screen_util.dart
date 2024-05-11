@@ -83,7 +83,7 @@ class _GroupListItemState extends State<GroupListItem> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: 7.0.w
+                      horizontal: ScreenUtil().setWidth(7),
                     ),
                     child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,7 +95,7 @@ class _GroupListItemState extends State<GroupListItem> {
                           fontSize: 13.sp
                         )
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: ScreenUtil().setHeight(4)),
                       Text(
                         widget.groupName, 
                         style: TextStyle(
@@ -104,13 +104,13 @@ class _GroupListItemState extends State<GroupListItem> {
                         )
                       ),
                       SizedBox(
-                        height: 3.h
+                        height: ScreenUtil().setHeight(3),
                       ),
                       Row(
                         children: [
                           Icon(
                             Icons.people, 
-                            size: 13.w
+                            size: ScreenUtil().setWidth(13),
                           ), // 인원수 아이콘
                           SizedBox(
                             width: 3.w
@@ -124,7 +124,7 @@ class _GroupListItemState extends State<GroupListItem> {
                         ],
                       ),
                       SizedBox(
-                        height: 3.h
+                        height: ScreenUtil().setHeight(3),
                       ),
                       Text(
                         (widget.publicState == 'PUBLIC') ? '공개':'비공개', 

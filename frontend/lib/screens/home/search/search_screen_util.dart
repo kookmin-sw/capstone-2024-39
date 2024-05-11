@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
-
+import 'package:provider/provider.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/http.dart';
 //검색의 리스트 아이템 템플릿
 
 class SearchListItem extends StatefulWidget {
   final Map<String, dynamic> data;
+  final String type;
+  final int clubId;
 
   const SearchListItem({
     super.key,
     required this.data,
+    required this.type,
+    required this.clubId
   });
 
   @override
@@ -20,17 +26,38 @@ class SearchListItem extends StatefulWidget {
 class _SearchListItemState extends State<SearchListItem> {
   @override
   Widget build(BuildContext context) {
+    final secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     return Column(
       children: [
         Ink(
           width: ScreenUtil().setWidth(370),
           height: ScreenUtil().setHeight(105),
           child: InkWell(
-            onTap: () {
-              context.push(
-                '/book_info',
-                extra: widget.data,
-              );
+            onTap: () async{
+              switch (widget.type) {
+                case "search":
+                var token = await secureStorage.readData("token");
+                  var result = await bookAdd(token, widget.data);
+                  print(result);
+                  if(result == "도서 추가 완료"){ // 새로운 책
+                    
+                  }
+                  else{ //이미 있는 책
+                    await getBookInfo(token, widget.data['isbn']);
+                  }
+                  context.push(
+                    '/book_info',
+                    extra: widget.data,
+                  );
+                  break;
+                case "select":
+                  var token = await secureStorage.readData("token");
+                  String result = await groupBookSelect(token, widget.data, widget.clubId);
+                  if(result == "선정 완료"){
+                    Navigator.pop(context, true);
+                  }
+                  break;
+              }
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,10 +84,12 @@ class _SearchListItemState extends State<SearchListItem> {
                     Container(
                       width: ScreenUtil().setWidth(280),
                       child: Text(
-                        widget.data['title'],
+                        (widget.data['title'].length > 100)?widget.data['title'].substring(0,100) + '...':widget.data['title'],
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: (widget.data['title'].length < 50)? 20:13,
+                          fontSize:
+                              (widget.data['title'].length < 50) ? 20 : 
+                              (widget.data['title'].length < 100)? 15 : 12,
                           fontFamily: 'Noto Sans KR',
                           fontWeight: FontWeight.w700,
                         ),
@@ -72,7 +101,7 @@ class _SearchListItemState extends State<SearchListItem> {
                     Container(
                       width: ScreenUtil().setWidth(280),
                       child: Text(
-                        "${(widget.data['author'] == '')?'저자 미상':widget.data['author']} | ${widget.data['publisher']}",
+                        "${(widget.data['author'] == '') ? '저자 미상' : widget.data['author']} | ${widget.data['publisher']}",
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 11,

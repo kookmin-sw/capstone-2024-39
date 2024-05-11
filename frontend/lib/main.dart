@@ -23,6 +23,7 @@ import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dar
 import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
+import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -54,7 +55,7 @@ final GoRouter router = GoRouter(
         path: '/group_info',
         builder: (context, state) {
           final Map<String, dynamic> groupData =
-            state.extra as Map<String, dynamic>;
+              state.extra as Map<String, dynamic>;
           final int id = groupData['id'] as int;
           final String groupName = groupData['groupName'] as String;
           return GroupInfoScreen(
@@ -62,6 +63,17 @@ final GoRouter router = GoRouter(
             groupName: groupName,
           );
         }),
+    GoRoute(
+      name: 'groupbook_select',
+      path: '/groupbook_select',
+      builder: (context, state) {
+        final Map<String, dynamic> data =
+              state.extra as Map<String, dynamic>;
+        String title = data['title'] as String;
+        int clubId = data['clubId'] as int;
+        return GroupBookSelectScreen(title: title, clubId: clubId,);
+      },
+    ),
     GoRoute(
       name: 'bookreport_template',
       path: '/bookreport_template',
@@ -116,27 +128,45 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'notice_list',
       path: '/notice_list',
-      builder: (context, state) => const NoticeListScreen(),
+      builder: (context, state){
+        List<dynamic> posts = state.extra as List<dynamic>;
+        return NoticeListScreen(
+          posts: posts,
+        );
+      } 
     ),
     GoRoute(
       name: 'post_list',
       path: '/post_list',
-      builder: (context, state) => const PostListScreen(),
+      builder: (context, state){
+        List<dynamic> posts = state.extra as List<dynamic>;
+        return PostListScreen(
+          posts: posts,
+        );
+      }
     ),
     GoRoute(
       name: 'post',
       path: '/post',
       builder: (context, state) {
-        final Map<String, dynamic> extraData =
+        final Map<String, dynamic> extradata =
             state.extra as Map<String, dynamic>;
-        final String postTitle = extraData['title'] as String;
-        final String kindOf = extraData['kindOf'] as String;
-        final String postBody = extraData['body'] as String;
+        // final String postTitle = extraData['title'] as String;
+        // final bool kindOf = extraData['kindOf'] as bool;
+        // final String postBody = extraData['body'] as String;
+        // final List<dynamic> comments = extraData["commentResponseList"] as List<dynamic>;
+        // Map<String, dynamic> data = state.extra as Map<String, dynamic>;
+        final int postId = extradata['postId'] as int;
+        final int clubId = extradata['clubId'] as int;
 
         return PostScreen(
-          title: postTitle,
-          body: postBody,
-          kindOf: kindOf,
+          // title: postTitle,
+          // body: postBody,
+          // kindOf: kindOf,
+          // comments: comments,
+          postId: postId,
+          clubId: clubId,
+          // data: data,
         );
       },
     ),
@@ -157,12 +187,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => BookInfoProvider()),
-          ChangeNotifierProvider(create: (_) => SecureStorageService()),
-          // 다른 프로바이더도 여기에 추가
-        ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => BookInfoProvider()),
+        ChangeNotifierProvider(create: (_) => SecureStorageService()),
+        // 다른 프로바이더도 여기에 추가
+      ],
       child: MaterialApp.router(
         routerConfig: router,
         theme: ThemeData(

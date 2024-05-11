@@ -7,8 +7,7 @@ class SecureStorageService extends ChangeNotifier {
 
   Future<void> saveData(String key, String value) async {
     await _secureStorage.write(key: key, value: value);
-    print(value);
-    notifyListeners(); // 데이터가 변경되었음을 Provider에 알립니다.
+    notifyListeners();
   }
 
   Future<String?> readData(String key) async {

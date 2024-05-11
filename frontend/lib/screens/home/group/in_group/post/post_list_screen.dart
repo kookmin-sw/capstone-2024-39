@@ -6,18 +6,9 @@ import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 
 //게시글 목록 페이지
 
-List<String> Test_post = ['연습1', '연습2', '연습3'];
-List<String> R_data = [];
-
-
-Future<List<String>> fetchDataFromDatabase() async {
-  return ['route1', 'route2', 'route3'];
-}
-
-List<Widget> _buildPostListView(BuildContext context, List<String> postTitles) {
+List<Widget> _buildPostListView(BuildContext context, List<dynamic> Postdata) {
   List<Widget> items = [];
-
-  for (String postTitle in postTitles) {
+  for (Map<String, dynamic> post in Postdata) {
     items.add(
       Column(
         children: [
@@ -26,27 +17,40 @@ List<Widget> _buildPostListView(BuildContext context, List<String> postTitles) {
             width: double.infinity,
             child: Ink(
               child: InkWell(
-                onTap: (){
-                  context.push(
-                    '/post',
-                    extra: {
-                      'title': postTitle,
-                      'kindOf': '게시판',
-                      'body': postTitle,
-                    }
-                  );
+                onTap: () {
+                  context.push('/post', extra: {
+                    "postId": post['id'],
+                    "clubId": post['clubId'],
+                  });
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    postTitle,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'Noto Sans KR',
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.17,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        post['title'],
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Noto Sans KR',
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.17,
+                        ),
+                      ),
                     ),
-                  ),
+                    (post['isSticky'])
+                        ? Padding(
+                          padding: const EdgeInsets.only(
+                            left: 10.0),
+                          child: Text(
+                              '공지사항',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                        )
+                        : Container(),
+                  ],
                 ),
               ),
             ),
@@ -68,10 +72,12 @@ List<Widget> _buildPostListView(BuildContext context, List<String> postTitles) {
   return items;
 }
 
-
-
 class PostListScreen extends StatefulWidget {
-  const PostListScreen({super.key});
+  final List<dynamic> posts;
+  const PostListScreen({
+    super.key,
+    required this.posts,
+  });
 
   @override
   State<PostListScreen> createState() => _PostListScreenState();
@@ -99,7 +105,7 @@ class _PostListScreenState extends State<PostListScreen> {
         ),
         body: SingleChildScrollView(
           child: Column(
-            children: _buildPostListView(context,Test_post),
+            children: _buildPostListView(context, widget.posts),
           ),
         ),
       ),
