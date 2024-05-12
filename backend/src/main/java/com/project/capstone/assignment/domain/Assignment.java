@@ -2,6 +2,7 @@ package com.project.capstone.assignment.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.project.capstone.assignment.controller.dto.CreateAssignmentRequest;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.content.domain.Content;
 import jakarta.persistence.*;
@@ -38,4 +39,8 @@ public class Assignment {
     @JsonBackReference
     @ManyToOne
     private Club club;
+
+    public Assignment(CreateAssignmentRequest request, Club club) {
+        this(null, request.name(), request.startDate(), request.endDate(), new ArrayList<>(), club);
+    }
 }
