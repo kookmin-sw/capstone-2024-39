@@ -1,5 +1,9 @@
 package com.project.capstone.content.service;
 
+import com.project.capstone.assignment.domain.Assignment;
+import com.project.capstone.assignment.domain.AssignmentRepository;
+import com.project.capstone.assignment.exception.AssignmentException;
+import com.project.capstone.assignment.exception.AssignmentExceptionType;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
 import com.project.capstone.book.exception.BookException;
@@ -29,6 +33,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.project.capstone.assignment.exception.AssignmentExceptionType.ASSIGNMENT_NOT_FOUND;
+import static com.project.capstone.assignment.exception.AssignmentExceptionType.NOT_EXIST_BOOK;
 import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.club.exception.ClubExceptionType.CLUB_NOT_FOUND;
 import static com.project.capstone.content.exception.ContentExceptionType.CONTENT_NOT_FOUND;
@@ -44,8 +50,9 @@ public class ContentService {
     private final BookRepository bookRepository;
     private final ClubRepository clubRepository;
     private final MemberRepository memberRepository;
+    private final AssignmentRepository assignmentRepository;
 
-    public void createContent(String userId, ContentCreateRequest request, Long clubId) {
+    public void createContent(String userId, ContentCreateRequest request, Long clubId, Long asId) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
@@ -62,7 +69,22 @@ public class ContentService {
             club = clubRepository.findClubById(clubId).orElseThrow(
                     () -> new ClubException(CLUB_NOT_FOUND)
             );
+            if (club.getBook() == null) {
+                throw new AssignmentException(NOT_EXIST_BOOK);
+            }
         }
+
+        Assignment assignment;
+        if (asId == null) {
+            assignment = null;
+        }
+        else {
+            assignment = assignmentRepository.findAssignmentById(asId).orElseThrow(
+                    () -> new AssignmentException(ASSIGNMENT_NOT_FOUND)
+            );
+        }
+
+
         Content saved = contentRepository.save(
                 Content.builder()
                         .type(request.contentType())
@@ -77,6 +99,9 @@ public class ContentService {
 
         member.getContents().add(saved);
         book.getContents().add(saved);
+        if (assignment != null) {
+            assignment.getContents().add(saved);
+        }
         if (club != null) {
             club.getContents().add(saved);
         }

@@ -1,7 +1,9 @@
 package com.project.capstone.club.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.project.capstone.assignment.domain.Assignment;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.club.controller.dto.ClubCreateRequest;
 import com.project.capstone.memberclub.domain.MemberClub;
@@ -60,13 +62,18 @@ public class Club {
     @OneToMany(mappedBy = "club")
     private List<Quiz> quizzes = new ArrayList<>();
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "club")
+    private List<Assignment> assignments = new ArrayList<>();
+
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
 
     public Club(ClubCreateRequest request, UUID memberId) {
         this(null, memberId, request.topic(), request.name(), null, request.maximum(), request.publicStatus(), request.password(),
-                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
     }
 
 }
