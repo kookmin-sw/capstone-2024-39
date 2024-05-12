@@ -21,7 +21,7 @@ import java.util.List;
 public class Assignment {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -34,7 +34,7 @@ public class Assignment {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "assignment")
-    List<Content> contentList = new ArrayList<>();
+    List<Content> contents = new ArrayList<>();
 
     @JsonBackReference
     @ManyToOne
