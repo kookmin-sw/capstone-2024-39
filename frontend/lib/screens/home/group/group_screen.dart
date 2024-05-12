@@ -78,7 +78,13 @@ class _GroupState extends State<GroupScreen> {
                       },
                       child: Text('${j + 1}'),
                     ),
-                    Text(Thema[j]),
+                    Text(
+                      Thema[j],
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),
