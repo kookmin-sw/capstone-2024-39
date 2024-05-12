@@ -31,7 +31,9 @@ public class AssignmentService {
         if (!club.getManagerId().toString().equals(userId)) {
             throw new ClubException(UNAUTHORIZED_ACTION);
         }
-        assignmentRepository.save(new Assignment(request, club));
+        Assignment saved = assignmentRepository.save(new Assignment(request, club));
+
+        club.getAssignments().add(saved);
     }
 
 
@@ -39,7 +41,7 @@ public class AssignmentService {
         Club club = clubRepository.findClubById(clubId).orElseThrow(
                 () -> new ClubException(CLUB_NOT_FOUND)
         );
-        List<Assignment> assignmentsByClub = assignmentRepository.findAssignmentsByClub(club);
+        List<Assignment> assignmentsByClub = club.getAssignments();
         List<AssignmentResponse> assignmentResponseList = new ArrayList<>();
         for (Assignment assignment : assignmentsByClub) {
             assignmentResponseList.add(new AssignmentResponse(assignment));

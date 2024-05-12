@@ -64,7 +64,7 @@ public class Club {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "club")
-    private List<Assignment> assignmentList = new ArrayList<>();
+    private List<Assignment> assignments = new ArrayList<>();
 
     @JsonBackReference
     @ManyToOne

@@ -24,7 +24,7 @@ public record ClubResponse (
         LocalDateTime createdAt,
         int maximum,
         int memberCnt,
-        int password,
+        Integer password,
         PublicStatus publicstatus,
         List<PostResponse> posts,
         List<SimpleMemberResponse> memberList
@@ -32,7 +32,7 @@ public record ClubResponse (
 ) {
     public ClubResponse(Club club) {
         this(club.getId(), club.getBook() == null ? null : createBookResponse(club.getBook()), club.getManagerId(), club.getTopic(), club.getName(), club.getCreatedAt(), club.getMaximum(),
-                club.getMembers().size(), club.getPassword(), club.getPublicStatus(), createPostResponseList(club.getPosts()), createSimpleMemberResponse(club.getMembers()));
+                club.getMembers().size(), club.getPassword() == null ? null : club.getPassword(), club.getPublicStatus(), createPostResponseList(club.getPosts()), createSimpleMemberResponse(club.getMembers()));
     }
 
     private static List<PostResponse> createPostResponseList(List<Post> postList) {
