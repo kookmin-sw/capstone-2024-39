@@ -89,7 +89,6 @@ public class ContentService {
                         .member(member)
                         .book(book)
                         .club(club)
-                        .assignment(assignment)
                         .build()
         );
 
