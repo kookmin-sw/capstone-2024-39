@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
@@ -91,26 +90,11 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                 },
               ),
               const SizedBox(height: 16.0),
-              // 대표 책 설정 - 모임 화면에서 설정하도록 회의
-              // TextField(
-              //   controller: _textControllers[1],
-              //   decoration: InputDecoration(
-              //     labelText: '대표 책',
-              //     hintText: '대표책',
-              //   ),
-              //   onChanged: (value){
-              //     setState(() {
-              //       _enableCreateGroup[1] = !_isFieldEmpty(_textControllers[1]);
-              //     });
-              //   },
-              // ),
-              // SizedBox(height: 16.0),
-              // 모임 주제
               DropdownButtonFormField(
                 decoration: const InputDecoration(
                   labelText: '모임 주제',
                 ),
-                items: Thema.map((theme) => DropdownMenuItem(
+                items: realThema.map((theme) => DropdownMenuItem(
                       value: theme,
                       child: Text(theme),
                     )).toList(),
@@ -139,14 +123,15 @@ class _GroupMakeState extends State<GroupMakeScreen> {
               const SizedBox(height: 16.0),
               // 공개 비공개 여부
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text('Public'),
-                  CupertinoSwitch(
-                    value: _isPublic[0],
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
+                  // const Text('Public'),
+                  // CupertinoSwitch(
+                  //   value: _isPublic[0],
+                  //   onChanged: (value) {
+                  //     setState(() {});
+                  //   },
+                  // ),
                   ToggleButtons(
                     isSelected: _isPublic,
                     borderRadius: BorderRadius.circular(10),
@@ -227,7 +212,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                         }
 
                         if (result.toString() == "모임 생성 완료") {
-                          context.pop();
+                          context.pop(true);
                         } else {
                           // 모임 생성 실패시 코드 작성
                         }

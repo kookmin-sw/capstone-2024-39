@@ -9,6 +9,7 @@ import 'package:frontend/screens/home/group/group_screen_util.dart'
     as GroupUtil;
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 List<dynamic> BookData = [];
 List<dynamic> GroupData = [];
@@ -24,25 +25,56 @@ class SearchScreen extends StatefulWidget {
 class _SearchState extends State<SearchScreen> {
   final TextEditingController _textControllers = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  var secureStorage;
+  var userInfo;
+  bool _isLoading = true;
 
   void _SearchData(String text) async {
     BookData = await SearchBook(text);
     GroupData = await groupSerachforBook(text);
-    setState(() {});
+    setState(() {
+      _isLoading = true;
+      _loadData(700);
+      check = true;
+    });
   }
 
   bool _isFieldEmpty(TextEditingController controller) {
     return controller.text.trim().isEmpty;
   }
 
+  Future<void> _initUserState() async {
+    try {
+      var id = await secureStorage.readData('id');
+      var token = await secureStorage.readData('token');
+      var _userInfo = await getUserInfo(id, token);
+      setState(() {
+        userInfo = _userInfo;
+      });
+    } catch (e) {
+      setState(() {
+        userInfo = null;
+      });
+    }
+  }
+
   void initiate() {
     //초기화 함수
     _scrollController.addListener(() {});
+    _initUserState();
     setState(() {
       BookData = [];
       GroupData = [];
       _textControllers.clear();
       check = false;
+    });
+  }
+
+  Future<void> _loadData(int term) async {
+    Timer(Duration(milliseconds: term), () {
+      setState(() {
+        _isLoading = false;
+      });
     });
   }
 
@@ -52,17 +84,17 @@ class _SearchState extends State<SearchScreen> {
     _scrollController.dispose();
     super.dispose();
   }
-  
+
   @override
   void initState() {
     super.initState();
+    secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     initiate();
+    _loadData(300);
   }
 
   @override
   Widget build(BuildContext context) {
-    final secureStorage =
-        Provider.of<SecureStorageService>(context, listen: false); 
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => Scaffold(
@@ -80,7 +112,11 @@ class _SearchState extends State<SearchScreen> {
           ),
           centerTitle: true,
         ),
-        body: Center(
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(), // 로딩 애니매이션
+              )
+            : Center(
           child: Column(
             children: [
               Container(
@@ -95,39 +131,59 @@ class _SearchState extends State<SearchScreen> {
                   ),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: ScreenUtil().setWidth(280),
-                            child: TextField(
-                              controller: _textControllers,
-                              decoration: const InputDecoration(
-                                hintText: '검색어',
-                              ),
-                              onChanged: (value) {
-                                setState(() {});
+                      Container(
+                        margin:
+                            EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w),
+                        padding: EdgeInsets.only(left: 10.w),
+                        height: ScreenUtil().setHeight(40),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF2F2F2),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                if (_isFieldEmpty(_textControllers)) {
+                                  // 검색 x
+                                  // BookData = [];
+                                } else {
+                                  _SearchData(_textControllers.text);
+                                  _scrollController.animateTo(0,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut);
+                                }
                               },
+                              icon: const Icon(Icons.search),
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              if (_isFieldEmpty(_textControllers)) {
-                                // 검색 x
-                                // BookData = [];
-                              } else {
-                                _SearchData(_textControllers.text);
-                                _scrollController.animateTo(0,
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.easeInOut);
-                                setState(() {
-                                  check = true;
-                                });
-                              }
-                            },
-                            icon: const Icon(Icons.search),
-                          )
-                        ],
+                            SizedBox(
+                              width: ScreenUtil().setWidth(260),
+                              child: TextField(
+                                controller: _textControllers,
+                                decoration: const InputDecoration(
+                                  hintText: '책 제목을 검색해주세요',
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                onSubmitted: (value) {
+                                  if (_isFieldEmpty(_textControllers)) {
+                                    // 검색 x
+                                    // BookData = [];
+                                  } else {
+                                    _SearchData(_textControllers.text);
+                                    _scrollController.animateTo(0,
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut);
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   )),
@@ -140,9 +196,8 @@ class _SearchState extends State<SearchScreen> {
                       if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
                       ElevatedButton(
                         onPressed: () async {
-                          dynamic userInfo = await login(
-                              "test13@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                          // dynamic userInfo = await singup("test16@gmail.com", "랑데부", 24, "남자");
+                          dynamic userInfo = await login("test13@gmail.com");
+                          // dynamic userInfo = await singup("test13@gmail.com", "한지민", 30, "여자");
                           print(userInfo['token']);
                           print(userInfo['id']);
                           await secureStorage.saveData(
@@ -153,9 +208,20 @@ class _SearchState extends State<SearchScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () async {
-                          dynamic userInfo = await login(
-                              "test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                          // dynamic userInfo = await singup("test16@gmail.com", "랑데부", 24, "남자");
+                          dynamic userInfo = await login("test80@gmail.com"); 
+                          // dynamic userInfo = await singup("test80@gmail.com", "젠랑이", 7, "남자");
+                          print(userInfo['token']);
+                          print(userInfo['id']);
+                          await secureStorage.saveData(
+                              "token", userInfo['token']);
+                          await secureStorage.saveData("id", userInfo['id']);
+                        },
+                        child: Text('젠랑이'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          dynamic userInfo = await login("test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                          // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
                           print(userInfo['token']);
                           print(userInfo['id']);
                           await secureStorage.saveData(
@@ -188,13 +254,11 @@ class _SearchState extends State<SearchScreen> {
                             itemCount: GroupData.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: GroupUtil.GroupListItem(
-                                  id: GroupData[index]['id'],
-                                  groupName: GroupData[index]['name'],
-                                  groupCnt: GroupData[index]['maximum'],
-                                  publicState: GroupData[index]['publicStatus'],
-                                  topic: GroupData[index]['topic'],
+                                  data: GroupData[index],
+                                  userInfo: userInfo,
                                 ),
                               );
                             },

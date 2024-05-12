@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
-import 'package:frontend/provider/grouplist_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
@@ -24,6 +23,9 @@ import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart'
 import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
 import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/make_post/post_make_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/make_post/homework_make_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/homework_memberlist_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -67,11 +69,13 @@ final GoRouter router = GoRouter(
       name: 'groupbook_select',
       path: '/groupbook_select',
       builder: (context, state) {
-        final Map<String, dynamic> data =
-              state.extra as Map<String, dynamic>;
+        final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
         String title = data['title'] as String;
         int clubId = data['clubId'] as int;
-        return GroupBookSelectScreen(title: title, clubId: clubId,);
+        return GroupBookSelectScreen(
+          title: title,
+          clubId: clubId,
+        );
       },
     ),
     GoRoute(
@@ -123,50 +127,89 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'homework_list',
       path: '/homework_list',
-      builder: (context, state) => const HomeworkListScreen(),
+      builder: (context, state) {
+        Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+        int clubId = extraData['clubId'] as int;
+        String managerId = extraData['managerId'] as String;
+        return HomeworkListScreen(
+          clubId: clubId,
+          managerId: managerId,
+        );
+      },
     ),
     GoRoute(
-      name: 'notice_list',
-      path: '/notice_list',
-      builder: (context, state){
-        List<dynamic> posts = state.extra as List<dynamic>;
-        return NoticeListScreen(
-          posts: posts,
-        );
-      } 
-    ),
+        name: 'notice_list',
+        path: '/notice_list',
+        builder: (context, state) {
+          Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+          int clubId = extraData['clubId'] as int;
+          String managerId = extraData['managerId'] as String;
+          return NoticeListScreen(
+            clubId: clubId,
+            managerId: managerId,
+          );
+        }),
     GoRoute(
-      name: 'post_list',
-      path: '/post_list',
-      builder: (context, state){
-        List<dynamic> posts = state.extra as List<dynamic>;
-        return PostListScreen(
-          posts: posts,
-        );
-      }
-    ),
+        name: 'post_list',
+        path: '/post_list',
+        builder: (context, state) {
+          Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+          int clubId = extraData['clubId'] as int;
+          String managerId = extraData['managerId'] as String;
+          return PostListScreen(
+            clubId: clubId,
+            managerId: managerId,
+          );
+        }),
     GoRoute(
       name: 'post',
       path: '/post',
       builder: (context, state) {
         final Map<String, dynamic> extradata =
             state.extra as Map<String, dynamic>;
-        // final String postTitle = extraData['title'] as String;
-        // final bool kindOf = extraData['kindOf'] as bool;
-        // final String postBody = extraData['body'] as String;
-        // final List<dynamic> comments = extraData["commentResponseList"] as List<dynamic>;
-        // Map<String, dynamic> data = state.extra as Map<String, dynamic>;
         final int postId = extradata['postId'] as int;
         final int clubId = extradata['clubId'] as int;
-
         return PostScreen(
-          // title: postTitle,
-          // body: postBody,
-          // kindOf: kindOf,
-          // comments: comments,
           postId: postId,
           clubId: clubId,
-          // data: data,
+        );
+      },
+    ),
+    GoRoute(
+      name: 'post_make',
+      path: '/post_make',
+      builder: (context, state) {
+        final Map<String, dynamic> extradata =
+            state.extra as Map<String, dynamic>;
+        int clubId = extradata['clubId'] as int;
+        String managerId = extradata['managerId'] as String;
+        return PostMakeScreen(
+          clubId: clubId,
+          managerId: managerId,
+        );
+      },
+    ),
+    GoRoute(
+      name: 'homework_make',
+      path: '/homework_make',
+      builder: (context, state){
+        int clubId = state.extra as int;
+        return HomeworkMakeScreen(
+          clubId: clubId,
+        );
+      },
+    ),
+    GoRoute(
+      name: 'homeworkmember_make',
+      path: '/homeworkmember_make',
+      builder: (context, state){
+        final Map<String, dynamic> extradata =
+            state.extra as Map<String, dynamic>;
+        int clubId = extradata['clubId'] as int;
+        Map<String,dynamic> post = extradata['post'] as Map<String,dynamic>;
+        return HomeworkMemberlistScreen(
+          clubId: clubId,
+          post: post,
         );
       },
     ),

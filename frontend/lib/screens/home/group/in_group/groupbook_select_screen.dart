@@ -46,7 +46,7 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
           title: const Text(
-            '검색',
+            '대표책 검색',
             style: TextStyle(
               color: Colors.white,
               fontSize: 25,
@@ -59,17 +59,6 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
         body: Center(
           child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                height: ScreenUtil().setHeight(80),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF0E9913),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
-                  ),
-                ),
-              ),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -81,6 +70,8 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
                       if(BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)
                           SearchUtil.SearchListItem(data: BookData[i], type: "select", clubId: widget.clubId,),
+                      if(BookData.isEmpty)
+                        const Text('검색된 책이 없습니다.'),
                     ],
                   ),
                 ),
