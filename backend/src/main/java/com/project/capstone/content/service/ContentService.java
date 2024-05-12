@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.project.capstone.assignment.exception.AssignmentExceptionType.ASSIGNMENT_NOT_FOUND;
+import static com.project.capstone.assignment.exception.AssignmentExceptionType.NOT_EXIST_BOOK;
 import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.club.exception.ClubExceptionType.CLUB_NOT_FOUND;
 import static com.project.capstone.content.exception.ContentExceptionType.CONTENT_NOT_FOUND;
@@ -68,6 +69,9 @@ public class ContentService {
             club = clubRepository.findClubById(clubId).orElseThrow(
                     () -> new ClubException(CLUB_NOT_FOUND)
             );
+            if (club.getBook() == null) {
+                throw new AssignmentException(NOT_EXIST_BOOK);
+            }
         }
 
         Assignment assignment;
@@ -79,6 +83,7 @@ public class ContentService {
                     () -> new AssignmentException(ASSIGNMENT_NOT_FOUND)
             );
         }
+
 
         Content saved = contentRepository.save(
                 Content.builder()
