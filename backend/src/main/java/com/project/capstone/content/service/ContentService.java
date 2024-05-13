@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.project.capstone.assignment.exception.AssignmentExceptionType.ASSIGNMENT_NOT_FOUND;
-import static com.project.capstone.assignment.exception.AssignmentExceptionType.NOT_EXIST_BOOK;
+import static com.project.capstone.assignment.exception.AssignmentExceptionType.*;
 import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.club.exception.ClubExceptionType.CLUB_NOT_FOUND;
 import static com.project.capstone.content.exception.ContentExceptionType.CONTENT_NOT_FOUND;
@@ -82,6 +81,9 @@ public class ContentService {
             assignment = assignmentRepository.findAssignmentById(asId).orElseThrow(
                     () -> new AssignmentException(ASSIGNMENT_NOT_FOUND)
             );
+            if (!assignment.getAssignmentType().toString().equals(request.contentType().toString())) {
+                throw new AssignmentException(NOT_MATCH_TYPE);
+            }
         }
 
 
@@ -94,6 +96,7 @@ public class ContentService {
                         .member(member)
                         .book(book)
                         .club(club)
+                        .assignment(assignment)
                         .build()
         );
 
