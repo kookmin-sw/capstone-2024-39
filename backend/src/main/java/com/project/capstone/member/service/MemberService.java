@@ -64,4 +64,21 @@ public class MemberService {
         member.getMyBooks().add(saved);
         book.getMembersAddThisBook().add(saved);
     }
+
+    public void addMyBooks(String userId, List<AddBookRequest> requests, String groupName) {
+        Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
+                () -> new MemberException(MEMBER_NOT_FOUND)
+        );
+        for (AddBookRequest request : requests) {
+            Book book = bookRepository.findBookByIsbn(request.isbn()).orElseGet(
+                    () -> bookRepository.save(new Book(request))
+            );
+            if (myBookRepository.findMyBookByMemberAndBook(member, book).isPresent()) {
+                throw new MyBookException(ALREADY_EXIST_MYBOOK);
+            }
+            MyBook saved = myBookRepository.save(new MyBook(null, groupName, member, book));
+            member.getMyBooks().add(saved);
+            book.getMembersAddThisBook().add(saved);
+        }
+    }
 }

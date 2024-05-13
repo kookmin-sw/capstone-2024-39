@@ -40,4 +40,11 @@ public class MemberController {
         memberService.addMyBook(details.getUserId(), request, groupName);
         return ResponseEntity.ok().body("추가 완료");
     }
+
+    @PostMapping("/my-book/adds")
+    public ResponseEntity<?> addMyBooks(@AuthenticationPrincipal PrincipalDetails details,
+                                        @RequestBody List<AddBookRequest> requests, @RequestParam String groupName) {
+        memberService.addMyBooks(details.getUserId(), requests, groupName);
+        return ResponseEntity.ok().body("추가 완료");
+    }
 }
