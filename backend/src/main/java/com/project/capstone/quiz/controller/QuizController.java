@@ -20,8 +20,8 @@ public class QuizController {
     @PostMapping("/create")
     public ResponseEntity<?> createQuiz(@AuthenticationPrincipal PrincipalDetails details,
                                         @RequestBody CreateQuizRequest request,
-                                        @RequestParam Long bookId, @RequestParam(required = false) Long clubId) {
-        quizService.createQuiz(details.getUserId(), request, bookId, clubId);
+                                        @RequestParam(required = false) Long clubId, @RequestParam(required = false) Long asId) {
+        quizService.createQuiz(details.getUserId(), request, clubId, asId);
         return ResponseEntity.ok().body("퀴즈 생성 완료");
     }
 

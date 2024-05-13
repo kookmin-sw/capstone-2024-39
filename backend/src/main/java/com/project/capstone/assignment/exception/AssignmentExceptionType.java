@@ -10,7 +10,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @AllArgsConstructor
 public enum AssignmentExceptionType implements ExceptionType {
     ASSIGNMENT_NOT_FOUND(NOT_FOUND, 601, "해당 과제를 찾을 수 없습니다."),
-    NOT_EXIST_BOOK(BAD_REQUEST, 602, "대표책이 지정되지 않았습니다.")
+    NOT_EXIST_BOOK(BAD_REQUEST, 602, "대표책이 지정되지 않았습니다."),
+    NOT_MATCH_TYPE(BAD_REQUEST, 603, "과제 타입이 서로 맞지 않습니다.")
     ;
 
 

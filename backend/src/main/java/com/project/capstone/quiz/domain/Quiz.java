@@ -1,6 +1,7 @@
 package com.project.capstone.quiz.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.project.capstone.assignment.domain.Assignment;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.member.domain.Member;
@@ -44,5 +45,9 @@ public class Quiz {
     @JsonBackReference
     @ManyToOne
     private Club club;
+
+    @JsonBackReference
+    @ManyToOne
+    private Assignment assignment;
 
 }

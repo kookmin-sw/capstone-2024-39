@@ -31,6 +31,7 @@ public class AssignmentService {
         if (!club.getManagerId().toString().equals(userId)) {
             throw new ClubException(UNAUTHORIZED_ACTION);
         }
+        log.info(String.valueOf(request.type()));
         Assignment saved = assignmentRepository.save(new Assignment(request, club));
 
         club.getAssignments().add(saved);
