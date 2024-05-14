@@ -13,9 +13,12 @@ import com.project.capstone.content.exception.ContentException;
 import com.project.capstone.quiz.controller.dto.QuizResponse;
 import com.project.capstone.quiz.domain.Quiz;
 import com.project.capstone.quiz.domain.QuizRepository;
+import com.project.capstone.recommend.controller.dto.EmbeddingRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +34,30 @@ public class BookService {
     private final BookRepository bookRepository;
     private final QuizRepository quizRepository;
     private final ContentRepository contentRepository;
+    private static final String EMBEDDING_MODEL = "text-embedding-3-small";
+
+    @Value("${openai.key}")
+    private String key;
     public void addBook(AddBookRequest request) {
         if (bookRepository.findBookByIsbn(request.isbn()).isPresent()) {
             throw new BookException(ALREADY_EXIST_BOOK);
         }
         bookRepository.save(new Book(request));
 
+        WebClient webClient = WebClient.builder().build();
+        String url = "https://api.openai.com/v1/embeddings";
+
+        EmbeddingRequest embeddingRequest = new EmbeddingRequest("오늘 샌드위치 개 맛있다.", EMBEDDING_MODEL);
+        String res = webClient.post()
+                .uri(url)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + key)
+                .bodyValue(embeddingRequest)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        log.info(res);
     }
 
     public BookResponse getBookByIsbn(String isbn) {

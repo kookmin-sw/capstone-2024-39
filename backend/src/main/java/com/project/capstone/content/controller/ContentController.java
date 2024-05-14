@@ -28,14 +28,14 @@ public class ContentController {
     }
 
     // 단일 컨텐츠 조회
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<ContentResponse> getContent(@PathVariable Long id) {
         ContentResponse contentResponse = contentService.getContent(id);
         return ResponseEntity.ok().body(contentResponse);
     }
 
     // 컨텐츠 종류별 조회
-    @GetMapping("/get")
+    @GetMapping("/search/get")
     public ResponseEntity<List<ContentResponse>> getContents(@RequestParam String type, @RequestParam Long clubId) {
         List<ContentResponse> contentResponseList = contentService.getContents(type, clubId);
         return ResponseEntity.ok().body(contentResponseList);
