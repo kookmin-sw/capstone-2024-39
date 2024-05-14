@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,37 +14,6 @@ class MypageScreen extends StatefulWidget {
   @override
   // ignore: library_private_types_in_public_api
   _MypageScreenState createState() => _MypageScreenState();
-}
-
-class Book {
-  final String title;
-  final String author;
-  final String publisher;
-  final String startDate;
-  final String endDate;
-  final String type;
-  final String imageUrl;
-
-  Book({
-    required this.title,
-    required this.author,
-    required this.publisher,
-    required this.startDate,
-    required this.endDate,
-    required this.type,
-    required this.imageUrl,
-  });
-
-  //   factory Book.fromJson(Map<String, dynamic> json) {
-  //   return Book(
-  //     id: json['id'] as int,
-  //     writer: json['writer'] as String,
-  //     clubId: json['clubId'] as int,
-  //     title: json['title'] as String,
-  //     body: json['body'] as String,
-  //     isSticky: json['isSticky'] as bool,
-  //   );
-  // }
 }
 
 class Library {
@@ -70,7 +40,7 @@ class _MypageScreenState extends State<MypageScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  List<Book> books = [];
+  var books = [];
 
   List<Library> libraries = [
     Library(
@@ -124,12 +94,12 @@ class _MypageScreenState extends State<MypageScreen>
   var id;
   var token;
   var isLogin;
+  var userInfo;
 
   @override
   void initState() {
     super.initState();
     _initUserState();
-    // _initBookState();
     _tabController = TabController(length: 2, vsync: this);
     books.sort((a, b) => a.endDate.compareTo(b.endDate));
   }
@@ -138,26 +108,17 @@ class _MypageScreenState extends State<MypageScreen>
     final secureStorage =
         Provider.of<SecureStorageService>(context, listen: false);
     token = await secureStorage.readData("token");
+    id = await secureStorage.readData("id");
     print(token);
     if (token == null) {
       isLogin = false;
     } else {
       isLogin = true;
+      userInfo = await getUserInfo(id, token);
+      books = userInfo['contentList'];
+      print(books);
     }
   }
-
-// Future<void> _initBookState() async {
-//   final secureStorage =
-//       Provider.of<SecureStorageService>(context, listen: false);
-//   id = await secureStorage.readData("id");
-//   token = await secureStorage.readData("token");
-//   Map<String, dynamic> userInfo = await getUserInfo(id, token);
-//   if (userInfo.containsKey("contentList")) {
-//     books = List<Book>.from(userInfo["contentList"].map((bookJson) => Book.fromJson(bookJson)));
-//   } else {
-//     books = []; // Handle case when "postList" is not present or is empty
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
@@ -233,6 +194,10 @@ class LoggedWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    Icon(
+                      Icons.account_circle,
+                      size: 70.w,
+                    ),
                     SizedBox(width: 16.w),
                     Text(
                       name,
@@ -251,8 +216,15 @@ class LoggedWidget extends StatelessWidget {
   }
 }
 
-class LoginWidget extends StatelessWidget {
+class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
+
+  @override
+  _LoginWidgetState createState() => _LoginWidgetState();
+}
+
+class _LoginWidgetState extends State<LoginWidget> {
+  dynamic userInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +252,6 @@ class LoginWidget extends StatelessWidget {
               SizedBox(width: 76.w),
               ElevatedButton(
                 onPressed: () {
-                  //context.push('/login');
                   signInWithGoogle(context);
                 },
                 child: const Text('로그인'),
@@ -292,31 +263,32 @@ class LoginWidget extends StatelessWidget {
       ),
     );
   }
-}
 
-void signInWithGoogle(BuildContext context) async {
-  final secureStorage =
-      Provider.of<SecureStorageService>(context, listen: false);
-  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  void signInWithGoogle(BuildContext context) async {
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false);
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-  if (googleUser != null) {
-    // print('name = ${googleUser.displayName}');
-    // print('email = ${googleUser.email}');
-    // print('id = ${googleUser.id}');
-    dynamic userInfo = await login(googleUser.email);
-    await secureStorage.saveData('userID', googleUser.email);
-    if (userInfo['token'] == null) {
-      context.push('/signup');
+    if (googleUser != null) {
+      print('name = ${googleUser.displayName}');
+      print('email = ${googleUser.email}');
+      print('id = ${googleUser.id}');
+
+      userInfo = await login(googleUser.email);
+      await secureStorage.saveData('userID', googleUser.email);
+      print(userInfo);
+      if (userInfo['exceptionCode'] != null) {
+        print('진입');
+        await context.push('/signup');
+      }
+      await secureStorage.saveData("token", userInfo['token']);
+      await secureStorage.saveData("id", userInfo['id']);
     }
-    print(userInfo['token']);
-    print(userInfo['id']);
-    await secureStorage.saveData("token", userInfo['token']);
-    await secureStorage.saveData("id", userInfo['id']);
   }
 }
 
 class BookReportWidget extends StatelessWidget {
-  final List<Book> books;
+  final List<dynamic> books;
 
   const BookReportWidget({super.key, required this.books});
 

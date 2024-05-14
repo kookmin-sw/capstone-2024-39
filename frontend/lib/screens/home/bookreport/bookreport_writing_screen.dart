@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
+    as searchutil;
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -39,10 +41,12 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _answerController3 = TextEditingController();
   final TextEditingController _answerController4 = TextEditingController();
   var token;
-
-  // Predefined values for author and publisher
-  final String _author = "작가";
-  final String _publisher = "출판사";
+  List<dynamic> BookData = [];
+  String _author = "작가";
+  String _publisher = "출판사";
+  String _isbn = "";
+  String _publisherDate = "";
+  String _imageUrl = "";
 
   late final _KeyboardVisibilityObserverWrapper
       _keyboardVisibilityObserverWrapper;
@@ -146,6 +150,48 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                           hintText: '도서를 입력하세요.',
                           border: InputBorder.none,
                         ),
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) async {
+                          BookData =
+                              await SearchBook(_bookTitleController.text);
+                          showDialog(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('도서 검색 결과'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      for (int i = 0; i < BookData.length; i++)
+                                        searchutil.BookSearchListItem(
+                                          data: BookData[i],
+                                          type: "search",
+                                          clubId: 0,
+                                          onSelected: (selectedData) {
+                                            print(
+                                                'Selected Data: $selectedData');
+                                            _bookTitleController.text =
+                                                selectedData['title'];
+                                            setState(() {
+                                              _author = selectedData['author'];
+                                              _publisher =
+                                                  selectedData['publisher'];
+                                            });
+                                            _isbn = selectedData['isbn'];
+                                            _publisherDate =
+                                                selectedData['pubdate'];
+                                            _imageUrl = selectedData['image'];
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -157,7 +203,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  Text('$_author | $_publisher',
+                  Text('$_author  |  $_publisher',
                       style: const TextStyle(color: Colors.black)),
                 ],
               ),
@@ -318,8 +364,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 // 글 저장 기능 추가
                 contentCreate(
                     token,
-                    1,
-                    3,
+                    0,
+                    _isbn,
+                    _bookTitleController.text,
+                    _author,
+                    _publisher,
+                    _publisherDate,
+                    _imageUrl,
                     _template,
                     _bookTitleController.text,
                     _writingController.text,

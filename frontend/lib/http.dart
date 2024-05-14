@@ -194,15 +194,24 @@ Future<dynamic> groupCreate(dynamic token, String name, String topic,
 //컨텐츠 생성하기
 Future<dynamic> contentCreate(
     dynamic token,
-    int bookId,
     int clubId,
+    String isbn,
+    String title2,
+    String author,
+    String publisher,
+    String publishDate,
+    String imageUrl,
     String contentType,
     String title,
     String body,
     String startDate,
     String endDate) async {
-  var address =
-      Uri.parse("$BASE_URL/content/create?bookId=$bookId&clubId=$clubId");
+  var address;
+  if (clubId == 0) {
+    address = Uri.parse("$BASE_URL/content/create?");
+  } else {
+    address = Uri.parse("$BASE_URL/content/create?clubId=$clubId");
+  }
   http.Response res = await http.post(
     address,
     headers: {
@@ -210,6 +219,14 @@ Future<dynamic> contentCreate(
       "Authorization": 'Bearer $token',
     },
     body: json.encode({
+      "addBookRequest": {
+        "isbn": "i-$isbn",
+        "title": title2,
+        "author": author,
+        "publisher": publisher,
+        "publishDate": publishDate,
+        "imageUrl": imageUrl,
+      },
       "contentType": contentType,
       "title": title,
       "body": body,
@@ -471,7 +488,7 @@ Future<String> commentCreate(dynamic token, int postId, String body) async {
 //서재 불러오기
 Future<List<dynamic>> getLibrary(String token) async {
   List<dynamic> libraryList = [];
-  var address = Uri.parse("$BASE_URL/library");
+  var address = Uri.parse("$BASE_URL/member/my-book");
   http.Response res = await http.get(
     address,
     headers: {
@@ -495,7 +512,7 @@ Future<String> addBookToLibrary(
     String publisher,
     String publishDate,
     String imageUrl) async {
-  var address = Uri.parse("$BASE_URL/library/add");
+  var address = Uri.parse("$BASE_URL/member/my-book/add");
   http.Response res = await http.post(
     address,
     headers: {
@@ -512,5 +529,22 @@ Future<String> addBookToLibrary(
     }),
   );
   final data = res.body;
+  return data;
+}
+
+//서재에 책 여러권 추가하기
+Future<String> addBooksToLibrary(
+    String token, String groupName, List<dynamic> books) async {
+  var address = Uri.parse("$BASE_URL/member/my-book/adds?groupName=$groupName");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode(books),
+  );
+  final data = res.body;
+  print(data);
   return data;
 }
