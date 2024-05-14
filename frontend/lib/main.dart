@@ -67,11 +67,13 @@ final GoRouter router = GoRouter(
       name: 'groupbook_select',
       path: '/groupbook_select',
       builder: (context, state) {
-        final Map<String, dynamic> data =
-              state.extra as Map<String, dynamic>;
+        final Map<String, dynamic> data = state.extra as Map<String, dynamic>;
         String title = data['title'] as String;
         int clubId = data['clubId'] as int;
-        return GroupBookSelectScreen(title: title, clubId: clubId,);
+        return GroupBookSelectScreen(
+          title: title,
+          clubId: clubId,
+        );
       },
     ),
     GoRoute(
@@ -126,25 +128,23 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const HomeworkListScreen(),
     ),
     GoRoute(
-      name: 'notice_list',
-      path: '/notice_list',
-      builder: (context, state){
-        List<dynamic> posts = state.extra as List<dynamic>;
-        return NoticeListScreen(
-          posts: posts,
-        );
-      } 
-    ),
+        name: 'notice_list',
+        path: '/notice_list',
+        builder: (context, state) {
+          List<dynamic> posts = state.extra as List<dynamic>;
+          return NoticeListScreen(
+            posts: posts,
+          );
+        }),
     GoRoute(
-      name: 'post_list',
-      path: '/post_list',
-      builder: (context, state){
-        List<dynamic> posts = state.extra as List<dynamic>;
-        return PostListScreen(
-          posts: posts,
-        );
-      }
-    ),
+        name: 'post_list',
+        path: '/post_list',
+        builder: (context, state) {
+          List<dynamic> posts = state.extra as List<dynamic>;
+          return PostListScreen(
+            posts: posts,
+          );
+        }),
     GoRoute(
       name: 'post',
       path: '/post',

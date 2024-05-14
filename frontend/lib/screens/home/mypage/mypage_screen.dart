@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -196,7 +197,7 @@ class LoggedWidget extends StatelessWidget {
                     Icon(
                       Icons.account_circle,
                       size: 70.w,
-                      ),
+                    ),
                     SizedBox(width: 16.w),
                     Text(
                       name,
@@ -215,8 +216,15 @@ class LoggedWidget extends StatelessWidget {
   }
 }
 
-class LoginWidget extends StatelessWidget {
+class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
+
+  @override
+  _LoginWidgetState createState() => _LoginWidgetState();
+}
+
+class _LoginWidgetState extends State<LoginWidget> {
+  dynamic userInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +252,6 @@ class LoginWidget extends StatelessWidget {
               SizedBox(width: 76.w),
               ElevatedButton(
                 onPressed: () {
-                  //context.push('/login');
                   signInWithGoogle(context);
                 },
                 child: const Text('로그인'),
@@ -256,26 +263,27 @@ class LoginWidget extends StatelessWidget {
       ),
     );
   }
-}
 
-void signInWithGoogle(BuildContext context) async {
-  final secureStorage =
-      Provider.of<SecureStorageService>(context, listen: false);
-  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  void signInWithGoogle(BuildContext context) async {
+    final secureStorage =
+        Provider.of<SecureStorageService>(context, listen: false);
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-  if (googleUser != null) {
-    // print('name = ${googleUser.displayName}');
-    // print('email = ${googleUser.email}');
-    // print('id = ${googleUser.id}');
-    dynamic userInfo = await login(googleUser.email);
-    await secureStorage.saveData('userID', googleUser.email);
-    if (userInfo['token'] == null) {
-      context.push('/signup');
+    if (googleUser != null) {
+      print('name = ${googleUser.displayName}');
+      print('email = ${googleUser.email}');
+      print('id = ${googleUser.id}');
+
+      userInfo = await login(googleUser.email);
+      await secureStorage.saveData('userID', googleUser.email);
+      print(userInfo);
+      if (userInfo['exceptionCode'] != null) {
+        print('진입');
+        await context.push('/signup');
+      }
+      await secureStorage.saveData("token", userInfo['token']);
+      await secureStorage.saveData("id", userInfo['id']);
     }
-    print(userInfo['token']);
-    print(userInfo['id']);
-    await secureStorage.saveData("token", userInfo['token']);
-    await secureStorage.saveData("id", userInfo['id']);
   }
 }
 

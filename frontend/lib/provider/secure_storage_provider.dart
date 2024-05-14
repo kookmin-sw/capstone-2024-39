@@ -18,6 +18,11 @@ class SecureStorageService extends ChangeNotifier {
     await _secureStorage.delete(key: key);
     notifyListeners();
   }
+
+  Future<void> deleteAllData() async {
+    await _secureStorage.deleteAll();
+    notifyListeners();
+  }
 }
 
 class SecureStorageProvider extends StatelessWidget {

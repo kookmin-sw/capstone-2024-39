@@ -52,7 +52,7 @@ class _SearchState extends State<SearchScreen> {
     _scrollController.dispose();
     super.dispose();
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +62,7 @@ class _SearchState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final secureStorage =
-        Provider.of<SecureStorageService>(context, listen: false); 
+        Provider.of<SecureStorageService>(context, listen: false);
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => Scaffold(
@@ -139,17 +139,10 @@ class _SearchState extends State<SearchScreen> {
                     children: [
                       if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
                       ElevatedButton(
-                        onPressed: () async {
-                          dynamic userInfo = await login(
-                              "test13@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                          // dynamic userInfo = await singup("test16@gmail.com", "랑데부", 24, "남자");
-                          print(userInfo['token']);
-                          print(userInfo['id']);
-                          await secureStorage.saveData(
-                              "token", userInfo['token']);
-                          await secureStorage.saveData("id", userInfo['id']);
+                        onPressed: () {
+                          context.push('/bookreport_viewing');
                         },
-                        child: Text('한지민'),
+                        child: Text('테스트'),
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -177,6 +170,7 @@ class _SearchState extends State<SearchScreen> {
                         onPressed: () async {
                           await secureStorage.deleteData("token");
                           await secureStorage.deleteData("id");
+                          await secureStorage.deleteAllData();
                         },
                         child: Text('토큰 삭제'),
                       ),
@@ -188,7 +182,8 @@ class _SearchState extends State<SearchScreen> {
                             itemCount: GroupData.length,
                             itemBuilder: (BuildContext context, int index) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: GroupUtil.GroupListItem(
                                   id: GroupData[index]['id'],
                                   groupName: GroupData[index]['name'],
