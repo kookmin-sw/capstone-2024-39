@@ -200,7 +200,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'homework_make',
       path: '/homework_make',
-      builder: (context, state){
+      builder: (context, state) {
         int clubId = state.extra as int;
         return HomeworkMakeScreen(
           clubId: clubId,
@@ -210,11 +210,11 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'homeworkmember_make',
       path: '/homeworkmember_make',
-      builder: (context, state){
+      builder: (context, state) {
         final Map<String, dynamic> extradata =
             state.extra as Map<String, dynamic>;
         int clubId = extradata['clubId'] as int;
-        Map<String,dynamic> post = extradata['post'] as Map<String,dynamic>;
+        Map<String, dynamic> post = extradata['post'] as Map<String, dynamic>;
         return HomeworkMemberlistScreen(
           clubId: clubId,
           post: post,

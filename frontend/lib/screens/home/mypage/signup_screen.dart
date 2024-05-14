@@ -220,7 +220,6 @@ class _SignupState extends State<SignupScreen> {
                           if (_validateAge(_ageController.text) == null &&
                               _validateName(_nameController.text) == null &&
                               _validateGender(_genderController.text) == null) {
-                            print("성공");
                             final secureStorage =
                                 Provider.of<SecureStorageService>(context,
                                     listen: false);
@@ -235,6 +234,7 @@ class _SignupState extends State<SignupScreen> {
                                 'age', _ageController.text);
                             await secureStorage.saveData(
                                 'gender', _genderController.text);
+                            print("성공");
                             context.pop();
                           } else {
                             print("실패");
