@@ -1,3 +1,4 @@
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
@@ -24,6 +25,10 @@ class _GroupListItemState extends State<GroupListItem> {
   final bool LoginCheck = true;
 
   bool memberCheck(dynamic data) {
+    print(data);
+    if(widget.userInfo == null){
+      return false;
+    }
     for (dynamic member in data['memberList']) {
       if (member['id'] == widget.userInfo['id']) {
         return true;
@@ -37,6 +42,11 @@ class _GroupListItemState extends State<GroupListItem> {
       'groupName': data['name'],
       'id': data['id'],
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -98,12 +108,14 @@ class _GroupListItemState extends State<GroupListItem> {
                           // 책사진 넣는 곳
                           width: 40.w,
                           height: 60.h,
-                          decoration: BoxDecoration(
+                          decoration: ShapeDecoration(
                             image: DecorationImage(
                               image:
                                   NetworkImage(widget.data['book']['imageUrl']),
                               fit: BoxFit.fill,
                             ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3)),
                           ),
                         ),
                       )

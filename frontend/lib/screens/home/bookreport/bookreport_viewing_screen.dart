@@ -4,7 +4,14 @@ import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
-  const BookReportViewingScreen({super.key});
+  final String type;
+  final dynamic contentData;
+
+  const BookReportViewingScreen({
+    super.key,
+    required this.type,
+    required this.contentData,
+  });
 
   @override
   State<BookReportViewingScreen> createState() => _BookReportViewingState();
@@ -18,23 +25,64 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   String _template = '';
   String _title = '';
   String _body = '';
-  final String _author = "작가";
-  final String _publisher = "출판사";
+  String _author = "작가";
+  String _publisher = "출판사";
   // ignore: prefer_typing_uninitialized_variables
   var token;
 
   void initializeContentData(dynamic token) async {
     _contentData = await contentLoad(token, 2);
-    _template = _contentData[0]['type'] as String;
+    _template = contentTypeCheck(_contentData[0]['type'] as String);
     _title = _contentData[0]['title'] as String;
     _body = _contentData[0]['body'] as String;
+  }
+
+  void initializeClubContentData(dynamic content){
+    
+    setState(() {
+      _template = contentTypeCheck(content['type']);
+      _title = content['title'];
+      _body = content['body'];
+      _author = content['book']['author'];
+      _publisher = content['book']['publisher'];
+    });
+  }
+
+  String contentTypeCheck(String template){ 
+    switch (template) {
+      case "Review":
+        return "독후감";
+      case "ShortReview":
+        return "한줄평";
+      case "Quotation":
+        return "인용구";
+      case "MultipleChoice":
+        return "객관식";
+      case "ShortAnswer":
+        return "단답식";
+      case "OX":
+        return "OX";
+      default:
+        return "";
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _initUserState();
-    initializeContentData(token);
+    switch (widget.type) {
+      case 'club':
+        initializeClubContentData(widget.contentData);
+        break;
+      case 'bookInfo':
+        initializeContentData(token);
+        break;
+
+      default:
+        break;
+    }
+    
   }
 
   Future<void> _initUserState() async {
@@ -121,7 +169,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
         return Text(_body);
       case "한줄평":
         return Text(_body);
-      case "인용문구":
+      case "인용구":
         return Align(
           alignment: Alignment.center,
           child: Stack(

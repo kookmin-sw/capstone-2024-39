@@ -222,6 +222,7 @@ class _SearchState extends State<SearchScreen> {
                         onPressed: () async {
                           dynamic userInfo = await login("test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
                           // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
+                          // print(userInfo);
                           print(userInfo['token']);
                           print(userInfo['id']);
                           await secureStorage.saveData(

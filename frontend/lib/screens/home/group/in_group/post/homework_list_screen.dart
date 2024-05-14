@@ -41,6 +41,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
     var _posts = await getAssign(_token, widget.clubId);
     setState(() {
       posts = _posts;
+      print(posts);
     });
   }
 
@@ -114,7 +115,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
                     context.push('/homeworkmember_make', extra: {
                       'post': post,
                       'clubId': widget.clubId,
-                    });
+                    }); 
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),

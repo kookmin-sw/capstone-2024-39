@@ -224,7 +224,43 @@ Future<dynamic> contentCreate(
 //컨텐츠 불러오기
 Future<List<dynamic>> contentLoad(dynamic token, int id) async {
   List<dynamic> contentList = [];
-  var address = Uri.parse("$BASE_URL/content/$id");
+  var address = Uri.parse("$BASE_URL/content/search/$id");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    contentList.add(data[i]);
+  }
+  return contentList;
+}
+
+//해당 책의 컨텐츠 불러오기
+Future<List<dynamic>> bookcontentLoad(dynamic token, String ISBN, String content) async {
+  List<dynamic> contentList = [];
+  var address = Uri.parse("$BASE_URL/book/$ISBN/content");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  for (int i = 0; i < data.length; i++) {
+    contentList.add(data[i]);
+  }
+  return contentList;
+}
+
+//해당 책의 퀴즈 불러오기
+Future<List<dynamic>> bookQuizLoad(dynamic token, String ISBN) async {
+  List<dynamic> contentList = [];
+  var address = Uri.parse("$BASE_URL/book/$ISBN/quiz");
   http.Response res = await http.get(
     address,
     headers: {
@@ -380,7 +416,7 @@ Future<dynamic> getBookInfo(dynamic token, String isbn) async {
 
 //과제 불러오기
 Future<List<dynamic>> getAssign(String token, int clubId) async {
-  var address = Uri.parse(BASE_URL + "/assign/get?clubId=$clubId");
+  var address = Uri.parse(BASE_URL + "/assign/search/get?clubId=$clubId");
   http.Response res = await http.get(
     address,
     headers: {
@@ -394,7 +430,7 @@ Future<List<dynamic>> getAssign(String token, int clubId) async {
 }
 
 //과제 생성하기
-Future<String> assignCreate(String token, int clubId, String name,
+Future<String> assignCreate(String token, int clubId, String name, String type,
     String startDate, String endDate) async {
   var address = Uri.parse(BASE_URL + "/assign/create?clubId=$clubId");
   http.Response res = await http.post(
@@ -405,6 +441,7 @@ Future<String> assignCreate(String token, int clubId, String name,
     },
     body: json.encode({
       "name": name,
+      "type": type,
       "startDate": startDate,
       "endDate": endDate,
     }),

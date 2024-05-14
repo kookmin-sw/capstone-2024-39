@@ -97,7 +97,15 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'bookreport_viewing',
       path: '/bookreport_viewing',
-      builder: (context, state) => const BookReportViewingScreen(),
+      builder: (context, state){
+        Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+        String type = extraData['type'] as String;
+        dynamic contentData = extraData['contentData'] as dynamic;
+        return BookReportViewingScreen(
+          type: type,
+          contentData: contentData,
+        );
+      },
     ),
     GoRoute(
       name: 'mypage',

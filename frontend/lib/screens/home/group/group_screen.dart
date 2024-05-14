@@ -28,6 +28,20 @@ final List<String> Thema = [
   '추천',
   '내 모임'
 ];
+final List<IconData> ThemaIcon = [
+  Icons.palette_outlined,
+  Icons.attach_money,
+  Icons.science_outlined,
+  Icons.self_improvement,
+  Icons.history_edu,
+  Icons.hail_outlined,
+  // Icons.local_play_outlined,
+  Icons.memory,
+  // Icons.group
+  Icons.collections_bookmark_outlined
+                          
+
+];
 //수정 전 - 역사, 경제, 종교, 사회, 시집
 //수정 - 예술과 문학, 금융/경제/투자, 과학과 철학, 자기개발, 역사, 취미
 //삭제 - 시집
@@ -105,37 +119,34 @@ class _GroupState extends State<GroupScreen> {
     BuildContext context,
     List<String> Thema,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
+    return Center(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: List.generate((Thema.length / 4).ceil(), (int i) {
           int startIndex = i * 4;
           int endIndex = (i + 1) * 4;
           if (endIndex > Thema.length) endIndex = Thema.length;
-
+            
           List<Widget> rowButtons = [];
           for (int j = startIndex; j < endIndex; j++) {
             rowButtons.add(
               SizedBox(
-                height: 50.h,
+                height: 80.h,
                 width: 90.w,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: const CircleBorder(),
-                        elevation: 5,
-                        shadowColor: Colors.grey,
-                      ),
+                    IconButton(
                       onPressed: () {
-                        print('${Thema[j]} 눌렸습니다.');
+                        // print('${Thema[j]} 눌렸습니다.');
                         final buttonOffset = j * 135.0.h;
                         _scrollController.animateTo(buttonOffset,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeInOut);
                       },
-                      child: Text('${j + 1}'),
+                      icon: Icon(
+                        ThemaIcon[j],
+                        // size:,
+                      ),
                     ),
                     Text(
                       Thema[j],
@@ -201,6 +212,7 @@ class _GroupState extends State<GroupScreen> {
       builder: (context, child) => Scaffold(
         appBar: AppBar(
           scrolledUnderElevation: 0,
+          // toolbarHeight: 35.h,
           backgroundColor: const Color(0xFF0E9913),
           title: const Text(
             '모임',

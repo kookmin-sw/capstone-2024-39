@@ -36,11 +36,11 @@ android {
         jvmTarget = '1.8'
     }
 
-    allprojects {
-        repositories {
-            maven { url 'https://www.jitpack.io' }
-        }
-    }
+    // allprojects {
+    //     repositories {
+    //         maven { url 'https://www.jitpack.io' }
+    //     }
+    // }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -71,5 +71,5 @@ flutter {
 }
 
 dependencies {
-    implementation 'io.agora.rtc:voice-sdk:4.3.1'
+    
 }

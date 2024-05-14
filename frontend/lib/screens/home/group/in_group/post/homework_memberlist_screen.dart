@@ -26,6 +26,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   var secureStorage;
   var id;
   var token;
+  var HW;
 
   Future<void> initUserInfo() async {
     var _id = await secureStorage.readData("id");
@@ -39,16 +40,34 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   Future<void> updateHwList() async {
     var _token = await secureStorage.readData("token");
     var _posts = await getAssign(_token, widget.clubId);
-    var _HwList;
+    var _HwList, _Hw;
     for (Map<String, dynamic> Hw in _posts) {
       if (Hw['id'] == widget.post['id']) {
         _HwList = Hw['contentList'];
+        _Hw = Hw;
         break;
       }
     }
     setState(() {
+      HW = _Hw;
       HwList = _HwList;
+      // print(HW);
     });
+  }
+
+  int typeCheck(Map<String, dynamic> hw){
+    switch (hw['type']) {
+      case "Review":
+        return 996;
+      case "ShortReview":
+        return 997;
+      case "Quotation":
+        return 998;
+      case "Quiz":
+        return 999;
+      default:
+        return 0;
+    }
   }
 
   @override
@@ -79,7 +98,17 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
+            context
+                .push(
+              "/bookreport_writing",
+              extra: typeCheck(HW),
+            )
+                .then((value) {
+              updateHwList();
+            });
+          },
           shape: const CircleBorder(),
           child: const Icon(Icons.add),
         ),
@@ -105,7 +134,14 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
               child: Ink(
                 child: InkWell(
                   onTap: () {
-                    
+                    // print(post);
+                    context.push(
+                      '/bookreport_viewing',
+                      extra: {
+                        'type': 'club',
+                        'contentData': post,
+                      },
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
