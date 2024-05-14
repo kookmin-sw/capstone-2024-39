@@ -3,6 +3,7 @@ package com.project.capstone.book.controller.dto;
 public record AddBookRequest(
         String isbn,
         String title,
+        String description,
         String author,
         String publisher,
         String publishDate,

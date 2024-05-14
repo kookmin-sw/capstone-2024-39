@@ -36,6 +36,7 @@ public class BookService {
             throw new BookException(ALREADY_EXIST_BOOK);
         }
         bookRepository.save(new Book(request));
+
     }
 
     public BookResponse getBookByIsbn(String isbn) {
