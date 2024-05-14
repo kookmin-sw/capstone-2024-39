@@ -21,23 +21,13 @@ var id;
 var data;
 
 class PostScreen extends StatefulWidget {
-  // final String title;
-  // final bool kindOf;
-  // final String body;
-  // final List<dynamic> comments;
   final int postId;
   final int clubId;
-  // final Map<String, dynamic> data;
 
   const PostScreen({
     super.key,
-    // required this.title,
-    // required this.kindOf,
-    // required this.body,
-    // required this.comments,
     required this.postId,
     required this.clubId,
-    // required this.data,
   });
 
   @override
@@ -56,7 +46,6 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Future<void> _loadData() async {
-    // 일정 시간이 지난 후에 로딩 상태를 변경하여 화면을 업데이트
     Timer(Duration(milliseconds: 800), () {
       setState(() {
         _isLoading = false;

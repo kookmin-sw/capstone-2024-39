@@ -1,29 +1,138 @@
 PODS:
+  - agora_rtc_engine (6.3.1):
+    - AgoraIrisRTC_iOS (= 4.3.1-build.1)
+    - AgoraRtcEngine_iOS (= 4.3.1)
+    - Flutter
+  - agora_rtm (1.5.9):
+    - AgoraRtm_iOS (= 1.5.1)
+    - Flutter
+  - AgoraIrisRTC_iOS (4.3.1-build.1)
+  - AgoraRtcEngine_iOS (4.3.1):
+    - AgoraRtcEngine_iOS/AIAEC (= 4.3.1)
+    - AgoraRtcEngine_iOS/AINS (= 4.3.1)
+    - AgoraRtcEngine_iOS/AudioBeauty (= 4.3.1)
+    - AgoraRtcEngine_iOS/ClearVision (= 4.3.1)
+    - AgoraRtcEngine_iOS/ContentInspect (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceCapture (= 4.3.1)
+    - AgoraRtcEngine_iOS/FaceDetection (= 4.3.1)
+    - AgoraRtcEngine_iOS/LipSync (= 4.3.1)
+    - AgoraRtcEngine_iOS/ReplayKit (= 4.3.1)
+    - AgoraRtcEngine_iOS/RtcBasic (= 4.3.1)
+    - AgoraRtcEngine_iOS/SpatialAudio (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoAv1CodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecDec (= 4.3.1)
+    - AgoraRtcEngine_iOS/VideoCodecEnc (= 4.3.1)
+    - AgoraRtcEngine_iOS/VirtualBackground (= 4.3.1)
+    - AgoraRtcEngine_iOS/VQA (= 4.3.1)
+  - AgoraRtcEngine_iOS/AIAEC (4.3.1)
+  - AgoraRtcEngine_iOS/AINS (4.3.1)
+  - AgoraRtcEngine_iOS/AudioBeauty (4.3.1)
+  - AgoraRtcEngine_iOS/ClearVision (4.3.1)
+  - AgoraRtcEngine_iOS/ContentInspect (4.3.1)
+  - AgoraRtcEngine_iOS/FaceCapture (4.3.1)
+  - AgoraRtcEngine_iOS/FaceDetection (4.3.1)
+  - AgoraRtcEngine_iOS/LipSync (4.3.1)
+  - AgoraRtcEngine_iOS/ReplayKit (4.3.1)
+  - AgoraRtcEngine_iOS/RtcBasic (4.3.1)
+  - AgoraRtcEngine_iOS/SpatialAudio (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoAv1CodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecDec (4.3.1)
+  - AgoraRtcEngine_iOS/VideoCodecEnc (4.3.1)
+  - AgoraRtcEngine_iOS/VirtualBackground (4.3.1)
+  - AgoraRtcEngine_iOS/VQA (4.3.1)
+  - AgoraRtm_iOS (1.5.1)
+  - AppAuth (1.7.5):
+    - AppAuth/Core (= 1.7.5)
+    - AppAuth/ExternalUserAgent (= 1.7.5)
+  - AppAuth/Core (1.7.5)
+  - AppAuth/ExternalUserAgent (1.7.5):
+    - AppAuth/Core
   - Flutter (1.0.0)
   - flutter_secure_storage (6.0.0):
+    - Flutter
+  - google_sign_in_ios (0.0.1):
+    - AppAuth (>= 1.7.4)
+    - Flutter
+    - FlutterMacOS
+    - GoogleSignIn (~> 7.1)
+    - GTMSessionFetcher (>= 3.4.0)
+  - GoogleSignIn (7.1.0):
+    - AppAuth (< 2.0, >= 1.7.3)
+    - GTMAppAuth (< 5.0, >= 4.1.1)
+    - GTMSessionFetcher/Core (~> 3.3)
+  - GTMAppAuth (4.1.1):
+    - AppAuth/Core (~> 1.7)
+    - GTMSessionFetcher/Core (< 4.0, >= 3.3)
+  - GTMSessionFetcher (3.4.1):
+    - GTMSessionFetcher/Full (= 3.4.1)
+  - GTMSessionFetcher/Core (3.4.1)
+  - GTMSessionFetcher/Full (3.4.1):
+    - GTMSessionFetcher/Core
+  - iris_method_channel (0.0.1):
     - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - permission_handler_apple (9.3.0):
+    - Flutter
 
 DEPENDENCIES:
+  - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
+  - agora_rtm (from `.symlinks/plugins/agora_rtm/ios`)
   - Flutter (from `Flutter`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
+  - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
+  - iris_method_channel (from `.symlinks/plugins/iris_method_channel/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AgoraIrisRTC_iOS
+    - AgoraRtcEngine_iOS
+    - AgoraRtm_iOS
+    - AppAuth
+    - GoogleSignIn
+    - GTMAppAuth
+    - GTMSessionFetcher
 
 EXTERNAL SOURCES:
+  agora_rtc_engine:
+    :path: ".symlinks/plugins/agora_rtc_engine/ios"
+  agora_rtm:
+    :path: ".symlinks/plugins/agora_rtm/ios"
   Flutter:
     :path: Flutter
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
+  google_sign_in_ios:
+    :path: ".symlinks/plugins/google_sign_in_ios/darwin"
+  iris_method_channel:
+    :path: ".symlinks/plugins/iris_method_channel/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
 
 SPEC CHECKSUMS:
+  agora_rtc_engine: 6753fa324d39ac0e7f65f2b67ea5003a4442e370
+  agora_rtm: 51b5cef21d9d664563b9a420f2c59531b1ad3e4c
+  AgoraIrisRTC_iOS: 7710d853202eca4900c2916aefc44abd5a139d4e
+  AgoraRtcEngine_iOS: f64be00fdda786bb7edd84ab461c31b7b4c93534
+  AgoraRtm_iOS: 595a9fa33a409831e6183396ea8f8bc563918403
+  AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
+  google_sign_in_ios: 07375bfbf2620bc93a602c0e27160d6afc6ead38
+  GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
+  GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
+  GTMSessionFetcher: 8000756fc1c19d2e5697b90311f7832d2e33f6cd
+  iris_method_channel: 0617c689164d8154c020c50f63ca79f92b8a7b9d
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
 
-PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+PODFILE CHECKSUM: 0ef830146778a3a3abc6ef5b6eb0ba6d0753cc56
 
 COCOAPODS: 1.15.2

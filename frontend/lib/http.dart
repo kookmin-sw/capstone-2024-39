@@ -86,7 +86,6 @@ Future<dynamic> login(String email) async {
     }),
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
-  // print(data);
 
   return data;
 }
@@ -127,7 +126,7 @@ Future<List<List<dynamic>>> groupSerachforTopic(List<String> topic) async {
   return groupList;
 }
 
-//모임 목록 가져오기(id를 기반으로)
+//모임 정보 가져오기(id를 기반으로)
 Future<dynamic> groupSerachforId(int clubId) async {
   var address = Uri.parse(BASE_URL + "/club/search/$clubId");
   http.Response res = await http.get(
@@ -325,7 +324,6 @@ Future<String> groupBookSelect(
       RegExp(r'(\d{4})(\d{2})(\d{2})'),
       (Match m) => '${m[1]}-${m[2]}-${m[3]}'));
   String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
-
   var address = Uri.parse(BASE_URL + "/club/book?clubId=$clubId");
   http.Response res = await http.post(
     address,
@@ -334,11 +332,8 @@ Future<String> groupBookSelect(
       "Authorization": 'Bearer $token',
     },
     body: json.encode({
-      "isbn": "i-${bookdata['isbn']}",
+      "isbn": bookdata['isbn'],
       "title": bookdata['title'],
-      "category1d": null,
-      "category2d": null,
-      "category3d": null,
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
       "publishDate": formattedDate,
@@ -357,7 +352,6 @@ Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
       RegExp(r'(\d{4})(\d{2})(\d{2})'),
       (Match m) => '${m[1]}-${m[2]}-${m[3]}'));
   String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
-  // print(bookdata['image']);
   var address = Uri.parse(BASE_URL + "/book/add");
   http.Response res = await http.post(
     address,
@@ -366,7 +360,7 @@ Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
       "Authorization": 'Bearer $token',
     },
     body: json.encode({
-      "isbn": "i-${bookdata['isbn']}",
+      "isbn": bookdata['isbn'],
       "title": bookdata['title'],
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
@@ -387,7 +381,7 @@ Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
 //책 기본 정보 불러오기
 Future<dynamic> getBookInfo(dynamic token, String isbn) async {
   print(isbn);
-  var address = Uri.parse(BASE_URL + "/book/search/i-$isbn");
+  var address = Uri.parse(BASE_URL + "/book/search/$isbn");
   http.Response res = await http.get(
     address,
     headers: {
@@ -397,7 +391,43 @@ Future<dynamic> getBookInfo(dynamic token, String isbn) async {
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
 
-  print(data);
+  // print(data);
+  return data;
+}
+
+//과제 불러오기
+Future<List<dynamic>> getAssign(String token, int clubId) async {
+  var address = Uri.parse(BASE_URL + "/assign/get?clubId=$clubId");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
+}
+
+//과제 생성하기
+Future<String> assignCreate(String token, int clubId, String name,
+    String startDate, String endDate) async {
+  var address = Uri.parse(BASE_URL + "/assign/create?clubId=$clubId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+    body: json.encode({
+      "name": name,
+      "startDate": startDate,
+      "endDate": endDate,
+    }),
+  );
+  final data = res.body;
+
   return data;
 }
 
@@ -412,6 +442,27 @@ Future<dynamic> getPost(String token, int postId, int clubId) async {
     },
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
+
+  return data;
+}
+
+//게시글 만들기
+Future<String> postCreate(
+    String token, int clubId, String title, String body, bool isSticky) async {
+  var address = Uri.parse(BASE_URL + "/post/create?clubId=$clubId");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    },
+    body: json.encode({
+      "title": title,
+      "body": body,
+      "isSticky": isSticky,
+    }),
+  );
+  final data = res.body;
 
   return data;
 }

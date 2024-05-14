@@ -104,10 +104,11 @@ class _SearchListItemState extends State<SearchListItem> {
                         "${(widget.data['author'] == '') ? '저자 미상' : widget.data['author']} | ${widget.data['publisher']}",
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 11,
+                          fontSize: 11.sp,
                           fontFamily: 'Noto Sans KR',
                           fontWeight: FontWeight.w700,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

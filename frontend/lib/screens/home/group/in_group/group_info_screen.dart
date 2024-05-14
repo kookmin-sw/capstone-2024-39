@@ -363,6 +363,27 @@ class _GroupInfoState extends State<GroupInfoScreen> {
         false; // showDialog의 기본값은 false로 설정
   }
 
+  // 제한인원 초과 경우
+  void _showMaxlimitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('가입 실패'),
+          content: Text('모임의 정원이 초과되었습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final TextEditingController _textControllers = TextEditingController();
 
   bool _isFieldEmpty(TextEditingController controller) {
@@ -384,7 +405,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
 
   Future<void> _loadData() async {
     // 일정 시간이 지난 후에 로딩 상태를 변경하여 화면을 업데이트
-    Timer(Duration(milliseconds: 800), () {
+    Timer(Duration(milliseconds: 600), () {
       setState(() {
         _isLoading = false;
       });
@@ -439,76 +460,152 @@ class _GroupInfoState extends State<GroupInfoScreen> {
       _isGroupMember = isGroupMember;
       _isGroupManager = isGroupManager;
       updateGroupList();
-      print(clubData['book']);
+      // print(clubData['book']);
     });
   }
 
-  Widget _searchWidget(int width, bool where) {
+  Widget _searchWidget() {
     return Row(
-      mainAxisAlignment:
-          (where) ? MainAxisAlignment.center : MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        (!where) ? Padding(padding: EdgeInsets.only(left: 20.0)) : Container(),
-        SizedBox(
-          width: ScreenUtil().setWidth(width),
-          child: TextField(
-            controller: _textControllers,
-            decoration: const InputDecoration(
-              hintText: '대표책 선정',
-            ),
-            onChanged: (value) {
-              setState(() {});
-            },
+        Container(
+          margin: EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w),
+          padding: EdgeInsets.only(left: 10.w),
+          height: 40.h,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF2F2F2),
+            borderRadius: BorderRadius.circular(25),
           ),
-        ),
-        IconButton(
-          onPressed: () async {
-            if (_isFieldEmpty(_textControllers)) {
-              // 검색 x
-              // BookData = [];
-            } else {
-              context.push('/groupbook_select', extra: {
-                "title": _textControllers.text,
-                "clubId": clubData['id'],
-              }).then((result) async {
-                if (result == true) {
-                  await _clubGetInfo();
-                  setState(() {
-                    print(clubData['book']);
-                  });
-                }
-              });
-              _textControllers.clear();
-            }
-            setState(() {});
-          },
-          icon: const Icon(Icons.search),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  if (_isFieldEmpty(_textControllers)) {
+                    // 검색 x
+                    // BookData = [];
+                  } else {
+                    context.push('/groupbook_select', extra: {
+                      "title": _textControllers.text,
+                      "clubId": clubData['id'],
+                    }).then((result) async {
+                      if (result == true) {
+                        await _clubGetInfo();
+                        setState(() {
+                          // print(clubData['book']);
+                        });
+                      }
+                    });
+                    _textControllers.clear();
+                  }
+                  setState(() {});
+                },
+                icon: const Icon(Icons.search),
+              ),
+              SizedBox(
+                width: 260.w,
+                child: TextField(
+                  controller: _textControllers,
+                  decoration: const InputDecoration(
+                    hintText: '대표책을 검색해주세요.',
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  onSubmitted: (value) {
+                    if (_isFieldEmpty(_textControllers)) {
+                      // 검색 x
+                      // BookData = [];
+                    } else {
+                      context.push('/groupbook_select', extra: {
+                        "title": _textControllers.text,
+                        "clubId": clubData['id'],
+                      }).then((result) async {
+                        if (result == true) {
+                          await _clubGetInfo();
+                          setState(() {
+                            // print(clubData['book']);
+                          });
+                        }
+                      });
+                      _textControllers.clear();
+                    }
+                    setState(() {});
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
   Widget _bookWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 20.0),
-          child: Container(
-            width: ScreenUtil().setWidth(80),
-            height: ScreenUtil().setHeight(105),
-            decoration: ShapeDecoration(
-              image: DecorationImage(
-                // image: NetworkImage(clubData['image']),
-                image: NetworkImage('https://via.placeholder.com/60x86'),
-                fit: BoxFit.fill,
+          padding: EdgeInsets.only(top: 10.h, left: 15.w, right: 15.w),
+          child: Column(
+            children: [
+              Text(
+                '대표책',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14.sp,
+                  fontFamily: 'Noto Sans KR',
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3)),
-            ),
+              Container(
+                width: 80.w,
+                height: 105.h,
+                decoration: ShapeDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(clubData['book']['imageUrl']),
+                    fit: BoxFit.fill,
+                  ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3)),
+                ),
+              ),
+            ],
           ),
         ),
+        Padding(
+          padding: EdgeInsets.only(top: 30.h),
+          child: Column(
+            children: [
+              SizedBox(
+                width: 250.w,
+                child: Text(
+                  clubData['book']['title'],
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.sp,
+                    fontFamily: 'Noto Sans KR',
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(
+                width: 250.w,
+                child: Text(
+                  "${(clubData['book']['author'].length != 0) ? clubData['book']['author'] : '저자 미상'} | ${clubData['book']['publisher']}",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.sp,
+                    fontFamily: 'Noto Sans KR',
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -517,341 +614,330 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(390, 675),
-      builder: (context, child) => Scaffold(
-          // backgroundColor: Color(0xffE7FFEB),
-          appBar: AppBar(
-            scrolledUnderElevation: 0,
-            backgroundColor: const Color(0xFF0E9913),
-            title: Text(widget.groupName),
-            centerTitle: true,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 15.0),
-                child: Visibility(
-                  visible: !_isGroupMember,
-                  child: Ink(
-                    width: 70.w,
-                    height: 30.h,
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(
-                          width: 2,
-                          strokeAlign: BorderSide.strokeAlignOutside,
-                          color: Color(0xFFEEF1F4),
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: InkWell(
-                      onTap: () async {
-                        // 회원 가입 동작
-                        String result = await groupJoin(token, widget.clubId);
-                        await _clubGetInfo();
-                        if (result == "모임 가입 완료") {
-                          setState(() {
-                            _isGroupMember = true;
-                            updateGroupList();
-                          });
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(15),
-                      child: const Center(
-                        child: Text(
-                          '가입하기',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                            fontFamily: 'Noto Sans KR',
-                            fontWeight: FontWeight.w700,
+      builder: (context, child) => _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(), // 로딩 애니매이션
+            )
+          : Scaffold(
+              // backgroundColor: Color(0xffE7FFEB),
+              appBar: AppBar(
+                scrolledUnderElevation: 0,
+                backgroundColor: const Color(0xFF0E9913),
+                title: Text(widget.groupName),
+                centerTitle: true,
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15.0),
+                    child: Visibility(
+                      visible: !_isGroupMember,
+                      child: Ink(
+                        width: 70.w,
+                        height: 30.h,
+                        decoration: ShapeDecoration(
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            side: const BorderSide(
+                              width: 2,
+                              strokeAlign: BorderSide.strokeAlignOutside,
+                              color: Color(0xFFEEF1F4),
+                            ),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Builder(builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Visibility(
-                    //멤버일 경우만 회원목록을 보도록
-                    visible: _isGroupMember,
-                    child: IconButton(
-                      icon: const Icon(Icons.menu),
-                      onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                      },
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
-          endDrawer: (_isGroupMember) ? _buildGroupList(context) : null,
-          onEndDrawerChanged: _handleDrawerStateChanged,
-          body: _isLoading
-              ? Center(
-                  child: CircularProgressIndicator(), // 로딩 애니매이션
-                )
-              : Center(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: (clubData["book"] == null)
-                            ? ScreenUtil().setHeight(80)
-                            : ScreenUtil().setHeight(170),
-                        width: ScreenUtil().setWidth(390),
-                        decoration: const ShapeDecoration(
-                          color: Color(0xFF0E9913),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(50),
-                              bottomRight: Radius.circular(50),
+                        child: InkWell(
+                          onTap: () async {
+                            if (clubData['maximum'] == clubData['memberCnt']) {
+                              _showMaxlimitDialog();
+                            } else {
+                              // 회원 가입 동작
+                              String result =
+                                  await groupJoin(token, widget.clubId);
+                              await _clubGetInfo();
+                              if (result == "모임 가입 완료") {
+                                setState(() {
+                                  _isGroupMember = true;
+                                  updateGroupList();
+                                });
+                              }
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(15),
+                          child: const Center(
+                            child: Text(
+                              '가입하기',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontFamily: 'Noto Sans KR',
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
-                        child: Container(
-                            child: (_isGroupManager)
-                                ? (clubData["book"] != null)
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _bookWidget(),
-                                          _searchWidget(100, false),
-                                        ],
-                                      )
-                                    : _searchWidget(280, true)
-                                : (clubData["book"] != null)
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _bookWidget(),
-                                        ],
-                                      )
-                                    : null),
                       ),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 38.h,
-                              ),
-                              //과제
-                              Ink(
-                                width: 350.w,
-                                height: 120.h,
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 4),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(6),
-                                  onTap: () {
-                                    context.push('/homework_list');
-                                  },
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                          left: 5.0,
-                                          top: 3.0,
-                                        ),
-                                        child: Text(
-                                          '과제',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontFamily: 'Noto Sans KR',
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5.h,
-                                      ),
-                                      Expanded(
-                                        child: ListView(
-                                          shrinkWrap: true,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                          children:
-                                              _buildTaskList(context, 10, '과제'),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 38.h,
-                              ),
-                              //공지사항
-                              Ink(
-                                width: 350.w,
-                                height: 120.h,
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 4),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(6),
-                                  onTap: () {
-                                    context.push(
-                                      '/notice_list',
-                                      extra: clubData['posts'],
-                                    );
-                                  },
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                          left: 5.0,
-                                          top: 3.0,
-                                        ),
-                                        child: Text(
-                                          '공지사항',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontFamily: 'Noto Sans KR',
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5.h,
-                                      ),
-                                      Expanded(
-                                        child: ListView(
-                                          shrinkWrap: true,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                          children: _buildTaskList(
-                                              context, 10, '공지사항'),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 38.h,
-                              ),
-                              //게시판
-                              Ink(
-                                width: 350.w,
-                                height: 120.h,
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 4),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(6),
-                                  onTap: () {
-                                    context.push(
-                                      '/post_list',
-                                      extra: clubData['posts'],
-                                    );
-                                  },
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Padding(
-                                        padding: EdgeInsets.only(
-                                          left: 5.0,
-                                          top: 3.0,
-                                        ),
-                                        child: Text(
-                                          '게시판',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                            fontFamily: 'Noto Sans KR',
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5.h,
-                                      ),
-                                      Expanded(
-                                        child: ListView(
-                                          shrinkWrap: true,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                          children: _buildTaskList(
-                                              context, 10, '게시판'),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 38.h,
-                              ),
-                              Container(
-                                width: 350.w,
-                                height: 120.h,
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 4),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
+                    ),
+                  ),
+                  Builder(builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Visibility(
+                        //멤버일 경우만 회원목록을 보도록
+                        visible: _isGroupMember,
+                        child: IconButton(
+                          icon: const Icon(Icons.menu),
+                          onPressed: () {
+                            Scaffold.of(context).openEndDrawer();
+                          },
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+              endDrawer: (_isGroupMember) ? _buildGroupList(context) : null,
+              onEndDrawerChanged: _handleDrawerStateChanged,
+              body: Center(
+                child: Column(
+                  children: [
+                    Container(
+                      height: (_isGroupManager)
+                          ? (clubData["book"] == null)
+                              ? 80.h
+                              : 220.h
+                          : (clubData["book"] == null)
+                              ? 20.h
+                              : 160.h,
+                      width: 390.w,
+                      decoration: const ShapeDecoration(
+                        color: Color(0xFF0E9913),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(50),
+                            bottomRight: Radius.circular(50),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                )),
+                      child: Container(
+                          child: (_isGroupManager)
+                              ? (clubData["book"] != null)
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _bookWidget(),
+                                        _searchWidget(),
+                                      ],
+                                    )
+                                  : _searchWidget()
+                              : (clubData["book"] != null)
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _bookWidget(),
+                                      ],
+                                    )
+                                  : null),
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 38.h,
+                            ),
+                            //과제
+                            Ink(
+                              width: 350.w,
+                              height: 120.h,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6)),
+                                shadows: const [
+                                  BoxShadow(
+                                    color: Color(0x3F000000),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 4),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6),
+                                onTap: () {
+                                  context.push('/homework_list', extra: {
+                                    "clubId": clubData['id'],
+                                    "managerId": clubData['managerId'],
+                                  });
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.0,
+                                        top: 3.0,
+                                      ),
+                                      child: Text(
+                                        '과제',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontFamily: 'Noto Sans KR',
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5.h,
+                                    ),
+                                    Expanded(
+                                      child: ListView(
+                                        shrinkWrap: true,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 50.0),
+                                        children:
+                                            _buildTaskList(context, 10, '과제'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 38.h,
+                            ),
+                            //공지사항
+                            Ink(
+                              width: 350.w,
+                              height: 120.h,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6)),
+                                shadows: const [
+                                  BoxShadow(
+                                    color: Color(0x3F000000),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 4),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6),
+                                onTap: () {
+                                  context.push('/notice_list', extra: {
+                                    "clubId": clubData['id'],
+                                    "managerId": clubData['managerId'],
+                                  });
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.0,
+                                        top: 3.0,
+                                      ),
+                                      child: Text(
+                                        '공지사항',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontFamily: 'Noto Sans KR',
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5.h,
+                                    ),
+                                    Expanded(
+                                      child: ListView(
+                                        shrinkWrap: true,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 50.0),
+                                        children:
+                                            _buildTaskList(context, 10, '공지사항'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 38.h,
+                            ),
+                            //게시판
+                            Ink(
+                              width: 350.w,
+                              height: 120.h,
+                              decoration: ShapeDecoration(
+                                color: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6)),
+                                shadows: const [
+                                  BoxShadow(
+                                    color: Color(0x3F000000),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 4),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(6),
+                                onTap: () {
+                                  context.push('/post_list', extra: {
+                                    "clubId": clubData['id'],
+                                    "managerId": clubData['managerId'],
+                                  });
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 5.0,
+                                        top: 3.0,
+                                      ),
+                                      child: Text(
+                                        '게시판',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontFamily: 'Noto Sans KR',
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5.h,
+                                    ),
+                                    Expanded(
+                                      child: ListView(
+                                        shrinkWrap: true,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 50.0),
+                                        children:
+                                            _buildTaskList(context, 10, '게시판'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
     );
   }
 }
