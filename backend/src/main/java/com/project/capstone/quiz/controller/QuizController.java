@@ -26,7 +26,7 @@ public class QuizController {
     }
 
     // 단건 조회
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<QuizResponse> getQuiz(@PathVariable Long id) {
         QuizResponse quizResponse = quizService.getQuiz(id);
         return ResponseEntity.ok().body(quizResponse);

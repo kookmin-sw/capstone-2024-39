@@ -27,6 +27,7 @@ public class Book {
     private Long id;
     private String isbn;
     private String title;
+    private String description;
     private String author;
     private String publisher;
     @Column(name = "publish_date")
@@ -51,7 +52,7 @@ public class Book {
     private List<MyBook> membersAddThisBook = new ArrayList<>();
 
     public Book(AddBookRequest request) {
-        this(null, request.isbn(), request.title(), request.author(), request.publisher(), request.publishDate(),
+        this(null, request.isbn(), request.title(), request.description(), request.author(), request.publisher(), request.publishDate(),
                 request.imageUrl(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 }

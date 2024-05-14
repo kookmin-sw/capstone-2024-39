@@ -27,7 +27,7 @@ public class AssignmentController {
     }
 
     // 모임의 과제 조회
-    @GetMapping("/get")
+    @GetMapping("/search/get")
     public ResponseEntity<List<AssignmentResponse>> getAssignment(@RequestParam Long clubId) {
         List<AssignmentResponse> assignmentResponseList = assignmentService.getAssignment(clubId);
         return ResponseEntity.ok().body(assignmentResponseList);
