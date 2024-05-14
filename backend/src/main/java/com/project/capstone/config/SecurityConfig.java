@@ -24,7 +24,8 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequest ->
-                authorizeRequest.requestMatchers("/auth/**", "/club/search/**").permitAll()
+                authorizeRequest.requestMatchers("/auth/**", "/club/search/**", "/content/search/**"
+                        , "/quiz/search/**", "/book/**", "/assign/search/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
