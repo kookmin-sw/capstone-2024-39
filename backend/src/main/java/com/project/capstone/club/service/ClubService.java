@@ -144,13 +144,13 @@ public class ClubService {
         clubRepository.updateBook(book, clubId);
     }
 
-    public List<SimpleClubResponse> getClubByBookTitle(String title) {
+    public List<ClubResponse> getClubByBookTitle(String title) {
         List<Book> booksContainingTitle = bookRepository.findBooksByTitleContaining(title);
-        List<SimpleClubResponse> clubResponseList = new ArrayList<>();
+        List<ClubResponse> clubResponseList = new ArrayList<>();
         for (Book book : booksContainingTitle) {
             List<Club> clubList = clubRepository.findClubsByBook(book);
             for (Club club : clubList) {
-                clubResponseList.add(new SimpleClubResponse(club));
+                clubResponseList.add(new ClubResponse(club));
             }
         }
         return clubResponseList;

@@ -10,6 +10,8 @@ public record ContentResponse(
         Long id,
         String writer,
         BookResponse book,
+        String startDate,
+        String endDate,
         Long clubId,
         ContentType type,
         String title,
@@ -17,7 +19,7 @@ public record ContentResponse(
         int likes
 ) {
     public ContentResponse(Content content) {
-        this(content.getId(), content.getMember().getName(), new BookResponse(content.getBook()),
+        this(content.getId(), content.getMember().getName(), new BookResponse(content.getBook()), content.getStartDate(), content.getEndDate(),
                 content.getClub() == null ? null : content.getClub().getId(), content.getType(), content.getTitle(), content.getBody(), content.getLikes());
     }
 }
