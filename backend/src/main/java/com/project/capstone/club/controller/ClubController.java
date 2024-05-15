@@ -83,8 +83,8 @@ public class ClubController {
 
     // 대표책으로 모임 조회
     @GetMapping("/search/book")
-    public ResponseEntity<List<SimpleClubResponse>> getClubByBookName(@RequestParam String title) {
-        List<SimpleClubResponse> clubResponseList = clubService.getClubByBookTitle(title);
+    public ResponseEntity<List<ClubResponse>> getClubByBookName(@RequestParam String title) {
+        List<ClubResponse> clubResponseList = clubService.getClubByBookTitle(title);
         return ResponseEntity.ok().body(clubResponseList);
     }
 }
