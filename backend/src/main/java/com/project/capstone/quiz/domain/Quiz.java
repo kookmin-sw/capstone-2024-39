@@ -28,6 +28,10 @@ public class Quiz {
 
     @Enumerated(EnumType.STRING)
     private QuizType type;
+    @Column(name = "start_date")
+    private String startDate;
+    @Column(name = "end_date")
+    private String endDate;
     private String description;
     private String answer;
     private String example1;
@@ -52,8 +56,8 @@ public class Quiz {
     private Assignment assignment;
 
     public Quiz(CreateQuizRequest request, Member member, Book book, Club club, Assignment assignment) {
-        this(null, request.type(), request.description(), request.answer(), request.example1(), request.example2(), request.example3(), request.example4(),
-                member, book, club, assignment);
+        this(null, request.type(), request.startDate(), request.endDate(), request.description(), request.answer(),
+                request.example1(), request.example2(), request.example3(), request.example4(), member, book, club, assignment);
     }
 
 }

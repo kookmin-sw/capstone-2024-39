@@ -7,6 +7,8 @@ public record CreateQuizRequest(
 
         AddBookRequest addBookRequest,
         QuizType type,
+        String startDate,
+        String endDate,
         String description,
         String answer,
         String example1,
