@@ -54,9 +54,11 @@ public class QuizService {
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
 
-        Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElseGet(
-                () -> bookRepository.save(new Book(request.addBookRequest()))
-        );
+        Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElse(null);
+        if (book == null) {
+            book = bookRepository.save(new Book(request.addBookRequest()));
+            // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
+        }
 
         Club club;
         if (clubId == null) {
@@ -84,21 +86,7 @@ public class QuizService {
             }
         }
 
-        Quiz saved = quizRepository.save(
-                Quiz.builder()
-                        .type(request.type())
-                        .description(request.description())
-                        .answer(request.answer())
-                        .example1(request.example1())
-                        .example2(request.example2())
-                        .example3(request.example3())
-                        .example4(request.example4())
-                        .member(member)
-                        .book(book)
-                        .club(club)
-                        .assignment(assignment)
-                        .build()
-        );
+        Quiz saved = quizRepository.save(new Quiz(request, member, book, club, assignment));
 
         member.getQuizzes().add(saved);
         book.getQuizzes().add(saved);
@@ -108,7 +96,6 @@ public class QuizService {
         if (club != null) {
             club.getQuizzes().add(saved);
         }
-        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
 

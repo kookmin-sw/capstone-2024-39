@@ -5,6 +5,7 @@ import com.project.capstone.assignment.domain.Assignment;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.club.domain.Club;
 import com.project.capstone.member.domain.Member;
+import com.project.capstone.quiz.controller.dto.CreateQuizRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,5 +50,10 @@ public class Quiz {
     @JsonBackReference
     @ManyToOne
     private Assignment assignment;
+
+    public Quiz(CreateQuizRequest request, Member member, Book book, Club club, Assignment assignment) {
+        this(null, request.type(), request.description(), request.answer(), request.example1(), request.example2(), request.example3(), request.example4(),
+                member, book, club, assignment);
+    }
 
 }
