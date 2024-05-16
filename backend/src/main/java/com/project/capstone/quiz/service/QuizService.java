@@ -22,6 +22,8 @@ import com.project.capstone.quiz.domain.Quiz;
 import com.project.capstone.quiz.domain.QuizRepository;
 import com.project.capstone.quiz.exception.QuizException;
 import com.project.capstone.quiz.exception.QuizExceptionType;
+import com.project.capstone.recommend.controller.dto.EmbeddingRequest;
+import com.project.capstone.recommend.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class QuizService {
     private final BookRepository bookRepository;
     private final ClubRepository clubRepository;
     private final AssignmentRepository assignmentRepository;
+    private final RecommendService recommendService;
     private final static String QUIZ_TYPE = "퀴즈";
 
     public void createQuiz(String userId, CreateQuizRequest request, Long clubId, Long asId) {
@@ -105,6 +108,7 @@ public class QuizService {
         if (club != null) {
             club.getQuizzes().add(saved);
         }
+        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
 

@@ -24,6 +24,8 @@ import com.project.capstone.member.domain.Member;
 import com.project.capstone.member.domain.MemberRepository;
 import com.project.capstone.member.exception.MemberException;
 import com.project.capstone.member.exception.MemberExceptionType;
+import com.project.capstone.recommend.controller.dto.EmbeddingRequest;
+import com.project.capstone.recommend.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,7 @@ public class ContentService {
     private final ClubRepository clubRepository;
     private final MemberRepository memberRepository;
     private final AssignmentRepository assignmentRepository;
+    private final RecommendService recommendService;
 
     public void createContent(String userId, ContentCreateRequest request, Long clubId, Long asId) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
@@ -108,6 +111,7 @@ public class ContentService {
         if (club != null) {
             club.getContents().add(saved);
         }
+        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
     public ContentResponse getContent(Long id) {
