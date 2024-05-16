@@ -7,18 +7,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/rec")
 public class RecommendController {
     private final RecommendService recommendService;
 
-    @GetMapping("/")
+    @GetMapping("/rec")
     public ResponseEntity<RecommendResponse> recommend(@AuthenticationPrincipal PrincipalDetails details) {
         RecommendResponse recommend = recommendService.recommend(details.getUserId());
         return ResponseEntity.ok().body(recommend);

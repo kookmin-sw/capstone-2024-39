@@ -111,7 +111,7 @@ public class ContentService {
         if (club != null) {
             club.getContents().add(saved);
         }
-        recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
+        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
     public ContentResponse getContent(Long id) {

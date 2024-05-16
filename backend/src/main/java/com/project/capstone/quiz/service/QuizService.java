@@ -108,7 +108,7 @@ public class QuizService {
         if (club != null) {
             club.getQuizzes().add(saved);
         }
-        recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
+        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
 

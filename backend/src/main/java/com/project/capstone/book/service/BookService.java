@@ -42,7 +42,7 @@ public class BookService {
             throw new BookException(ALREADY_EXIST_BOOK);
         }
         bookRepository.save(new Book(request));
-        recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+        // recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
     }
 
     public BookResponse getBookByIsbn(String isbn) {
