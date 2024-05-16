@@ -12,6 +12,8 @@ public record QuizResponse (
         BookResponse book,
         Long clubId,
         QuizType type,
+        String startDate,
+        String endDate,
         String description,
         String answer,
         String example1,
@@ -21,6 +23,6 @@ public record QuizResponse (
 ) {
     public QuizResponse(Quiz quiz) {
         this(quiz.getId(), quiz.getMember().getName(), new BookResponse(quiz.getBook()), quiz.getClub() == null ? null : quiz.getClub().getId(), quiz.getType(),
-                quiz.getDescription(), quiz.getAnswer(), quiz.getExample1(), quiz.getExample2(), quiz.getExample3(), quiz.getExample4());
+                quiz.getStartDate(), quiz.getEndDate(), quiz.getDescription(), quiz.getAnswer(), quiz.getExample1(), quiz.getExample2(), quiz.getExample3(), quiz.getExample4());
     }
 }
