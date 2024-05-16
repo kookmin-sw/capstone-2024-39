@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,9 +60,11 @@ public class ContentService {
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
 
-        Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElseGet(
-                () -> bookRepository.save(new Book(request.addBookRequest()))
-        );
+        Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElse(null);
+        if (book == null) {
+            book = bookRepository.save(new Book(request.addBookRequest()));
+            // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
+        }
 
         Club club;
         if (clubId == null) {
@@ -89,29 +92,16 @@ public class ContentService {
             }
         }
 
-
-        Content saved = contentRepository.save(
-                Content.builder()
-                        .type(request.contentType())
-                        .title(request.title())
-                        .body(request.body())
-                        .likes(0)
-                        .member(member)
-                        .book(book)
-                        .club(club)
-                        .assignment(assignment)
-                        .build()
-        );
-
+        Content saved = contentRepository.save(new Content(request, member, book, club, assignment));
         member.getContents().add(saved);
         book.getContents().add(saved);
+
         if (assignment != null) {
             assignment.getContents().add(saved);
         }
         if (club != null) {
             club.getContents().add(saved);
         }
-        // recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
     }
 
     public ContentResponse getContent(Long id) {
