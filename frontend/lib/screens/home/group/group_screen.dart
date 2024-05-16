@@ -107,7 +107,7 @@ class _GroupState extends State<GroupScreen> {
   }
 
   Future<void> _loadData() async {
-    Timer(const Duration(milliseconds: 700), () {
+    Timer(const Duration(milliseconds: 800), () {
       setState(() {
         _isLoading = false;
       });

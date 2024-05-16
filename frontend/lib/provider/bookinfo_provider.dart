@@ -19,12 +19,12 @@ class BookInfoProvider with ChangeNotifier {
       template: '한줄평',
     ),
     Book(
-      title: '인용문구',
+      title: '인용구',
       imageUrl: 'https://via.placeholder.com/60x86',
       startDate: DateTime.now().subtract(const Duration(days: 3)),
       endDate: DateTime.now().subtract(const Duration(days: 2)),
       isPublic: true,
-      template: '인용문구',
+      template: '인용구',
     ),
     Book(
       title: '퀴즈',

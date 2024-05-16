@@ -112,11 +112,7 @@ class _SearchState extends State<SearchScreen> {
           ),
           centerTitle: true,
         ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(), // 로딩 애니매이션
-              )
-            : Center(
+        body: Center(
           child: Column(
             children: [
               Container(
@@ -187,95 +183,110 @@ class _SearchState extends State<SearchScreen> {
                       ),
                     ],
                   )),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  controller: _scrollController,
-                  child: Column(
-                    children: [
-                      if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
-                      ElevatedButton(
-                        onPressed: () async {
-                          dynamic userInfo = await login("test13@gmail.com");
-                          // dynamic userInfo = await singup("test13@gmail.com", "한지민", 30, "여자");
-                          print(userInfo['token']);
-                          print(userInfo['id']);
-                          await secureStorage.saveData(
-                              "token", userInfo['token']);
-                          await secureStorage.saveData("id", userInfo['id']);
-                        },
-                        child: Text('한지민'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          dynamic userInfo = await login("test80@gmail.com"); 
-                          // dynamic userInfo = await singup("test80@gmail.com", "젠랑이", 7, "남자");
-                          print(userInfo['token']);
-                          print(userInfo['id']);
-                          await secureStorage.saveData(
-                              "token", userInfo['token']);
-                          await secureStorage.saveData("id", userInfo['id']);
-                        },
-                        child: Text('젠랑이'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          dynamic userInfo = await login("test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                          // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
-                          // print(userInfo);
-                          print(userInfo['token']);
-                          print(userInfo['id']);
-                          await secureStorage.saveData(
-                              "token", userInfo['token']);
-                          await secureStorage.saveData("id", userInfo['id']);
-                        },
-                        child: Text('최창연'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          var token = await secureStorage.readData("token");
-                          var id = await secureStorage.readData("id");
-                          print(token);
-                          print(id);
-                        },
-                        child: Text('토큰 확인'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await secureStorage.deleteData("token");
-                          await secureStorage.deleteData("id");
-                        },
-                        child: Text('토큰 삭제'),
-                      ),
-                      if (GroupData.isNotEmpty)
-                        SizedBox(
-                          height: 200, // 높이 조정
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: GroupData.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: GroupUtil.GroupListItem(
-                                  data: GroupData[index],
-                                  userInfo: userInfo,
+              _isLoading
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: 200.h),
+                        child: const CircularProgressIndicator(),
+                      ), // 로딩 애니매이션
+                    )
+                  : Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        controller: _scrollController,
+                        child: Column(
+                          children: [
+                            if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
+                            ElevatedButton(
+                              onPressed: () async {
+                                dynamic userInfo =
+                                    await login("test13@gmail.com");
+                                // dynamic userInfo = await singup("test13@gmail.com", "한지민", 30, "여자");
+                                print(userInfo['token']);
+                                print(userInfo['id']);
+                                await secureStorage.saveData(
+                                    "token", userInfo['token']);
+                                await secureStorage.saveData(
+                                    "id", userInfo['id']);
+                              },
+                              child: Text('한지민'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                dynamic userInfo =
+                                    await login("test80@gmail.com");
+                                // dynamic userInfo = await singup("test80@gmail.com", "젠랑이", 7, "남자");
+                                print(userInfo['token']);
+                                print(userInfo['id']);
+                                await secureStorage.saveData(
+                                    "token", userInfo['token']);
+                                await secureStorage.saveData(
+                                    "id", userInfo['id']);
+                              },
+                              child: Text('젠랑이'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                dynamic userInfo = await login(
+                                    "test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                                // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
+                                print(userInfo['token']);
+                                print(userInfo['id']);
+                                await secureStorage.saveData(
+                                    "token", userInfo['token']);
+                                await secureStorage.saveData(
+                                    "id", userInfo['id']);
+                              },
+                              child: Text('최창연'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                var token =
+                                    await secureStorage.readData("token");
+                                var id = await secureStorage.readData("id");
+                                print(token);
+                                print(id);
+                              },
+                              child: Text('토큰 확인'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                await secureStorage.deleteData("token");
+                                await secureStorage.deleteData("id");
+                              },
+                              child: Text('토큰 삭제'),
+                            ),
+                            if (GroupData.isNotEmpty)
+                              SizedBox(
+                                height: 200.h, // 높이 조정
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: GroupData.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: GroupUtil.GroupListItem(
+                                        data: GroupData[index],
+                                        userInfo: userInfo,
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            if (BookData.isNotEmpty)
+                              for (int i = 0; i < BookData.length; i++)
+                                SearchUtil.SearchListItem(
+                                  data: BookData[i],
+                                  type: "search",
+                                  clubId: 0,
+                                ),
+                          ],
                         ),
-                      if (BookData.isNotEmpty)
-                        for (int i = 0; i < BookData.length; i++)
-                          SearchUtil.SearchListItem(
-                            data: BookData[i],
-                            type: "search",
-                            clubId: 0,
-                          ),
-                    ],
-                  ),
-                ),
-              ),
+                      ),
+                    ),
             ],
           ),
         ),

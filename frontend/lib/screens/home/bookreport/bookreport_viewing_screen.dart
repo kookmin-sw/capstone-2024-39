@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
-  final String type;
   final dynamic contentData;
 
   const BookReportViewingScreen({
     super.key,
-    required this.type,
     required this.contentData,
   });
 
@@ -19,48 +19,57 @@ class BookReportViewingScreen extends StatefulWidget {
 
 class _BookReportViewingState extends State<BookReportViewingScreen> {
   final TextEditingController _answerController = TextEditingController();
-  List<dynamic> _contentData = [];
-  //DateTime _startDate = DateTime.now();
-  //DateTime _endDate = DateTime.now();
+  // List<dynamic> _contentData = [];
+  dynamic _startDate = DateTime.now();
+  dynamic _endDate = DateTime.now();
   //bool _isPublic = false;
-  String _template = '퀴즈';
+  String _template = '';
+  String _writer = '';
   String _title = '';
   String _body = '';
   String _author = "작가";
   String _publisher = "출판사";
-  String _category = '단답형';
+  String _category = '';
   String _answer = '';
   bool _oxanswer = false;
-  String _example1 = '';
-  String _example2 = '';
-  String _example3 = '';
-  String _example4 = '';
-  bool _answer1 = false;
-  bool _answer2 = false;
-  bool _answer3 = false;
-  bool _answer4 = false;
-  // ignore: prefer_typing_uninitialized_variables
+  // String _example1 = '';
+  // String _example2 = '';
+  // String _example3 = '';
+  // String _example4 = '';
+  List<dynamic> _exampleList = [null, null, null, null];
+  List<dynamic> _multipleanswer = [false, false, false, false];
+  // bool _answer1 = false;
+  // bool _answer2 = false;
+  // bool _answer3 = false;
+  // bool _answer4 = false;
   var token;
 
-  void initializeContentData(dynamic token) async {
-    // _contentData = await contentLoad(token, 2);
-    // _template = _contentData[0]['type'] as String;
-    // _title = _contentData[0]['title'] as String;
-    // _body = _contentData[0]['body'] as String;
-  }
-
-  void initializeClubContentData(dynamic content){
-    
+  void initializeClubContentData(dynamic content) {
+    print(content);
     setState(() {
       _template = contentTypeCheck(content['type']);
-      _title = content['title'];
-      _body = content['body'];
+      _writer = content['writer'];
+      // _startDate = content['startDate'];
+      // _endDate = content['endDate'];
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
+      print(_template);
+      if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
+        _body = content['body'];
+        _title = content['title'];
+      } else {
+        _category = quizCategory(content['type']);
+        _answer = content['answer'];
+        _body = content['description'];
+        _title = content['description'];
+        for (int i = 0; i < 4; i++) {
+          _exampleList[i] = content['example${i + 1}'];
+        }
+      }
     });
   }
 
-  String contentTypeCheck(String template){ 
+  String contentTypeCheck(String template) {
     switch (template) {
       case "Review":
         return "독후감";
@@ -68,12 +77,19 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
         return "한줄평";
       case "Quotation":
         return "인용구";
+      default:
+        return "퀴즈";
+    }
+  }
+
+  String quizCategory(String template) {
+    switch (template) {
       case "MultipleChoice":
         return "객관식";
       case "ShortAnswer":
-        return "단답식";
+        return "단답형";
       case "OX":
-        return "OX";
+        return "O/X";
       default:
         return "";
     }
@@ -83,18 +99,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   void initState() {
     super.initState();
     _initUserState();
-    switch (widget.type) {
-      case 'club':
-        initializeClubContentData(widget.contentData);
-        break;
-      case 'bookInfo':
-        initializeContentData(token);
-        break;
-
-      default:
-        break;
-    }
-    
+    initializeClubContentData(widget.contentData);
   }
 
   Future<void> _initUserState() async {
@@ -227,16 +232,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 SizedBox(
                   width: 121,
                   height: 22,
-                  child: DropdownButton<String>(
-                    value: _category,
-                    onChanged: null,
-                    items: <String>['단답형', '객관식', 'O/X']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+                  child: Text(
+                    _category,
                     style: const TextStyle(
                       fontSize: 14,
                       fontFamily: 'Noto Sans KR',
@@ -244,7 +241,6 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                       color: Colors.black,
                       height: 0,
                     ),
-                    underline: Container(),
                   ),
                 ),
               ],
@@ -255,6 +251,59 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               child: Expanded(
                 child: _buildQuizUI(_category),
               ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    switch (_category) {
+                      case "단답형":
+                        if (_answerController.text == _answer) {
+                          // 맞음
+                          _showRightDialog();
+                        } else {
+                          // 틀림
+                          _showWrongDialog();
+                        }
+                        break;
+                      case "O/X":
+                        if (_answer == 'O') {
+                          if (_oxanswer) {
+                            // 맞음
+                            _showRightDialog();
+                          } else {
+                            // 틀림
+                            _showWrongDialog();
+                          }
+                        } else {
+                          if (!_oxanswer) {
+                            //맞음
+                            _showRightDialog();
+                          } else {
+                            //틀림
+                            _showWrongDialog();
+                          }
+                        }
+                        break;
+                      case "객관식":
+                        int check = int.parse(_answer) - 1;
+                        if (_multipleanswer[check]) {
+                          // 맞음
+                          _showRightDialog();
+                        } else {
+                          // 틀림
+                          _showWrongDialog();
+                        }
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                  child: const Text('정답확인'),
+                ),
+              ],
             ),
           ],
         );
@@ -268,15 +317,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       case ("단답형"):
         return Column(
           children: [
-            SizedBox(
-              width: 350,
-              height: 190,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              child: SizedBox(
+                width: 350.w,
+                height: 190.h,
+                child: Stack(
+                  children: [
+                    Container(
                       width: 350,
                       height: 190,
                       decoration: BoxDecoration(
@@ -285,26 +333,27 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                         border: Border.all(width: 1),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        const Text('Q: '),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: SizedBox(
-                            //width: _screenWidth * 0.7,
-                            child: Text(
-                              _body,
-                              style: const TextStyle(fontSize: 14),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          SizedBox(height: 40.h),
+                          const Text('Q: '),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: SizedBox(
+                              //width: _screenWidth * 0.7,
+                              child: Text(
+                                _body,
+                                style: const TextStyle(fontSize: 14),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Padding(
@@ -334,49 +383,50 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       case ("O/X"):
         return Column(
           children: [
-            SizedBox(
-              width: 350,
-              height: 190,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              child: SizedBox(
+                width: 350.w,
+                height: 190.h,
+                child: Stack(
+                  children: [
+                    Container(
                       width: 350,
-                      height: 190,
+                      height: 220,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(width: 1),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        const Text('Q: '),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: SizedBox(
-                            //width: _screenWidth * 0.7,
-                            child: Text(
-                              _answer,
-                              style: const TextStyle(fontSize: 14),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          SizedBox(height: 40.h),
+                          const Text('Q: '),
+                          SizedBox(width: 10.h),
+                          Expanded(
+                            child: SizedBox(
+                              //width: _screenWidth * 0.7,
+                              child: Text(
+                                _body,
+                                style: const TextStyle(fontSize: 14),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     onPressed: () {
@@ -421,43 +471,43 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       case ("객관식"):
         return Column(
           children: [
-            SizedBox(
-              width: 350,
-              height: 190,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              child: SizedBox(
+                width: 350.w,
+                height: 190.h,
+                child: Stack(
+                  children: [
+                    Container(
                       width: 350,
-                      height: 190,
+                      height: 220,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(width: 1),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        const Text('Q: '),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: SizedBox(
-                            //width: _screenWidth * 0.7,
-                            child: Text(
-                              _body,
-                              style: const TextStyle(fontSize: 14),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          SizedBox(height: 40.h),
+                          const Text('Q: '),
+                          SizedBox(width: 10.w),
+                          Expanded(
+                            child: SizedBox(
+                              //width: _screenWidth * 0.7,
+                              child: Text(
+                                _body,
+                                style: const TextStyle(fontSize: 14),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 15),
@@ -465,209 +515,69 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _answer1 = true;
-                            _answer2 = false;
-                            _answer3 = false;
-                            _answer4 = false;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(0),
-                          child: _answer1
-                              ? const Icon(Icons.check, color: Colors.green)
-                              : const Icon(Icons.check, color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 0.5,
+                  for (int i = 0; i < _exampleList.length; i++)
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  for (int j = 0; j < 4; j++) {
+                                    if (i == j) {
+                                      _multipleanswer[j] = true;
+                                    } else {
+                                      _multipleanswer[j] = false;
+                                    }
+                                  }
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(0),
+                                child: _multipleanswer[i]
+                                    ? const Icon(Icons.check,
+                                        color: Colors.green)
+                                    : const Icon(Icons.check,
+                                        color: Colors.grey),
+                              ),
                             ),
-                            color: _answer1 ? Colors.green : Colors.white,
-                          ),
-                          height: 24,
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              const Text('A: '),
-                              Expanded(
-                                child: SizedBox(
-                                  //width: _screenWidth * 0.7,
-                                  child: Text(
-                                    _example1,
-                                    style: const TextStyle(fontSize: 10),
+                            const SizedBox(width: 5),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: Colors.black,
+                                    width: 0.5,
                                   ),
+                                  color: _multipleanswer[i]
+                                      ? Colors.green
+                                      : Colors.white,
+                                ),
+                                height: 24.h,
+                                alignment: Alignment.center,
+                                child: Row(
+                                  children: [
+                                    SizedBox(width: 10.w),
+                                    const Text('A: '),
+                                    Expanded(
+                                      child: SizedBox(
+                                        //width: _screenWidth * 0.7,
+                                        child: Text(
+                                          _exampleList[i],
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _answer1 = false;
-                            _answer2 = true;
-                            _answer3 = false;
-                            _answer4 = false;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(0),
-                          child: _answer2
-                              ? const Icon(Icons.check, color: Colors.green)
-                              : const Icon(Icons.check, color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 0.5,
                             ),
-                            color: _answer2 ? Colors.green : Colors.white,
-                          ),
-                          height: 24,
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              const Text('A: '),
-                              Expanded(
-                                child: SizedBox(
-                                  //width: _screenWidth * 0.7,
-                                  child: Text(
-                                    _example2,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _answer1 = false;
-                            _answer2 = false;
-                            _answer3 = true;
-                            _answer4 = false;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(0),
-                          child: _answer3
-                              ? const Icon(Icons.check, color: Colors.green)
-                              : const Icon(Icons.check, color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 0.5,
-                            ),
-                            color: _answer3 ? Colors.green : Colors.white,
-                          ),
-                          height: 24,
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              const Text('A: '),
-                              Expanded(
-                                child: SizedBox(
-                                  //width: _screenWidth * 0.7,
-                                  child: Text(
-                                    _example3,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _answer1 = false;
-                            _answer2 = false;
-                            _answer3 = false;
-                            _answer4 = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(0),
-                          child: _answer4
-                              ? const Icon(Icons.check, color: Colors.green)
-                              : const Icon(Icons.check, color: Colors.grey),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 0.5,
-                            ),
-                            color: _answer4 ? Colors.green : Colors.white,
-                          ),
-                          height: 24,
-                          alignment: Alignment.center,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              const Text('A: '),
-                              Expanded(
-                                child: SizedBox(
-                                  //width: _screenWidth * 0.7,
-                                  child: Text(
-                                    _example4,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -677,5 +587,45 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       default:
         throw ArgumentError('Invalid quiz type');
     }
+  }
+
+  void _showRightDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('정답'),
+          content: Text('정답을 맞추셨습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showWrongDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('오답'),
+          content: Text('정답을 틀리셨습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

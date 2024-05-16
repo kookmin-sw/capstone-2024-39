@@ -37,11 +37,12 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
   }
 
   Future<void> updatePostList() async {
-    var _token = await secureStorage.readData("token");
-    var _posts = await getAssign(_token, widget.clubId);
+    var _posts = await getAssign(widget.clubId);
+    if(_posts.runtimeType == Map<String,dynamic>){
+      _posts = [];
+    }
     setState(() {
       posts = _posts;
-      print(posts);
     });
   }
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
@@ -8,6 +10,7 @@ import 'package:frontend/screens/home/mypage/login_screen.dart';
 import 'package:frontend/screens/home/mypage/makelibrary_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/mypage/signup_screen.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +29,8 @@ import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dar
 import 'package:frontend/screens/home/group/in_group/post/make_post/post_make_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/make_post/homework_make_screen.dart';
 import 'package:frontend/screens/home/group/in_group/post/homework_memberlist_screen.dart';
+import 'package:frontend/screens/home/group/in_group/voicecall/voice_class.dart';
+import 'package:frontend/screens/book/book_content_screen.dart';
 
 void main() async {
   runApp(const App());
@@ -90,19 +95,23 @@ final GoRouter router = GoRouter(
       name: 'bookreport_writing',
       path: '/bookreport_writing',
       builder: (context, state) {
-        int index = state.extra as int;
-        return BookReportWritingScreen(index: index);
+        Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+        int index = extraData['index'] as int;
+        dynamic clubId = extraData['clubId'] as dynamic;
+        dynamic asId = extraData['asId'] as dynamic;
+        return BookReportWritingScreen(
+          index: index,
+          clubId: clubId,
+          asId: asId,
+        );
       },
     ),
     GoRoute(
       name: 'bookreport_viewing',
       path: '/bookreport_viewing',
-      builder: (context, state){
-        Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
-        String type = extraData['type'] as String;
-        dynamic contentData = extraData['contentData'] as dynamic;
+      builder: (context, state) {
+        dynamic contentData = state.extra as dynamic;
         return BookReportViewingScreen(
-          type: type,
           contentData: contentData,
         );
       },
@@ -230,6 +239,25 @@ final GoRouter router = GoRouter(
             data: data,
           );
         }),
+    GoRoute(
+        name: 'book_content',
+        path: '/book_content',
+        builder: (context, state) {
+          Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
+          dynamic posts = extraData['posts'] as dynamic;
+          String type = extraData['type'] as String;
+          String isbn = extraData['isbn'] as String;
+          return BookContentScreen(
+            posts: posts, 
+            type: type,
+            isbn: isbn,
+          );
+        }),
+    GoRoute(
+      name: 'voicecall',
+      path: '/voicecall',
+      builder: (context, state) => const VoiceCallScreen(),
+    ),
   ],
 );
 

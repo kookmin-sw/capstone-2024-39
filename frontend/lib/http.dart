@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml2json/xml2json.dart';
@@ -194,9 +195,10 @@ Future<dynamic> groupCreate(dynamic token, String name, String topic,
 //컨텐츠 생성하기
 Future<dynamic> contentCreate(
     dynamic token,
-    int clubId,
+    dynamic clubId,
+    dynamic asId,
     String isbn,
-    String title2,
+    String booktitle,
     String author,
     String publisher,
     String publishDate,
@@ -207,10 +209,12 @@ Future<dynamic> contentCreate(
     String startDate,
     String endDate) async {
   var address;
-  if (clubId == 0) {
+  // print(clubId);
+  if (clubId == null) {
+    print(clubId);
     address = Uri.parse("$BASE_URL/content/create?");
   } else {
-    address = Uri.parse("$BASE_URL/content/create?clubId=$clubId");
+    address = Uri.parse("$BASE_URL/content/create?clubId=$clubId&asId=$asId");
   }
   http.Response res = await http.post(
     address,
@@ -220,8 +224,8 @@ Future<dynamic> contentCreate(
     },
     body: json.encode({
       "addBookRequest": {
-        "isbn": "i-$isbn",
-        "title": title2,
+        "isbn": isbn, 
+        "title": booktitle,
         "author": author,
         "publisher": publisher,
         "publishDate": publishDate,
@@ -235,18 +239,77 @@ Future<dynamic> contentCreate(
     }),
   );
   final data = res.body;
+  // final data = json.decode(utf8.decode(res.bodyBytes));
+  print(data);
+  return data;
+}
+
+//퀴즈 생성하기
+Future<dynamic> quizCreate(
+    dynamic token,
+    dynamic clubId,
+    dynamic asId,
+    String isbn,
+    String booktitle,
+    String author,
+    String publisher,
+    String publishDate,
+    String imageUrl,
+    String type,
+    String description,
+    var answer,
+    var example1,
+    var example2,
+    var example3,
+    var example4,
+    String startDate,
+    String endDate) async {
+  var address;
+  if (clubId == null) {
+    print(clubId);
+    address = Uri.parse("$BASE_URL/quiz/create?");
+  } else {
+    address = Uri.parse("$BASE_URL/quiz/create?clubId=$clubId&asId=$asId");
+  }
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+    body: json.encode({
+      "addBookRequest": {
+        "isbn": isbn, 
+        "title": booktitle,
+        "author": author,
+        "publisher": publisher,
+        "publishDate": publishDate,
+        "imageUrl": imageUrl,
+      },
+      "type": type,
+      "description" : description,
+      "answer": answer,
+      "example1": example1,
+      "example2": example2,
+      "example3": example3,
+      "example4": example4,
+      "startDate": startDate,
+      "endDate": endDate,
+    }),
+  );
+  final data = res.body;
+  print(data);
   return data;
 }
 
 //컨텐츠 불러오기
-Future<List<dynamic>> contentLoad(dynamic token, int id) async {
+Future<List<dynamic>> contentLoad(int id) async {
   List<dynamic> contentList = [];
   var address = Uri.parse("$BASE_URL/content/search/$id");
   http.Response res = await http.get(
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": 'Bearer $token',
     },
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
@@ -257,14 +320,13 @@ Future<List<dynamic>> contentLoad(dynamic token, int id) async {
 }
 
 //해당 책의 컨텐츠 불러오기
-Future<List<dynamic>> bookcontentLoad(dynamic token, String ISBN, String content) async {
+Future<List<dynamic>> bookcontentLoad(String ISBN, String content) async {
   List<dynamic> contentList = [];
-  var address = Uri.parse("$BASE_URL/book/$ISBN/content");
+  var address = Uri.parse("$BASE_URL/book/$ISBN/content?type=$content");
   http.Response res = await http.get(
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": 'Bearer $token',
     },
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
@@ -275,14 +337,13 @@ Future<List<dynamic>> bookcontentLoad(dynamic token, String ISBN, String content
 }
 
 //해당 책의 퀴즈 불러오기
-Future<List<dynamic>> bookQuizLoad(dynamic token, String ISBN) async {
+Future<List<dynamic>> bookQuizLoad(String ISBN) async {
   List<dynamic> contentList = [];
   var address = Uri.parse("$BASE_URL/book/$ISBN/quiz");
   http.Response res = await http.get(
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": 'Bearer $token',
     },
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
@@ -382,7 +443,7 @@ Future<String> groupBookSelect(
 }
 
 //책 추가하기
-Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
+Future<String> bookAdd(Map<String, dynamic> bookdata) async {
   String originalDate = bookdata['pubdate'];
   DateTime parsedDate = DateTime.parse(originalDate.replaceAllMapped(
       RegExp(r'(\d{4})(\d{2})(\d{2})'),
@@ -393,7 +454,6 @@ Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": 'Bearer $token',
     },
     body: json.encode({
       "isbn": bookdata['isbn'],
@@ -415,14 +475,12 @@ Future<String> bookAdd(dynamic token, Map<String, dynamic> bookdata) async {
 }
 
 //책 기본 정보 불러오기
-Future<dynamic> getBookInfo(dynamic token, String isbn) async {
-  print(isbn);
+Future<dynamic> getBookInfo(String isbn) async {
   var address = Uri.parse(BASE_URL + "/book/search/$isbn");
   http.Response res = await http.get(
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer $token",
     },
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
@@ -432,16 +490,15 @@ Future<dynamic> getBookInfo(dynamic token, String isbn) async {
 }
 
 //과제 불러오기
-Future<List<dynamic>> getAssign(String token, int clubId) async {
+Future<dynamic> getAssign(int clubId) async {
   var address = Uri.parse(BASE_URL + "/assign/search/get?clubId=$clubId");
   http.Response res = await http.get(
     address,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer $token",
     },
   );
-  final data = json.decode(utf8.decode(res.bodyBytes));
+  var data = json.decode(utf8.decode(res.bodyBytes));
   // print(data);
   return data;
 }
@@ -465,6 +522,7 @@ Future<String> assignCreate(String token, int clubId, String name, String type,
   );
   final data = res.body;
 
+  // print(data);
   return data;
 }
 

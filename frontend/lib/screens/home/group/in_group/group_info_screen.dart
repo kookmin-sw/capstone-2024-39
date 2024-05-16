@@ -222,6 +222,13 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               ),
             ),
           ),
+
+          ElevatedButton(
+            onPressed: (){
+              context.push('/voicecall');
+            }, 
+            child: Text('test voice'),
+          ),
         ],
       ),
     );
@@ -397,11 +404,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     clubData = await groupSerachforId(widget.clubId);
 
     setState(() {});
-    // print(clubData);
   }
 
   Future<void> _clubGetAssign() async {
-    clubHwList = await getAssign(token, widget.clubId);
+    clubHwList = await getAssign(widget.clubId);
+    if (clubHwList.runtimeType == Map<String, dynamic>) {
+      clubHwList = null;
+    }
+
     setState(() {});
   }
 
@@ -437,7 +447,9 @@ class _GroupInfoState extends State<GroupInfoScreen> {
       id = await secureStorage.readData("id");
       token = await secureStorage.readData("token");
       bool isGroupMember = await userState(id, token);
+
       await _clubGetInfo();
+
       await _clubGetAssign();
 
       if (id == clubData['managerId']) {
@@ -449,7 +461,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
         _isGroupMember = isGroupMember;
         _isGroupManager = isGroupManager;
         updateGroupList();
-        // print(clubData['book']);
       });
     } catch (e) {
       setState(() {

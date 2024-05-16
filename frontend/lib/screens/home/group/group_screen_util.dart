@@ -46,6 +46,7 @@ class _GroupListItemState extends State<GroupListItem> {
 
   @override
   void initState() {
+    // print(widget.data);
     super.initState();
   }
 

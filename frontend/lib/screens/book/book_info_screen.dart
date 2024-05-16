@@ -67,17 +67,20 @@ class _BookInfoState extends State<BookInfoScreen> {
 
   Future<void> updateBookcontent() async {
     var _review, _shortreview, _quotation, _quiz;
-    _review = await bookcontentLoad(token, widget.data['isbn'], 'Review');
-    _quotation = await bookcontentLoad(token, widget.data['isbn'], 'Quotation');
-    _quotation =
-        await bookcontentLoad(token, widget.data['isbn'], 'ShortReview');
-    _quiz = await bookQuizLoad(token, widget.data['isbn']);
+    _review = await bookcontentLoad(widget.data['isbn'], 'Review');
+    _quotation = await bookcontentLoad(widget.data['isbn'], 'Quotation');
+    _shortreview = await bookcontentLoad(widget.data['isbn'], 'ShortReview');
+    _quiz = await bookQuizLoad(widget.data['isbn']);
 
     setState(() {
       review = _review;
       shortreview = _shortreview;
       quotation = _quotation;
       quiz = _quiz;
+      // print(review);
+      // print(shortreview);
+      // print(quotation);
+      // print(quiz);
     });
   }
 
@@ -217,7 +220,13 @@ class _BookInfoState extends State<BookInfoScreen> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: () {
-                          // context.push('/homework_list');
+                          context.push('/book_content', extra: {
+                            "posts": quiz,
+                            "type": "Quiz",
+                            "isbn": widget.data['isbn'],
+                          }).then((value) async {
+                            updateBookcontent();
+                          });
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,10 +288,24 @@ class _BookInfoState extends State<BookInfoScreen> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(6),
                             onTap: () {
-                              // context.push('/homework_list');
+                              var post, type;
                               if (_selectType[0]) {
+                                post = review;
+                                type = "Review";
                               } else if (_selectType[1]) {
-                              } else if (_selectType[2]) {}
+                                post = shortreview;
+                                type = "ShortReview";
+                              } else if (_selectType[2]) {
+                                post = quotation;
+                                type = "Quotation";
+                              }
+                              context.push('/book_content', extra: {
+                                "posts": post,
+                                "type": type,
+                                "isbn": widget.data['isbn'],
+                              }).then((value) async {
+                                updateBookcontent();
+                              });
                             },
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,7 +358,7 @@ class _BookInfoState extends State<BookInfoScreen> {
   }
 
   //각 게시판의 글들을 리스트로 형성
-  List<Widget> _buildTaskList(BuildContext context, String type, String isbn) {
+  List<Widget> _buildTaskList(BuildContext context, String type) {
     List<Widget> tasks = [];
     List<dynamic> temp;
     int cnt = 0;
@@ -345,11 +368,11 @@ class _BookInfoState extends State<BookInfoScreen> {
           break;
         }
         temp = quiz;
-        temp.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a["endDate"]);
-          DateTime dateTimeB = DateTime.parse(b["endDate"]);
-          return dateTimeB.compareTo(dateTimeA);
-        });
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
         for (var post in temp) {
           if (cnt > 4) {
             break;
@@ -369,15 +392,15 @@ class _BookInfoState extends State<BookInfoScreen> {
         }
         break;
       case '독후감':
-        if (clubHwList == null) {
+        if (review == null) {
           break;
         }
-        temp = clubHwList;
-        temp.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a["endDate"]);
-          DateTime dateTimeB = DateTime.parse(b["endDate"]);
-          return dateTimeB.compareTo(dateTimeA);
-        });
+        temp = review;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
         for (var post in temp) {
           if (cnt > 3) {
             break;
@@ -397,15 +420,15 @@ class _BookInfoState extends State<BookInfoScreen> {
         }
         break;
       case '한줄평':
-        if (clubHwList == null) {
+        if (shortreview == null) {
           break;
         }
-        temp = clubHwList;
-        temp.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a["endDate"]);
-          DateTime dateTimeB = DateTime.parse(b["endDate"]);
-          return dateTimeB.compareTo(dateTimeA);
-        });
+        temp = shortreview;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
         for (var post in temp) {
           if (cnt > 3) {
             break;
@@ -425,15 +448,15 @@ class _BookInfoState extends State<BookInfoScreen> {
         }
         break;
       case '인용구':
-        if (clubHwList == null) {
+        if (quotation == null) {
           break;
         }
-        temp = clubHwList;
-        temp.sort((a, b) {
-          DateTime dateTimeA = DateTime.parse(a["endDate"]);
-          DateTime dateTimeB = DateTime.parse(b["endDate"]);
-          return dateTimeB.compareTo(dateTimeA);
-        });
+        temp = quotation;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
         for (var post in temp) {
           if (cnt > 3) {
             break;
@@ -464,26 +487,11 @@ class _BookInfoState extends State<BookInfoScreen> {
   Widget _buildTaskEntry(BuildContext context, var post, bool isQuiz) {
     return InkWell(
       onTap: () {
-        //퀴즈 탭 됐을 때
-        if (isQuiz) {
-          if (_isGroupMember) {
-            context.push('/post', extra: {
-              'postId': post['id'],
-              'clubId': post['clubId'],
-            }).then((value) async {
-              updateBookcontent();
-            });
-          }
-        }
-        //과제가 탭 됐을 때
-        else {
-          if (_isGroupMember) {
-            context.push('/homeworkmember_make', extra: {
-              'post': post,
-              'clubId': widget.clubId,
-            }).then((value) async {});
-          }
-        }
+        // 퀴즈나 다른 컨텐츠 모두 눌러도 가능하도록
+        context.push(
+          '/bookreport_viewing',
+          extra: post,
+        );
       },
       child: Container(
         width: 50.w,
@@ -497,7 +505,7 @@ class _BookInfoState extends State<BookInfoScreen> {
             left: 3.0,
           ),
           child: Text(
-            (isQuiz) ? post['title'] : post['name'],
+            isQuiz ? post['description'] : post['title'],
           ),
         ),
       ),
