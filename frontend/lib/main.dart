@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/book/book_info_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_template_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
 import 'package:frontend/screens/home/bookreport/bookreport_writing_screen.dart';
+import 'package:frontend/screens/home/group/group_screen.dart';
+import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
+import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/homework_memberlist_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/make_post/homework_make_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/make_post/post_make_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
+import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
+import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/mypage/login_screen.dart';
 import 'package:frontend/screens/home/mypage/makelibrary_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/mypage/signup_screen.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-
-import 'package:frontend/screens/home/home_screen.dart';
 import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:frontend/screens/home/shorts/shorts_screen.dart';
-import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
-import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/homework_list_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/notice_list_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/post_list_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
-import 'package:frontend/screens/book/book_info_screen.dart';
-import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/make_post/post_make_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/make_post/homework_make_screen.dart';
-import 'package:frontend/screens/home/group/in_group/post/homework_memberlist_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   runApp(const App());
@@ -97,7 +96,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       name: 'bookreport_viewing',
       path: '/bookreport_viewing',
-      builder: (context, state) => const BookReportViewingScreen(),
+      builder: (context, state) {
+        int id = state.extra as int;
+        return BookReportViewingScreen(id: id);
+      },
     ),
     GoRoute(
       name: 'mypage',

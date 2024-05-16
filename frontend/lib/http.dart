@@ -1,8 +1,9 @@
+import 'dart:convert';
+
+import 'package:frontend/secret.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml2json/xml2json.dart';
-import 'package:frontend/secret.dart';
-import 'dart:convert';
 
 const String NaverBookSearchURL =
     "https://openapi.naver.com/v1/search/book.json";
@@ -220,7 +221,7 @@ Future<dynamic> contentCreate(
     },
     body: json.encode({
       "addBookRequest": {
-        "isbn": "i-$isbn",
+        "isbn": isbn,
         "title": title2,
         "author": author,
         "publisher": publisher,

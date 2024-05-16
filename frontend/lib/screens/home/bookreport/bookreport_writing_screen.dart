@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
@@ -345,8 +344,12 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Expanded(
-                child: _buildTemplateUI(_template),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildTemplateUI(_template),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 15),
@@ -361,7 +364,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             alignment: Alignment.bottomRight,
             child: ElevatedButton(
               onPressed: () {
-                // 글 저장 기능 추가
                 contentCreate(
                     token,
                     0,
@@ -422,25 +424,24 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   decoration: const InputDecoration(
                     hintText: '인용문을 작성해주세요',
                     hintStyle: TextStyle(
-                      // 힌트 텍스트 정중앙 정렬
                       height: 15,
                     ),
                     border: InputBorder.none,
                   ),
                   onChanged: (text) {
-                    setState(() {}); // Rebuild widget when text changes
+                    setState(() {});
                   },
                 ),
               ),
               const Positioned(
                 left: 0,
                 top: 0,
-                child: Icon(Icons.format_quote), // 좌측 상단 따옴표 아이콘
+                child: Icon(Icons.format_quote),
               ),
               const Positioned(
                 right: 0,
                 bottom: 0,
-                child: Icon(Icons.format_quote), // 우측 하단 따옴표 아이콘
+                child: Icon(Icons.format_quote),
               ),
             ],
           ),
@@ -494,8 +495,12 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Expanded(
-                child: _buildQuizUI(selectedCategory!),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuizUI(selectedCategory!),
+                  ),
+                ],
               ),
             ),
           ],

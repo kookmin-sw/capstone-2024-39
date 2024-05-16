@@ -4,7 +4,9 @@ import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
-  const BookReportViewingScreen({super.key});
+  final int id;
+
+  const BookReportViewingScreen({super.key, required this.id});
 
   @override
   State<BookReportViewingScreen> createState() => _BookReportViewingState();
@@ -36,10 +38,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   var token;
 
   void initializeContentData(dynamic token) async {
-    // _contentData = await contentLoad(token, 2);
-    // _template = _contentData[0]['type'] as String;
-    // _title = _contentData[0]['title'] as String;
-    // _body = _contentData[0]['body'] as String;
+    _contentData = await contentLoad(token, widget.id);
+    print(widget.id);
+    print(_contentData);
+    // _template = _contentData['type'] as String;
+    // _title = _contentData['title'] as String;
+    // _body = _contentData['body'] as String;
   }
 
   @override
@@ -116,8 +120,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Expanded(
-                child: _buildTemplateUI(_template),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildTemplateUI(_template),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 15),
@@ -204,8 +212,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Expanded(
-                child: _buildQuizUI(_category),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuizUI(_category),
+                  ),
+                ],
               ),
             ),
           ],

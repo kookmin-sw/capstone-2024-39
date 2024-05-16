@@ -10,8 +10,6 @@ class AgoraApi {
 
   Future<void> initAgora() async {
     _engine = createAgoraRtcEngine();
-    await _engine.initialize(const RtcEngineContext(
-      appId: Agora_AppID
-    ));
+    await _engine.initialize(const RtcEngineContext(appId: Agora_AppID));
   }
 }

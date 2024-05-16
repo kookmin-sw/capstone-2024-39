@@ -71,5 +71,4 @@ flutter {
 }
 
 dependencies {
-    implementation 'io.agora.rtc:voice-sdk:4.3.1'
 }

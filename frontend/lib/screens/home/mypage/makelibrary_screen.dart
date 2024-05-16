@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
-import 'package:go_router/go_router.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class MakeLibraryScreen extends StatefulWidget {
@@ -259,7 +259,7 @@ class _MakeLibraryScreenState extends State<MakeLibraryScreen> {
             addBooksToLibrary(token, _appBarTitle, _bookList);
             print(_appBarTitle);
             print(_bookList);
-            //context.pop();
+            context.pop();
           },
           backgroundColor: const Color(0xFF0E9913),
           child: const Icon(Icons.save),
