@@ -53,7 +53,11 @@ class BookReportTemplateScreen extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push('/bookreport_writing', extra: index),
+        onTap: () => context.push('/bookreport_writing', extra: {
+          "index": index,
+          "clubId": null,
+          "asId": null,
+        }),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[

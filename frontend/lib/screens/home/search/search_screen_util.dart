@@ -24,6 +24,12 @@ class SearchListItem extends StatefulWidget {
 }
 
 class _SearchListItemState extends State<SearchListItem> {
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final secureStorage = Provider.of<SecureStorageService>(context, listen: false);
@@ -36,14 +42,13 @@ class _SearchListItemState extends State<SearchListItem> {
             onTap: () async{
               switch (widget.type) {
                 case "search":
-                var token = await secureStorage.readData("token");
-                  var result = await bookAdd(token, widget.data);
+                  var result = await bookAdd(widget.data);
                   print(result);
                   if(result == "도서 추가 완료"){ // 새로운 책
                     
                   }
                   else{ //이미 있는 책
-                    await getBookInfo(token, widget.data['isbn']);
+                    await getBookInfo(widget.data['isbn']);
                   }
                   context.push(
                     '/book_info',

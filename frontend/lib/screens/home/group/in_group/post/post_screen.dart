@@ -71,26 +71,26 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(390, 675),
-      builder: (context, child) => Scaffold(
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          backgroundColor: const Color(0xFF0E9913),
-          title: Text(
-            (data['isSticky']) ? "공지사항" : "게시글",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          centerTitle: true,
-        ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(), // 로딩 애니매이션
-              )
-            : Column(
+      builder: (context, child) => _isLoading
+          ? Center(
+              child: CircularProgressIndicator(), // 로딩 애니매이션
+            )
+          : Scaffold(
+              appBar: AppBar(
+                scrolledUnderElevation: 0,
+                backgroundColor: const Color(0xFF0E9913),
+                title: Text(
+                  (data['isSticky']) ? "공지사항" : "게시글",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontFamily: 'Noto Sans KR',
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                centerTitle: true,
+              ),
+              body: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   //본문 내용 + 댓글창
@@ -201,7 +201,7 @@ class _PostScreenState extends State<PostScreen> {
                   ),
                 ],
               ),
-      ),
+            ),
     );
   }
 }

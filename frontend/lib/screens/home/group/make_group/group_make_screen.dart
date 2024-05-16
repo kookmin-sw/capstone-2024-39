@@ -89,7 +89,8 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
+              // 모임 주제 설정
               DropdownButtonFormField(
                 decoration: const InputDecoration(
                   labelText: '모임 주제',
@@ -105,7 +106,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
               // 모임 제한 인원
               TextField(
                 controller: _textControllers[2],
@@ -120,7 +121,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
               // 공개 비공개 여부
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -164,7 +165,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
               // 비밀번호
               if (_isPublic[1])
                 TextField(
@@ -182,7 +183,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                     });
                   },
                 ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
               // 생성하기 버튼
               ElevatedButton(
                 onPressed: _isCreateButtonEnabled()
