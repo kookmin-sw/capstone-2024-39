@@ -10,16 +10,21 @@ from typing import List
 
 app = FastAPI()
 load_dotenv()
+
+
 class EmbeddingRequest(BaseModel):
     isbn: str
     title: str
     description: str
 
+
 class RecommendRequest(BaseModel):
     isbnList: List[str]
 
+
 pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
 index = pc.Index("book-embedding")
+
 
 @app.post("/embed")
 async def get_embedding(embedding_request: EmbeddingRequest):
@@ -57,6 +62,7 @@ async def get_embedding(embedding_request: EmbeddingRequest):
         namespace="embeddings"
     )
     return "ok"
+
 
 @app.post("/recommend")
 async def recommend(recommend_request: RecommendRequest):
