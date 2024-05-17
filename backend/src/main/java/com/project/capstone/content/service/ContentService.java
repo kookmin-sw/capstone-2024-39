@@ -62,8 +62,8 @@ public class ContentService {
 
         Book book = bookRepository.findBookByIsbn(request.addBookRequest().isbn()).orElse(null);
         if (book == null) {
-            book = bookRepository.save(new Book(request.addBookRequest()));
             recommendService.embed(new EmbeddingRequest(request.addBookRequest().isbn(), request.addBookRequest().title(), request.addBookRequest().description()));
+            book = bookRepository.save(new Book(request.addBookRequest()));
         }
 
         Club club;

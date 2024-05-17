@@ -15,6 +15,8 @@ import com.project.capstone.member.domain.Member;
 import com.project.capstone.member.domain.MemberRepository;
 import com.project.capstone.member.exception.MemberException;
 import com.project.capstone.memberclub.exception.MemberClubException;
+import com.project.capstone.recommend.controller.dto.EmbeddingRequest;
+import com.project.capstone.recommend.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class ClubService {
     private final MemberClubRepository memberClubRepository;
     private final MemberRepository memberRepository;
     private final BookRepository bookRepository;
+    private final RecommendService recommendService;
 
     public List<ClubResponse> searchByTopic(String topic) {
         List<ClubResponse> clubResponseList = new ArrayList<>();
@@ -137,9 +140,11 @@ public class ClubService {
     @Transactional
     public void setBook(String managerId, AddBookRequest request, Long clubId) {
         Club club = checkIsManager(managerId, clubId);
-        Book book = bookRepository.findBookByIsbn(request.isbn()).orElseGet(
-                () -> bookRepository.save(new Book(request))
-        );
+        Book book = bookRepository.findBookByIsbn(request.isbn()).orElse(null);
+        if (book == null) {
+            recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+            book = bookRepository.save(new Book(request));
+        }
         club.setBook(book);
         clubRepository.updateBook(book, clubId);
     }

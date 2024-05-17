@@ -41,8 +41,8 @@ public class BookService {
         if (bookRepository.findBookByIsbn(request.isbn()).isPresent()) {
             throw new BookException(ALREADY_EXIST_BOOK);
         }
-        bookRepository.save(new Book(request));
         recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+        bookRepository.save(new Book(request));
     }
 
     public BookResponse getBookByIsbn(String isbn) {

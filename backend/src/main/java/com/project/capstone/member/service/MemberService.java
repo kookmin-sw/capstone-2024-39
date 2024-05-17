@@ -58,8 +58,8 @@ public class MemberService {
         );
         Book book = bookRepository.findBookByIsbn(request.isbn()).orElse(null);
         if (book == null) {
-            book = bookRepository.save(new Book(request));
             recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+            book = bookRepository.save(new Book(request));
         }
         if (myBookRepository.findMyBookByMemberAndBook(member, book).isPresent()) {
             throw new MyBookException(ALREADY_EXIST_MYBOOK);
@@ -76,8 +76,8 @@ public class MemberService {
         for (AddBookRequest request : requests) {
             Book book = bookRepository.findBookByIsbn(request.isbn()).orElse(null);
             if (book == null) {
-                book = bookRepository.save(new Book(request));
                 recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+                book = bookRepository.save(new Book(request));
             }
             if (myBookRepository.findMyBookByMemberAndBook(member, book).isPresent()) {
                 throw new MyBookException(ALREADY_EXIST_MYBOOK);
