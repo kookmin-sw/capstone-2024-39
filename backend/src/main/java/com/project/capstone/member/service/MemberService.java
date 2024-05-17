@@ -11,6 +11,8 @@ import com.project.capstone.member.exception.MemberException;
 import com.project.capstone.mybook.domain.MyBook;
 import com.project.capstone.mybook.domain.MyBookRepository;
 import com.project.capstone.mybook.exception.MyBookException;
+import com.project.capstone.recommend.controller.dto.EmbeddingRequest;
+import com.project.capstone.recommend.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MyBookRepository myBookRepository;
     private final BookRepository bookRepository;
+    private final RecommendService recommendService;
 
     public MemberResponse getMember(UUID id) {
         Member member = memberRepository.findMemberById(id).orElseThrow(
@@ -53,13 +56,14 @@ public class MemberService {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
-        Book book = bookRepository.findBookByIsbn(request.isbn()).orElseGet(
-                () -> bookRepository.save(new Book(request))
-        );
+        Book book = bookRepository.findBookByIsbn(request.isbn()).orElse(null);
+        if (book == null) {
+            book = bookRepository.save(new Book(request));
+            recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+        }
         if (myBookRepository.findMyBookByMemberAndBook(member, book).isPresent()) {
             throw new MyBookException(ALREADY_EXIST_MYBOOK);
         }
-
         MyBook saved = myBookRepository.save(new MyBook(null, groupName, member, book));
         member.getMyBooks().add(saved);
         book.getMembersAddThisBook().add(saved);
@@ -70,9 +74,11 @@ public class MemberService {
                 () -> new MemberException(MEMBER_NOT_FOUND)
         );
         for (AddBookRequest request : requests) {
-            Book book = bookRepository.findBookByIsbn(request.isbn()).orElseGet(
-                    () -> bookRepository.save(new Book(request))
-            );
+            Book book = bookRepository.findBookByIsbn(request.isbn()).orElse(null);
+            if (book == null) {
+                book = bookRepository.save(new Book(request));
+                recommendService.embed(new EmbeddingRequest(request.isbn(), request.title(), request.description()));
+            }
             if (myBookRepository.findMyBookByMemberAndBook(member, book).isPresent()) {
                 throw new MyBookException(ALREADY_EXIST_MYBOOK);
             }
