@@ -48,6 +48,4 @@ public class Post {
     @JsonBackReference
     @ManyToOne
     private Club club;
-
-
 }
