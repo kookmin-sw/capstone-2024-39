@@ -33,6 +33,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   bool _isKeyboardVisible = false;
 
   // Variables to store user input
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _bookTitleController = TextEditingController();
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
@@ -54,6 +55,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   String _isbn = "";
   String _publisherDate = "";
   String _imageUrl = "";
+  String _description = "";
 
   late final _KeyboardVisibilityObserverWrapper
       _keyboardVisibilityObserverWrapper;
@@ -168,89 +170,24 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  const Text('도서: '),
-                  SizedBox(width: 10.w),
+                  const Text('제목: '),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: SizedBox(
                       width: _screenWidth * 0.7.w,
                       child: TextField(
                         style: const TextStyle(fontSize: 14),
-                        controller: _bookTitleController,
+                        controller: _titleController,
                         decoration: const InputDecoration(
-                          hintText: '도서를 입력하세요.',
+                          hintText: '제목을 입력하세요.',
                           border: InputBorder.none,
                         ),
-                        textInputAction: TextInputAction.go,
-                        onSubmitted: (value) async {
-                          BookData =
-                              await SearchBook(_bookTitleController.text);
-                          showDialog(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('도서 검색 결과'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      for (int i = 0; i < BookData.length; i++)
-                                        searchutil.BookSearchListItem(
-                                          data: BookData[i],
-                                          type: "search",
-                                          clubId: 0,
-                                          onSelected: (selectedData) {
-                                            print(
-                                                'Selected Data: $selectedData');
-                                            _bookTitleController.text =
-                                                selectedData['title'];
-                                            setState(() {
-                                              _author = selectedData['author'];
-                                              _publisher =
-                                                  selectedData['publisher'];
-                                            });
-                                            _isbn = selectedData['isbn'];
-                                            _publisherDate =
-                                                selectedData['pubdate'];
-                                            _imageUrl = selectedData['image'];
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 5.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text('$_author  |  $_publisher',
-                      style: const TextStyle(color: Colors.black)),
-                ],
-              ),
-            ),
-            SizedBox(height: 5.h),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 10),
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //       border: Border.all(
-            //         width: 1.w,
-            //         color: const Color(0xFFA9AFB7),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: 5.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -301,66 +238,95 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            // SizedBox(height: 20.h),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 20),
-            //   child: Row(
-            //     children: [
-            //       const Text('공개 여부: ', style: TextStyle(color: Colors.black)),
-            //       SizedBox(width: 3.w),
-            //       GestureDetector(
-            //         onTap: () {
-            //           setState(() {
-            //             _isPublic = true;
-            //           });
-            //         },
-            //         child: Container(
-            //           decoration: BoxDecoration(
-            //             border: Border.all(
-            //               color: Colors.black,
-            //               width: 0.5.w,
-            //             ),
-            //             borderRadius: BorderRadius.circular(5),
-            //             color: _isPublic ? Colors.green : Colors.white,
-            //           ),
-            //           padding: const EdgeInsets.symmetric(horizontal: 5),
-            //           child: const Text(
-            //             '공개',
-            //             style: TextStyle(
-            //               color: Colors.black,
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //       SizedBox(width: 10.w),
-            //       GestureDetector(
-            //         onTap: () {
-            //           setState(() {
-            //             _isPublic = false;
-            //           });
-            //         },
-            //         child: Container(
-            //           decoration: BoxDecoration(
-            //             border: Border.all(
-            //               color: Colors.black,
-            //               width: 0.5.w,
-            //             ),
-            //             borderRadius: BorderRadius.circular(5),
-            //             color: !_isPublic ? Colors.green : Colors.white,
-            //           ),
-            //           padding: const EdgeInsets.symmetric(horizontal: 5),
-            //           child: const Text(
-            //             '비공개',
-            //             style: TextStyle(
-            //               color: Colors.black,
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            SizedBox(height: 5.h),
+            const SizedBox(height: 15),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
+                    color: const Color(0xFFA9AFB7),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  const Text('도서: '),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: SizedBox(
+                      width: _screenWidth * 0.7,
+                      child: TextField(
+                        style: const TextStyle(fontSize: 14),
+                        controller: _bookTitleController,
+                        decoration: const InputDecoration(
+                          hintText: '도서를 입력하세요.',
+                          border: InputBorder.none,
+                        ),
+                        textInputAction: TextInputAction.go,
+                        onSubmitted: (value) async {
+                          BookData =
+                              await SearchBook(_bookTitleController.text);
+                          showDialog(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('도서 검색 결과'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      for (int i = 0; i < BookData.length; i++)
+                                        searchutil.BookSearchListItem(
+                                          data: BookData[i],
+                                          type: "search",
+                                          clubId: 0,
+                                          onSelected: (selectedData) {
+                                            print(
+                                                'Selected Data: $selectedData');
+                                            _bookTitleController.text =
+                                                selectedData['title'];
+                                            setState(() {
+                                              _author = selectedData['author'];
+                                              _publisher =
+                                                  selectedData['publisher'];
+                                            });
+                                            _isbn = selectedData['isbn'];
+                                            _publisherDate =
+                                                selectedData['pubdate'];
+                                            _imageUrl = selectedData['image'];
+                                            _description =
+                                                selectedData['description'];
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text('$_author  |  $_publisher',
+                      style: const TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
@@ -404,12 +370,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       widget.asId,
                       _isbn,
                       _bookTitleController.text,
+                      _description,
                       _author,
                       _publisher,
                       _publisherDate,
                       _imageUrl,
                       _template,
-                      _bookTitleController.text,
+                      _titleController.text,
                       _writingController.text,
                       _startDate.toString(),
                       _endDate.toString());
@@ -542,19 +509,19 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     border: InputBorder.none,
                   ),
                   onChanged: (text) {
-                    setState(() {}); // Rebuild widget when text changes
+                    setState(() {});
                   },
                 ),
               ),
               const Positioned(
                 left: 0,
                 top: 0,
-                child: Icon(Icons.format_quote), // 좌측 상단 따옴표 아이콘
+                child: Icon(Icons.format_quote),
               ),
               const Positioned(
                 right: 0,
                 bottom: 0,
-                child: Icon(Icons.format_quote), // 우측 하단 따옴표 아이콘
+                child: Icon(Icons.format_quote),
               ),
             ],
           ),

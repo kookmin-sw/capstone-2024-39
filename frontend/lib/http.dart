@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
+import 'dart:convert';
+
+import 'package:frontend/secret.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml2json/xml2json.dart';
-import 'package:frontend/secret.dart';
-import 'dart:convert';
 
 const String NaverBookSearchURL =
     "https://openapi.naver.com/v1/search/book.json";
@@ -223,6 +223,7 @@ Future<dynamic> contentCreate(
     dynamic asId,
     String isbn,
     String booktitle,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -250,6 +251,7 @@ Future<dynamic> contentCreate(
       "addBookRequest": {
         "isbn": isbn,
         "title": booktitle,
+        "description": description,
         "author": author,
         "publisher": publisher,
         "publishDate": publishDate,
@@ -632,6 +634,7 @@ Future<String> addBookToLibrary(
     String token,
     String isbn,
     String title,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -646,6 +649,7 @@ Future<String> addBookToLibrary(
     body: json.encode({
       "isbn": isbn,
       "title": title,
+      "description": description,
       "author": author,
       "publisher": publisher,
       "publishDate": publishDate,

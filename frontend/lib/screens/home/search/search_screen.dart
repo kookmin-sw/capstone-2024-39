@@ -1,15 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
-import 'package:frontend/screens/home/search/search_screen_util.dart'
-    as SearchUtil;
+import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart'
     as GroupUtil;
-import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/search/search_screen_util.dart'
+    as SearchUtil;
 import 'package:provider/provider.dart';
-import 'dart:async';
 
 List<dynamic> BookData = [];
 List<dynamic> GroupData = [];
@@ -206,15 +205,9 @@ class _SearchState extends State<SearchScreen> {
                             if (check && GroupData.isEmpty) const Text("모임 검색 결과가 없습니다"),
                             ElevatedButton(
                               onPressed: () async {
-                                dynamic userInfo =
-                                    await login("test13@gmail.com");
-                                // dynamic userInfo = await singup("test13@gmail.com", "한지민", 30, "여자");
-                                print(userInfo['token']);
-                                print(userInfo['id']);
-                                await secureStorage.saveData(
-                                    "token", userInfo['token']);
-                                await secureStorage.saveData(
-                                    "id", userInfo['id']);
+                                await secureStorage.saveData('name', '이현준');
+                                await secureStorage.saveData('age', '23');
+                                await secureStorage.saveData('gender', '남자');
                               },
                               child: Text('한지민'),
                             ),
