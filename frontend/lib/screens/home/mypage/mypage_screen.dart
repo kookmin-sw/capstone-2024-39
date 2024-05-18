@@ -77,6 +77,7 @@ class _MypageScreenState extends State<MypageScreen>
         age = userInfo['age']?.toString() ?? '0';
         gender = userInfo['gender'];
         books = userInfo['contentList'];
+        print(books);
         secureStorage.saveData('name', name!);
         secureStorage.saveData('age', age!);
         secureStorage.saveData('gender', gender!);
@@ -281,10 +282,15 @@ class _LoginWidgetState extends State<LoginWidget> {
       userInfo = await login(googleUser.email);
       await secureStorage.saveData('userID', googleUser.email);
       if (userInfo['exceptionCode'] != null) {
-        context.push('/signup');
+        context.push('/signup').then((_) {
+          widget.updateLoginStatus(true);
+        });
       } else {
         await secureStorage.saveData("token", userInfo['token']);
         await secureStorage.saveData("id", userInfo['id']);
+        await secureStorage.saveData("name", userInfo['name']);
+        await secureStorage.saveData("age", userInfo['age'].toString());
+        await secureStorage.saveData("gender", userInfo['gender']);
         widget.updateLoginStatus(true);
       }
     }
@@ -302,9 +308,11 @@ class BookReportWidget extends StatelessWidget {
       itemCount: books.length,
       itemBuilder: (context, index) {
         final book = books[index];
+        final startDate = book['startDate'].toString().substring(0, 10);
+        final endDate = book['endDate'].toString().substring(0, 10);
         return GestureDetector(
           onTap: () async {
-            context.push('/bookreport_viewing', extra: book['id']);
+            context.push('/bookreport_viewing', extra: book);
           },
           child: SizedBox(
             height: 101.h,
@@ -317,7 +325,7 @@ class BookReportWidget extends StatelessWidget {
                     width: 240.w,
                     height: 16.h,
                     child: Text(
-                      '${book['startDate']} ~ ${book['endDate']}',
+                      '$startDate ~ $endDate',
                       style: TextStyle(
                         color: const Color(0xFF6E767F),
                         fontSize: 9.sp,

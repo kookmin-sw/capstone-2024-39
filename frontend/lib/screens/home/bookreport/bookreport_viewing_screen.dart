@@ -22,6 +22,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   String _template = '';
   String _writer = '';
   String _title = '';
+  String _booktitle = '';
   String _body = '';
   String _author = "작가";
   String _publisher = "출판사";
@@ -43,6 +44,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
+        _booktitle = content['book']['title'];
       } else {
         _category = quizCategory(content['type']);
         _answer = content['answer'];
@@ -127,6 +129,15 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               child: Row(
                 children: [
                   Text(_title),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(_booktitle),
                 ],
               ),
             ),

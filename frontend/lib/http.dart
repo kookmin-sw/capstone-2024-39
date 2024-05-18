@@ -199,6 +199,7 @@ Future<dynamic> contentCreate(
     dynamic asId,
     String isbn,
     String booktitle,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -211,7 +212,6 @@ Future<dynamic> contentCreate(
   var address;
   // print(clubId);
   if (clubId == null) {
-    print(clubId);
     address = Uri.parse("$BASE_URL/content/create?");
   } else {
     address = Uri.parse("$BASE_URL/content/create?clubId=$clubId&asId=$asId");
@@ -226,6 +226,7 @@ Future<dynamic> contentCreate(
       "addBookRequest": {
         "isbn": isbn,
         "title": booktitle,
+        "description": description,
         "author": author,
         "publisher": publisher,
         "publishDate": publishDate,
@@ -239,7 +240,7 @@ Future<dynamic> contentCreate(
     }),
   );
   final data = res.body;
-  // final data = json.decode(utf8.decode(res.bodyBytes));
+  //final data = json.decode(utf8.decode(res.bodyBytes));
   print(data);
   return data;
 }
@@ -603,6 +604,7 @@ Future<String> addBookToLibrary(
     String token,
     String isbn,
     String title,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -617,6 +619,7 @@ Future<String> addBookToLibrary(
     body: json.encode({
       "isbn": isbn,
       "title": title,
+      "description": description,
       "author": author,
       "publisher": publisher,
       "publishDate": publishDate,

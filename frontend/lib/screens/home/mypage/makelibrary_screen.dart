@@ -119,7 +119,6 @@ class _MakeLibraryScreenState extends State<MakeLibraryScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: SizedBox(
-                      //width: _screenWidth * 0.7,
                       child: TextField(
                         style: const TextStyle(fontSize: 14),
                         controller: _bookTitleController,
@@ -150,6 +149,8 @@ class _MakeLibraryScreenState extends State<MakeLibraryScreen> {
                                             _tempbookList = {
                                               'isbn': selectedData['isbn'],
                                               'title': selectedData['title'],
+                                              'description':
+                                                  selectedData['description'],
                                               'author': selectedData['author'],
                                               'publisher':
                                                   selectedData['publisher'],

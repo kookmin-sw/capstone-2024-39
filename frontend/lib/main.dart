@@ -107,9 +107,7 @@ final GoRouter router = GoRouter(
       path: '/bookreport_viewing',
       builder: (context, state) {
         dynamic contentData = state.extra as dynamic;
-        return BookReportViewingScreen(
-          contentData: contentData,
-        );
+        return BookReportViewingScreen(contentData: contentData);
       },
     ),
     GoRoute(
