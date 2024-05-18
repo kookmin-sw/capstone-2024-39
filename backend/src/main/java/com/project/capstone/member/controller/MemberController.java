@@ -47,4 +47,17 @@ public class MemberController {
         memberService.addMyBooks(details.getUserId(), requests, groupName);
         return ResponseEntity.ok().body("추가 완료");
     }
+
+    @DeleteMapping("/my-book/rm/group")
+    public ResponseEntity<?> removeMyBookGroup(@AuthenticationPrincipal PrincipalDetails details, @RequestParam String groupName) {
+        memberService.removeMyBookGroup(details.getUserId(), groupName);
+        return ResponseEntity.ok().body("나만의 서재 삭제 완료");
+    }
+
+    @DeleteMapping("/my-book/rm/book")
+    public ResponseEntity<?> removeMyBook(@AuthenticationPrincipal PrincipalDetails details,
+                                          @RequestParam String groupName, @RequestParam String isbn) {
+        memberService.removeMyBook(details.getUserId(), groupName, isbn);
+        return ResponseEntity.ok().body("나만의 서재의 책 삭제 완료");
+    }
 }
