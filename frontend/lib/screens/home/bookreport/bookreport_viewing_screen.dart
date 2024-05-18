@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/http.dart';
-import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
   final dynamic contentData;
 
-  const BookReportViewingScreen({
-    super.key,
-    required this.contentData,
-  });
+  const BookReportViewingScreen({super.key, required this.contentData});
 
   @override
   State<BookReportViewingScreen> createState() => _BookReportViewingState();
@@ -20,28 +16,21 @@ class BookReportViewingScreen extends StatefulWidget {
 class _BookReportViewingState extends State<BookReportViewingScreen> {
   final TextEditingController _answerController = TextEditingController();
   // List<dynamic> _contentData = [];
-  dynamic _startDate = DateTime.now();
-  dynamic _endDate = DateTime.now();
+  final dynamic _startDate = DateTime.now();
+  final dynamic _endDate = DateTime.now();
   //bool _isPublic = false;
   String _template = '';
   String _writer = '';
   String _title = '';
+  String _booktitle = '';
   String _body = '';
   String _author = "작가";
   String _publisher = "출판사";
   String _category = '';
   String _answer = '';
   bool _oxanswer = false;
-  // String _example1 = '';
-  // String _example2 = '';
-  // String _example3 = '';
-  // String _example4 = '';
-  List<dynamic> _exampleList = [null, null, null, null];
-  List<dynamic> _multipleanswer = [false, false, false, false];
-  // bool _answer1 = false;
-  // bool _answer2 = false;
-  // bool _answer3 = false;
-  // bool _answer4 = false;
+  final List<dynamic> _exampleList = [null, null, null, null];
+  final List<dynamic> _multipleanswer = [false, false, false, false];
   var token;
 
   void initializeClubContentData(dynamic content) {
@@ -49,14 +38,13 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
     setState(() {
       _template = contentTypeCheck(content['type']);
       _writer = content['writer'];
-      // _startDate = content['startDate'];
-      // _endDate = content['endDate'];
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
       print(_template);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
+        _booktitle = content['book']['title'];
       } else {
         _category = quizCategory(content['type']);
         _answer = content['answer'];
@@ -149,6 +137,15 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
+                  Text(_booktitle),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
                   Text('$_author | $_publisher',
                       style: const TextStyle(color: Colors.black)),
                 ],
@@ -169,8 +166,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Expanded(
-                child: _buildTemplateUI(_template),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildTemplateUI(_template),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 15),
@@ -248,8 +249,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Expanded(
-                child: _buildQuizUI(_category),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuizUI(_category),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 10),

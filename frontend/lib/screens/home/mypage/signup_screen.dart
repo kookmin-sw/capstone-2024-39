@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -114,18 +114,22 @@ class _SignupState extends State<SignupScreen> {
                             ),
                             Positioned(
                               left: 20.w,
-                              child: Expanded(
-                                child: SizedBox(
-                                  width: 330.w,
-                                  child: TextField(
-                                    style: const TextStyle(fontSize: 14),
-                                    controller: _nameController,
-                                    decoration: const InputDecoration(
-                                      hintText: '이름',
-                                      border: InputBorder.none,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: 330.w,
+                                      child: TextField(
+                                        style: const TextStyle(fontSize: 14),
+                                        controller: _nameController,
+                                        decoration: const InputDecoration(
+                                          hintText: '이름',
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ],
@@ -154,20 +158,24 @@ class _SignupState extends State<SignupScreen> {
                             ),
                             Positioned(
                               left: 20.w,
-                              child: Expanded(
-                                child: SizedBox(
-                                  width: 330.w,
-                                  child: TextFormField(
-                                    style: const TextStyle(fontSize: 14),
-                                    controller: _ageController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      hintText: '나이',
-                                      border: InputBorder.none,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: 330.w,
+                                      child: TextFormField(
+                                        style: const TextStyle(fontSize: 14),
+                                        controller: _ageController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          hintText: '나이',
+                                          border: InputBorder.none,
+                                        ),
+                                        validator: _validateAge,
+                                      ),
                                     ),
-                                    validator: _validateAge,
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ],
@@ -196,19 +204,23 @@ class _SignupState extends State<SignupScreen> {
                             ),
                             Positioned(
                               left: 20.w,
-                              child: Expanded(
-                                child: SizedBox(
-                                  width: 330.w,
-                                  child: TextFormField(
-                                    style: const TextStyle(fontSize: 14),
-                                    controller: _genderController,
-                                    decoration: const InputDecoration(
-                                      hintText: '성별',
-                                      border: InputBorder.none,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: SizedBox(
+                                      width: 330.w,
+                                      child: TextFormField(
+                                        style: const TextStyle(fontSize: 14),
+                                        controller: _genderController,
+                                        decoration: const InputDecoration(
+                                          hintText: '성별',
+                                          border: InputBorder.none,
+                                        ),
+                                        validator: _validateAge,
+                                      ),
                                     ),
-                                    validator: _validateAge,
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ],

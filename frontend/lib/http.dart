@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
+import 'dart:convert';
+
+import 'package:frontend/secret.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:xml2json/xml2json.dart';
-import 'package:frontend/secret.dart';
-import 'dart:convert';
 
 const String NaverBookSearchURL =
     "https://openapi.naver.com/v1/search/book.json";
@@ -199,6 +199,7 @@ Future<dynamic> contentCreate(
     dynamic asId,
     String isbn,
     String booktitle,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -211,7 +212,6 @@ Future<dynamic> contentCreate(
   var address;
   // print(clubId);
   if (clubId == null) {
-    print(clubId);
     address = Uri.parse("$BASE_URL/content/create?");
   } else {
     address = Uri.parse("$BASE_URL/content/create?clubId=$clubId&asId=$asId");
@@ -224,8 +224,9 @@ Future<dynamic> contentCreate(
     },
     body: json.encode({
       "addBookRequest": {
-        "isbn": isbn, 
+        "isbn": isbn,
         "title": booktitle,
+        "description": description,
         "author": author,
         "publisher": publisher,
         "publishDate": publishDate,
@@ -239,7 +240,7 @@ Future<dynamic> contentCreate(
     }),
   );
   final data = res.body;
-  // final data = json.decode(utf8.decode(res.bodyBytes));
+  //final data = json.decode(utf8.decode(res.bodyBytes));
   print(data);
   return data;
 }
@@ -279,7 +280,7 @@ Future<dynamic> quizCreate(
     },
     body: json.encode({
       "addBookRequest": {
-        "isbn": isbn, 
+        "isbn": isbn,
         "title": booktitle,
         "author": author,
         "publisher": publisher,
@@ -287,7 +288,7 @@ Future<dynamic> quizCreate(
         "imageUrl": imageUrl,
       },
       "type": type,
-      "description" : description,
+      "description": description,
       "answer": answer,
       "example1": example1,
       "example2": example2,
@@ -603,6 +604,7 @@ Future<String> addBookToLibrary(
     String token,
     String isbn,
     String title,
+    String description,
     String author,
     String publisher,
     String publishDate,
@@ -617,6 +619,7 @@ Future<String> addBookToLibrary(
     body: json.encode({
       "isbn": isbn,
       "title": title,
+      "description": description,
       "author": author,
       "publisher": publisher,
       "publishDate": publishDate,

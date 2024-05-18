@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
-import 'package:frontend/screens/home/mypage/signup_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 class MypageScreen extends StatefulWidget {
   const MypageScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MypageScreenState createState() => _MypageScreenState();
 }
 
@@ -29,79 +26,35 @@ class LibraryBook {
   String publisher;
   String imageUrl;
 
-  LibraryBook(
-      {required this.title,
-      required this.author,
-      required this.publisher,
-      required this.imageUrl});
+  LibraryBook({
+    required this.title,
+    required this.author,
+    required this.publisher,
+    required this.imageUrl,
+  });
 }
 
 class _MypageScreenState extends State<MypageScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  var books = [];
+  List<dynamic> books = [];
+  List<Library> libraries = [];
 
-  List<Library> libraries = [
-    Library(
-      name: '즐겨찾기',
-      books: [
-        LibraryBook(
-          title: '원씽',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-        LibraryBook(
-          title: '원씽2',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-        LibraryBook(
-          title: '원씽',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-        LibraryBook(
-          title: '원씽2',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-      ],
-    ),
-    Library(
-      name: '읽고 싶은 책',
-      books: [
-        LibraryBook(
-          title: '원씽(The One Thing)',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-        LibraryBook(
-          title: '원씽(The One Thing)2',
-          author: 'Gary Keller, Jay Papasan',
-          publisher: 'Business Books',
-          imageUrl: 'https://via.placeholder.com/70x100',
-        ),
-      ],
-    ),
-  ];
-
-  var id;
-  var token;
-  var isLogin;
-  var userInfo;
+  String? id;
+  String? token;
+  String? name;
+  String? age;
+  String? gender;
+  bool isLogin = false;
+  dynamic userInfo;
+  int? userId;
 
   @override
   void initState() {
     super.initState();
-    _initUserState();
     _tabController = TabController(length: 2, vsync: this);
-    books.sort((a, b) => a.endDate.compareTo(b.endDate));
+    _initUserState();
   }
 
   Future<void> _initUserState() async {
@@ -109,15 +62,58 @@ class _MypageScreenState extends State<MypageScreen>
         Provider.of<SecureStorageService>(context, listen: false);
     token = await secureStorage.readData("token");
     id = await secureStorage.readData("id");
-    print(token);
+
     if (token == null) {
-      isLogin = false;
+      setState(() {
+        isLogin = false;
+      });
     } else {
-      isLogin = true;
-      userInfo = await getUserInfo(id, token);
-      books = userInfo['contentList'];
-      print(books);
+      setState(() {
+        isLogin = true;
+      });
+      userInfo = await getUserInfo(id!, token!);
+      setState(() {
+        name = userInfo['name'];
+        age = userInfo['age']?.toString() ?? '0';
+        gender = userInfo['gender'];
+        books = userInfo['contentList'];
+        print(books);
+        secureStorage.saveData('name', name!);
+        secureStorage.saveData('age', age!);
+        secureStorage.saveData('gender', gender!);
+      });
+      await _fetchLibraries(token!);
     }
+  }
+
+  Future<void> _fetchLibraries(String token) async {
+    final fetchedLibraries = await getLibrary(token);
+    setState(() {
+      libraries = parseLibraries(fetchedLibraries);
+    });
+  }
+
+  List<Library> parseLibraries(List<dynamic> libraryData) {
+    // Create a map of library names to Library objects
+    Map<String, Library> libraryMap = {};
+
+    for (var entry in libraryData) {
+      final groupName = entry['groupName'];
+      final book = LibraryBook(
+        title: entry['title'],
+        author: entry['author'],
+        publisher: entry['publisher'],
+        imageUrl: entry['imageUrl'],
+      );
+
+      if (libraryMap.containsKey(groupName)) {
+        libraryMap[groupName]!.books.add(book);
+      } else {
+        libraryMap[groupName] = Library(name: groupName, books: [book]);
+      }
+    }
+
+    return libraryMap.values.toList();
   }
 
   @override
@@ -138,7 +134,10 @@ class _MypageScreenState extends State<MypageScreen>
         ),
         body: Column(
           children: [
-            if (isLogin == true) const LoggedWidget() else const LoginWidget(),
+            if (isLogin)
+              const LoggedWidget()
+            else
+              LoginWidget(updateLoginStatus: _updateLoginStatus),
             TabBar(
               labelColor: Colors.black,
               indicatorColor: Colors.black,
@@ -157,7 +156,10 @@ class _MypageScreenState extends State<MypageScreen>
                 controller: _tabController,
                 children: [
                   BookReportWidget(books: books),
-                  MyLibraryWidget(libraries: libraries),
+                  MyLibraryWidget(
+                    libraries: libraries,
+                    onLibraryUpdated: _initUserState,
+                  ),
                 ],
               ),
             ),
@@ -165,6 +167,15 @@ class _MypageScreenState extends State<MypageScreen>
         ),
       ),
     );
+  }
+
+  void _updateLoginStatus(bool isLoggedIn) {
+    setState(() {
+      isLogin = isLoggedIn;
+      if (isLoggedIn) {
+        _initUserState();
+      }
+    });
   }
 }
 
@@ -189,23 +200,17 @@ class LoggedWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               color: Colors.grey[200],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.account_circle,
-                      size: 70.w,
-                    ),
-                    SizedBox(width: 16.w),
-                    Text(
-                      name,
-                      style: TextStyle(
-                          fontSize: 20.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 65.w),
-                  ],
+                Icon(
+                  Icons.account_circle,
+                  size: 70.w,
+                ),
+                SizedBox(width: 16.w),
+                Text(
+                  name,
+                  style:
+                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -217,7 +222,9 @@ class LoggedWidget extends StatelessWidget {
 }
 
 class LoginWidget extends StatefulWidget {
-  const LoginWidget({super.key});
+  final void Function(bool isLogin) updateLoginStatus;
+
+  const LoginWidget({super.key, required this.updateLoginStatus});
 
   @override
   _LoginWidgetState createState() => _LoginWidgetState();
@@ -252,7 +259,9 @@ class _LoginWidgetState extends State<LoginWidget> {
               SizedBox(width: 76.w),
               ElevatedButton(
                 onPressed: () {
-                  signInWithGoogle(context);
+                  setState(() {
+                    signInWithGoogle(context);
+                  });
                 },
                 child: const Text('로그인'),
               ),
@@ -270,19 +279,20 @@ class _LoginWidgetState extends State<LoginWidget> {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser != null) {
-      print('name = ${googleUser.displayName}');
-      print('email = ${googleUser.email}');
-      print('id = ${googleUser.id}');
-
       userInfo = await login(googleUser.email);
       await secureStorage.saveData('userID', googleUser.email);
-      print(userInfo);
       if (userInfo['exceptionCode'] != null) {
-        print('진입');
-        await context.push('/signup');
+        context.push('/signup').then((_) {
+          widget.updateLoginStatus(true);
+        });
+      } else {
+        await secureStorage.saveData("token", userInfo['token']);
+        await secureStorage.saveData("id", userInfo['id']);
+        await secureStorage.saveData("name", userInfo['name']);
+        await secureStorage.saveData("age", userInfo['age'].toString());
+        await secureStorage.saveData("gender", userInfo['gender']);
+        widget.updateLoginStatus(true);
       }
-      await secureStorage.saveData("token", userInfo['token']);
-      await secureStorage.saveData("id", userInfo['id']);
     }
   }
 }
@@ -298,9 +308,11 @@ class BookReportWidget extends StatelessWidget {
       itemCount: books.length,
       itemBuilder: (context, index) {
         final book = books[index];
+        final startDate = book['startDate'].toString().substring(0, 10);
+        final endDate = book['endDate'].toString().substring(0, 10);
         return GestureDetector(
           onTap: () async {
-            context.push('/bookreport_viewing');
+            context.push('/bookreport_viewing', extra: book);
           },
           child: SizedBox(
             height: 101.h,
@@ -313,7 +325,7 @@ class BookReportWidget extends StatelessWidget {
                     width: 240.w,
                     height: 16.h,
                     child: Text(
-                      '${book.startDate} ~ ${book.endDate}',
+                      '$startDate ~ $endDate',
                       style: TextStyle(
                         color: const Color(0xFF6E767F),
                         fontSize: 9.sp,
@@ -330,7 +342,7 @@ class BookReportWidget extends StatelessWidget {
                     width: 240.w,
                     height: 45.h,
                     child: Text(
-                      book.type,
+                      book['type'],
                       style: TextStyle(
                         color: const Color(0xFF6E767F),
                         fontSize: 9.sp,
@@ -347,7 +359,7 @@ class BookReportWidget extends StatelessWidget {
                     width: 240.w,
                     height: 16.h,
                     child: Text(
-                      '${book.author} | ${book.publisher}',
+                      '${book['book']['author']} | ${book['book']['publisher']}',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 10.sp,
@@ -363,13 +375,14 @@ class BookReportWidget extends StatelessWidget {
                   child: SizedBox(
                     width: 240.w,
                     child: Text(
-                      book.title,
+                      book['title'],
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 20.sp,
                         fontFamily: 'Noto Sans KR',
                         fontWeight: FontWeight.w700,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -381,7 +394,7 @@ class BookReportWidget extends StatelessWidget {
                     height: 85.68.h,
                     decoration: ShapeDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(book.imageUrl),
+                        image: NetworkImage(book['book']['imageUrl']),
                         fit: BoxFit.fill,
                       ),
                       shape: RoundedRectangleBorder(
@@ -399,18 +412,28 @@ class BookReportWidget extends StatelessWidget {
   }
 }
 
-class MyLibraryWidget extends StatelessWidget {
+class MyLibraryWidget extends StatefulWidget {
   final List<Library> libraries;
+  final VoidCallback onLibraryUpdated; // Add this line
 
-  const MyLibraryWidget({super.key, required this.libraries});
+  const MyLibraryWidget({
+    super.key,
+    required this.libraries,
+    required this.onLibraryUpdated, // Add this line
+  });
 
+  @override
+  _MyLibraryWidgetState createState() => _MyLibraryWidgetState();
+}
+
+class _MyLibraryWidgetState extends State<MyLibraryWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView.builder(
-        itemCount: libraries.length,
+        itemCount: widget.libraries.length,
         itemBuilder: (context, index) {
-          var library = libraries[index];
+          var library = widget.libraries[index];
           return Padding(
             padding: EdgeInsets.all(15.w),
             child: Column(
@@ -437,20 +460,18 @@ class MyLibraryWidget extends StatelessWidget {
                             Container(
                               width: 90.w,
                               height: 128.52.h,
-                              decoration: ShapeDecoration(
+                              decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: NetworkImage(book.imageUrl),
                                   fit: BoxFit.fill,
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3),
-                                ),
+                                borderRadius: BorderRadius.circular(3),
                               ),
                             ),
                             SizedBox(height: 5.h),
                             SizedBox(
-                              width: 90.w,
-                              height: 20.h,
+                              width: 90,
+                              height: 20,
                               child: Text(
                                 book.title,
                                 style: TextStyle(
@@ -474,7 +495,9 @@ class MyLibraryWidget extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/make_library');
+          context.push('/make_library').then((_) {
+            widget.onLibraryUpdated();
+          });
         },
         backgroundColor: Colors.green,
         shape: const CircleBorder(),
