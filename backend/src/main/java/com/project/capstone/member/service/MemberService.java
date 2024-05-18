@@ -3,6 +3,8 @@ package com.project.capstone.member.service;
 import com.project.capstone.book.controller.dto.AddBookRequest;
 import com.project.capstone.book.domain.Book;
 import com.project.capstone.book.domain.BookRepository;
+import com.project.capstone.book.exception.BookException;
+import com.project.capstone.book.exception.BookExceptionType;
 import com.project.capstone.member.controller.dto.MemberResponse;
 import com.project.capstone.member.controller.dto.MyBookResponse;
 import com.project.capstone.member.domain.Member;
@@ -16,13 +18,16 @@ import com.project.capstone.recommend.service.RecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.project.capstone.book.exception.BookExceptionType.BOOK_NOT_FOUND;
 import static com.project.capstone.member.exception.MemberExceptionType.MEMBER_NOT_FOUND;
 import static com.project.capstone.mybook.exception.MyBookExceptionType.ALREADY_EXIST_MYBOOK;
+import static com.project.capstone.mybook.exception.MyBookExceptionType.MYBOOK_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -86,5 +91,30 @@ public class MemberService {
             member.getMyBooks().add(saved);
             book.getMembersAddThisBook().add(saved);
         }
+    }
+
+    @Transactional
+    public void removeMyBookGroup(String userId, String groupName) {
+        Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
+                () -> new MemberException(MEMBER_NOT_FOUND)
+        );
+        if (myBookRepository.findMyBooksByMemberAndGroupName(member, groupName).isEmpty()) {
+            throw new MyBookException(MYBOOK_NOT_FOUND);
+        }
+        myBookRepository.deleteMyBooksByMemberAndGroupName(member, groupName);
+    }
+
+    @Transactional
+    public void removeMyBook(String userId, String groupName, String isbn) {
+        Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(
+                () -> new MemberException(MEMBER_NOT_FOUND)
+        );
+        Book book = bookRepository.findBookByIsbn(isbn).orElseThrow(
+                () -> new BookException(BOOK_NOT_FOUND)
+        );
+        if (myBookRepository.findMyBookByMemberAndBookAndGroupName(member, book, groupName).isEmpty()) {
+            throw new MyBookException(MYBOOK_NOT_FOUND);
+        }
+        myBookRepository.deleteMyBookByMemberAndBookAndGroupName(member, book, groupName);
     }
 }

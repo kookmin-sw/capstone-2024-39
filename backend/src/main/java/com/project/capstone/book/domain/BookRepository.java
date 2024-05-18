@@ -12,4 +12,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findBooksByTitleContaining(String title);
     @Query(value = "select isbn from Book order by rand() limit 10")
     List<String> findBooksByRandom();
+    void deleteBookById(Long id);
 }

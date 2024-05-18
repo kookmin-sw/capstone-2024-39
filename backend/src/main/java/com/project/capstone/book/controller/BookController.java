@@ -46,5 +46,10 @@ public class BookController {
         return ResponseEntity.ok(contentResponseList);
     }
 
-
+    // 책 삭제하기
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteBook(@RequestParam Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.ok().body("도서 삭제 완료");
+    }
 }
