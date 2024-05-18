@@ -15,9 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecommendController {
     private final RecommendService recommendService;
 
-    @GetMapping("/rec")
+    // 로그인 유저 전용
+    @GetMapping("/rec/member")
     public ResponseEntity<RecommendResponse> recommend(@AuthenticationPrincipal PrincipalDetails details) {
         RecommendResponse recommend = recommendService.recommend(details.getUserId());
+        return ResponseEntity.ok().body(recommend);
+    }
+
+    @GetMapping("/rec/anonymous")
+    public ResponseEntity<RecommendResponse> randomRecommend() {
+        RecommendResponse recommend = recommendService.randomRecommend();
         return ResponseEntity.ok().body(recommend);
     }
 }

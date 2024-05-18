@@ -68,8 +68,7 @@ public class RecommendService {
         List<Quiz> quizzes = member.getQuizzes();
         // 사용자가 만든 컨텐츠가 하나라도 없는 경우
         if (contents.isEmpty() && quizzes.isEmpty()) {
-            List<String> booksByRandom = bookRepository.findBooksByRandom();
-            return new RecommendResponse(booksByRandom);
+            randomRecommend();
         }
         for (Content content : contents) {
             isbnList.add(content.getBook().getIsbn());
@@ -95,5 +94,10 @@ public class RecommendService {
         } catch (Exception e) {
             throw new RecommendException(COMMUNICATION_FAIL);
         }
+    }
+
+    public RecommendResponse randomRecommend() {
+        List<String> booksByRandom = bookRepository.findBooksByRandom();
+        return new RecommendResponse(booksByRandom);
     }
 }

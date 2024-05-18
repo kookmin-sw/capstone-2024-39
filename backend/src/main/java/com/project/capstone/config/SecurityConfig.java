@@ -25,7 +25,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequest ->
                 authorizeRequest.requestMatchers("/auth/**", "/club/search/**", "/content/search/**"
-                        , "/quiz/search/**", "/book/**", "/assign/search/**").permitAll()
+                        , "/quiz/search/**", "/book/**", "/assign/search/**", "/rec/anonymous").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
