@@ -126,11 +126,11 @@ class _PostListScreenState extends State<PostListScreen> {
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 0.5,
+                    width: 0.5.w,
                   ),
                 ),
               ),

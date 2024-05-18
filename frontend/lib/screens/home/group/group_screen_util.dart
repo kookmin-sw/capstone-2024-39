@@ -55,13 +55,13 @@ class _GroupListItemState extends State<GroupListItem> {
     return Row(
       children: [
         Ink(
-          width: ScreenUtil().setWidth(170),
-          height: ScreenUtil().setHeight(95),
+          width: 170.w,
+          height: 95.h,
           decoration: ShapeDecoration(
             color: Colors.white,
             shape: RoundedRectangleBorder(
-              side: const BorderSide(
-                width: 2,
+              side: BorderSide(
+                width: 2.w,
                 strokeAlign: BorderSide.strokeAlignOutside,
                 color: Color(0xFFEEF1F4),
               ),
@@ -127,7 +127,7 @@ class _GroupListItemState extends State<GroupListItem> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: ScreenUtil().setWidth(7),
+                      horizontal: 7.w,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +135,7 @@ class _GroupListItemState extends State<GroupListItem> {
                       children: [
                         Text('주제:${widget.data['topic']}',
                             style: TextStyle(fontSize: 13.sp)),
-                        SizedBox(height: ScreenUtil().setHeight(4)),
+                        SizedBox(height: 4.h),
                         Text(
                           widget.data['name'],
                           style: TextStyle(
@@ -143,13 +143,13 @@ class _GroupListItemState extends State<GroupListItem> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(
-                          height: ScreenUtil().setHeight(3),
+                          height: 3.h,
                         ),
                         Row(
                           children: [
                             Icon(
                               Icons.people,
-                              size: ScreenUtil().setWidth(13),
+                              size: 13.w,
                               color: (widget.data['memberCnt'] ==
                                       widget.data['maximum'])
                                   ? Colors.red
@@ -168,7 +168,7 @@ class _GroupListItemState extends State<GroupListItem> {
                           ],
                         ),
                         SizedBox(
-                          height: ScreenUtil().setHeight(3),
+                          height: 3.h,
                         ),
                         Text(
                             (widget.data['publicstatus'] == 'PUBLIC')

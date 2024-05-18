@@ -35,6 +35,7 @@ class _BookContentState extends State<BookContentScreen> {
     setState(() {
       id = _id;
       token = _token;
+      print(id);
     });
   }
 
@@ -99,7 +100,7 @@ class _BookContentState extends State<BookContentScreen> {
           ),
           centerTitle: true,
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: (id != null && token != null)?FloatingActionButton(
           onPressed: () {
             context.push(
               '/bookreport_writing',
@@ -107,6 +108,8 @@ class _BookContentState extends State<BookContentScreen> {
                 "index": typeCheck(widget.type),
                 "clubId": null,
                 "asId": null,
+                "isbn": widget.isbn,
+                "dateInfo":null,
               },
             ).then((result) async {
               updatePostList();
@@ -114,7 +117,7 @@ class _BookContentState extends State<BookContentScreen> {
           },
           shape: const CircleBorder(),
           child: const Icon(Icons.add),
-        ),
+        ):null,
         body: SingleChildScrollView(
           child: Column(
             children: _buildPostListView(posts),

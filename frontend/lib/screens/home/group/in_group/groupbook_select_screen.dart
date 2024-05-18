@@ -65,7 +65,7 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: ScreenUtil().setHeight(5),
+                        height: 5.h,
                       ),
                       if(BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)

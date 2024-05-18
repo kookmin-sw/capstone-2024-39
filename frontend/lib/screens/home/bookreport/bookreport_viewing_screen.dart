@@ -32,16 +32,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   String _category = '';
   String _answer = '';
   bool _oxanswer = false;
-  // String _example1 = '';
-  // String _example2 = '';
-  // String _example3 = '';
-  // String _example4 = '';
+
   List<dynamic> _exampleList = [null, null, null, null];
   List<dynamic> _multipleanswer = [false, false, false, false];
-  // bool _answer1 = false;
-  // bool _answer2 = false;
-  // bool _answer3 = false;
-  // bool _answer4 = false;
   var token;
 
   void initializeClubContentData(dynamic content) {
@@ -169,8 +162,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Expanded(
+              child: Row(
+                children: [
+                  Expanded(
                 child: _buildTemplateUI(_template),
+              ),
+                ],
               ),
             ),
             const SizedBox(height: 15),
@@ -248,8 +245,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Expanded(
+              child: Row(
+                children: [
+                  Expanded(
                 child: _buildQuizUI(_category),
+              ),
+                ],
               ),
             ),
             const SizedBox(height: 10),

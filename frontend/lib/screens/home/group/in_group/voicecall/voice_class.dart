@@ -1,8 +1,8 @@
 import "package:agora_rtc_engine/agora_rtc_engine.dart";
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:agora_rtm/agora_rtm.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/secret.dart';
+import 'package:frontend/http.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VoiceCallScreen extends StatefulWidget {
@@ -13,11 +13,20 @@ class VoiceCallScreen extends StatefulWidget {
 }
 
 class _VoiceCallState extends State<VoiceCallScreen> {
+  TextEditingController _channelName = TextEditingController();
   String channelName = 'testChannel';
   int uid = 0;
   int? _remoteUid;
   bool _localUserJoined = false;
   late RtcEngine _engine;
+
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  showMessage(String message) {
+    scaffoldMessengerKey.currentState
+        ?.showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   void initState() {
@@ -38,26 +47,26 @@ class _VoiceCallState extends State<VoiceCallScreen> {
     _engine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-          debugPrint("local user ${connection.localUid} joined");
+          showMessage("local user ${connection.localUid} joined");
           setState(() {
             _localUserJoined = true;
           });
         },
         onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
-          debugPrint("remote user $remoteUid joined");
+          showMessage("remote user $remoteUid joined");
           setState(() {
             _remoteUid = remoteUid;
           });
         },
         onUserOffline: (RtcConnection connection, int remoteUid,
             UserOfflineReasonType reason) {
-          debugPrint("remote user $remoteUid left channel");
+          showMessage("remote user $remoteUid left channel");
           setState(() {
             _remoteUid = null;
           });
         },
         onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
-          debugPrint(
+          showMessage(
               '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
         },
       ),
@@ -65,19 +74,19 @@ class _VoiceCallState extends State<VoiceCallScreen> {
 
     // await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     // await _engine.enableVideo();
-    await _engine.enableAudio();
-    await _engine.setEnableSpeakerphone(true);
-    await _engine.startPreview();
+    // await _engine.enableAudio();s
+    // await _engine.setEnableSpeakerphone(true);
+    // await _engine.startPreview();
 
-    await _engine.joinChannel(
-      token: Agora_Token,
-      channelId: channelName,
-      uid: uid,
-      options: const ChannelMediaOptions(
-        clientRoleType: ClientRoleType.clientRoleBroadcaster,
-        channelProfile: ChannelProfileType.channelProfileCommunication,
-      ),
-    );
+    // await _engine.joinChannel(
+    //   token: Agora_Token,
+    //   channelId: channelName,
+    //   uid: uid,
+    //   options: const ChannelMediaOptions(
+    //     clientRoleType: ClientRoleType.clientRoleBroadcaster,
+    //     channelProfile: ChannelProfileType.channelProfileLiveBroadcasting,
+    //   ),
+    // );
   }
 
   void join() async {
@@ -93,9 +102,9 @@ class _VoiceCallState extends State<VoiceCallScreen> {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
+    await _engine.leaveChannel();
     super.dispose();
-    leave();
   }
 
   void leave() {
@@ -120,27 +129,79 @@ class _VoiceCallState extends State<VoiceCallScreen> {
       body: Stack(
         children: [
           Center(
-            child: _remoteVideo(),
+            child: _status(),
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox(
-              width: 100,
-              height: 150,
-              child: Center(
-                child: _localUserJoined
-                    ? AgoraVideoView(
-                        controller: VideoViewController(
-                          rtcEngine: _engine,
-                          canvas: const VideoCanvas(uid: 0),
-                        ),
-                      )
-                    : const CircularProgressIndicator(),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: TextField(
+                  controller: _channelName,
+                  
+                ),
               ),
-            ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      child: const Text("Join"),
+                      onPressed: () => {join()},
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      child: const Text("Leave"),
+                      onPressed: () => {leave()},
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      child: const Text("token"),
+                      onPressed: () async{
+                        await agoraToken(uid.toString(), channelName);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
+          // Align(
+          //   alignment: Alignment.topLeft,
+          //   child: SizedBox(
+          //     width: 100,
+          //     height: 150,
+          //     child: Center(
+          //       child: _localUserJoined
+          //           ? AgoraVideoView(
+          //               controller: VideoViewController(
+          //                 rtcEngine: _engine,
+          //                 canvas: const VideoCanvas(uid: 0),
+          //               ),
+          //             )
+          //           : const CircularProgressIndicator(),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
+    );
+  }
+
+  Widget _status() {
+    String statusText;
+
+    if (!_localUserJoined) {
+      statusText = 'Join a channel';
+    } else if (_remoteUid == null) {
+      statusText = 'Waiting for a remote user to join...';
+    } else {
+      statusText = 'Connected to remote user, uid:$_remoteUid';
+    }
+    return Text(
+      statusText,
     );
   }
 

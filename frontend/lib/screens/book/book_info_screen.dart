@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class BookInfoScreen extends StatefulWidget {
   final Map<String, dynamic> data; //책 정보
@@ -24,7 +25,7 @@ class _BookInfoState extends State<BookInfoScreen> {
   var secureStorage;
   var id, token;
   var review, shortreview, quotation, quiz;
-  // var userInfo;
+  bool _isLoading = true;
   List<bool> _selectType = [true, false, false];
 
   List<Widget> postType(BuildContext context, List<String> type) {
@@ -77,10 +78,10 @@ class _BookInfoState extends State<BookInfoScreen> {
       shortreview = _shortreview;
       quotation = _quotation;
       quiz = _quiz;
-      // print(review);
-      // print(shortreview);
-      // print(quotation);
-      // print(quiz);
+      print(review);
+      print(shortreview);
+      print(quotation);
+      print(quiz);
     });
   }
 
@@ -103,10 +104,19 @@ class _BookInfoState extends State<BookInfoScreen> {
     }
   }
 
+  Future<void> _loadData(int term) async {
+    Timer(Duration(milliseconds: term), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    _loadData(500);
     _initUserState();
     updateBookcontent();
   }
@@ -130,229 +140,236 @@ class _BookInfoState extends State<BookInfoScreen> {
           ),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 180.h,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0E9913),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                  bottomRight: Radius.circular(50),
-                ),
-              ),
-              child: Container(
-                child: Row(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Container(
-                            width: ScreenUtil().setWidth(80),
-                            height: ScreenUtil().setHeight(105),
-                            decoration: ShapeDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(widget.data['image']),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3)),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: 10.w,
-                          right: 20.w,
-                          bottom: 20.h,
-                        ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.vertical,
-                          child: Container(
-                            child: Text(
-                              widget.data['description'],
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                                fontFamily: 'Noto Sans KR',
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(), // 로딩 애니매이션
+              )
+            : Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 180.h,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF0E9913),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(50),
+                        bottomRight: Radius.circular(50),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Ink(
-                      width: 350.w,
-                      height: 120.h,
-                      decoration: ShapeDecoration(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                        shadows: const [
-                          BoxShadow(
-                            color: Color(0x3F000000),
-                            blurRadius: 6,
-                            offset: Offset(0, 4),
-                            spreadRadius: 0,
-                          )
-                        ],
-                      ),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(6),
-                        onTap: () {
-                          context.push('/book_content', extra: {
-                            "posts": quiz,
-                            "type": "Quiz",
-                            "isbn": widget.data['isbn'],
-                          }).then((value) async {
-                            updateBookcontent();
-                          });
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 20.0),
+                                child: Container(
+                                  width: ScreenUtil().setWidth(80),
+                                  height: ScreenUtil().setHeight(105),
+                                  decoration: ShapeDecoration(
+                                    image: DecorationImage(
+                                      image: NetworkImage(widget.data['image']),
+                                      fit: BoxFit.fill,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(3)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Expanded(
+                            child: Padding(
                               padding: EdgeInsets.only(
-                                left: 5.0,
-                                top: 3.0,
+                                left: 10.w,
+                                right: 20.w,
+                                bottom: 20.h,
                               ),
-                              child: Text(
-                                '퀴즈',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontFamily: 'Noto Sans KR',
-                                  fontWeight: FontWeight.w700,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Container(
+                                  child: Text(
+                                    widget.data['description'],
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontFamily: 'Noto Sans KR',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 5.h,
-                            ),
-                            Expanded(
-                              child: ListView(
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 50.0),
-                                children: _buildTaskList(context, '퀴즈'),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Column(
-                      children: [
-                        Row(
-                          children: postType(context, ['독후감', '한줄평', '인용구']),
-                        ),
-                        Ink(
-                          width: 350.w,
-                          height: 120.h,
-                          decoration: ShapeDecoration(
-                            color: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6)),
-                            shadows: const [
-                              BoxShadow(
-                                color: Color(0x3F000000),
-                                blurRadius: 6,
-                                offset: Offset(0, 4),
-                                spreadRadius: 0,
-                              )
-                            ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 30,
                           ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(6),
-                            onTap: () {
-                              var post, type;
-                              if (_selectType[0]) {
-                                post = review;
-                                type = "Review";
-                              } else if (_selectType[1]) {
-                                post = shortreview;
-                                type = "ShortReview";
-                              } else if (_selectType[2]) {
-                                post = quotation;
-                                type = "Quotation";
-                              }
-                              context.push('/book_content', extra: {
-                                "posts": post,
-                                "type": type,
-                                "isbn": widget.data['isbn'],
-                              }).then((value) async {
-                                updateBookcontent();
-                              });
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                (_selectType[0])
-                                    ? Expanded(
-                                        child: ListView(
-                                          shrinkWrap: true,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 50.0),
-                                          children:
-                                              _buildTaskList(context, '독후감'),
-                                        ),
-                                      )
-                                    : (_selectType[1])
-                                        ? Expanded(
-                                            child: ListView(
-                                              shrinkWrap: true,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 50.0),
-                                              children: _buildTaskList(
-                                                  context, '한줄평'),
-                                            ),
-                                          )
-                                        : Expanded(
-                                            child: ListView(
-                                              shrinkWrap: true,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 50.0),
-                                              children: _buildTaskList(
-                                                  context, '인용구'),
-                                            ),
-                                          ),
+                          Ink(
+                            width: 350.w,
+                            height: 120.h,
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6)),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x3F000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 4),
+                                  spreadRadius: 0,
+                                )
                               ],
                             ),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(6),
+                              onTap: () {
+                                context.push('/book_content', extra: {
+                                  "posts": quiz,
+                                  "type": "Quiz",
+                                  "isbn": widget.data['isbn'],
+                                }).then((value) async {
+                                  updateBookcontent();
+                                });
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(
+                                      left: 5.0,
+                                      top: 3.0,
+                                    ),
+                                    child: Text(
+                                      '퀴즈',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16,
+                                        fontFamily: 'Noto Sans KR',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Expanded(
+                                    child: ListView(
+                                      shrinkWrap: true,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 50.0),
+                                      children: _buildTaskList(context, '퀴즈'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Column(
+                            children: [
+                              Row(
+                                children:
+                                    postType(context, ['독후감', '한줄평', '인용구']),
+                              ),
+                              Ink(
+                                width: 350.w,
+                                height: 120.h,
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6)),
+                                  shadows: const [
+                                    BoxShadow(
+                                      color: Color(0x3F000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                      spreadRadius: 0,
+                                    )
+                                  ],
+                                ),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () {
+                                    var post, type;
+                                    if (_selectType[0]) {
+                                      post = review;
+                                      type = "Review";
+                                    } else if (_selectType[1]) {
+                                      post = shortreview;
+                                      type = "ShortReview";
+                                    } else if (_selectType[2]) {
+                                      post = quotation;
+                                      type = "Quotation";
+                                    }
+                                    context.push('/book_content', extra: {
+                                      "posts": post,
+                                      "type": type,
+                                      "isbn": widget.data['isbn'],
+                                    }).then((value) async {
+                                      updateBookcontent();
+                                    });
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      (_selectType[0])
+                                          ? Expanded(
+                                              child: ListView(
+                                                shrinkWrap: true,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 50.0),
+                                                children: _buildTaskList(
+                                                    context, '독후감'),
+                                              ),
+                                            )
+                                          : (_selectType[1])
+                                              ? Expanded(
+                                                  child: ListView(
+                                                    shrinkWrap: true,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 50.0),
+                                                    children: _buildTaskList(
+                                                        context, '한줄평'),
+                                                  ),
+                                                )
+                                              : Expanded(
+                                                  child: ListView(
+                                                    shrinkWrap: true,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 50.0),
+                                                    children: _buildTaskList(
+                                                        context, '인용구'),
+                                                  ),
+                                                ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

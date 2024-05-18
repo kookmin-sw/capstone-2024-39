@@ -36,20 +36,20 @@ class _SearchListItemState extends State<SearchListItem> {
     return Column(
       children: [
         Ink(
-          width: ScreenUtil().setWidth(370),
-          height: ScreenUtil().setHeight(105),
+          width: 370.w,
+          height: 105.h,
           child: InkWell(
             onTap: () async{
               switch (widget.type) {
                 case "search":
                   var result = await bookAdd(widget.data);
-                  print(result);
-                  if(result == "도서 추가 완료"){ // 새로운 책
+                  // print(result);
+                  // if(result == "도서 추가 완료"){ // 새로운 책
                     
-                  }
-                  else{ //이미 있는 책
-                    await getBookInfo(widget.data['isbn']);
-                  }
+                  // }
+                  // else{ //이미 있는 책
+                  //   await getBookInfo(widget.data['isbn']);
+                  // }
                   context.push(
                     '/book_info',
                     extra: widget.data,
@@ -69,8 +69,8 @@ class _SearchListItemState extends State<SearchListItem> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: ScreenUtil().setWidth(80),
-                  height: ScreenUtil().setHeight(105),
+                  width: 80.w,
+                  height: 105.h,
                   decoration: ShapeDecoration(
                     image: DecorationImage(
                       image: NetworkImage(widget.data['image']),
@@ -81,27 +81,26 @@ class _SearchListItemState extends State<SearchListItem> {
                   ),
                 ),
                 SizedBox(
-                  width: ScreenUtil().setWidth(5),
+                  width: 5.w,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: ScreenUtil().setWidth(280),
+                      width: 280.w,
                       child: Text(
-                        (widget.data['title'].length > 100)?widget.data['title'].substring(0,100) + '...':widget.data['title'],
+                        widget.data['title'],
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize:
-                              (widget.data['title'].length < 50) ? 20 : 
-                              (widget.data['title'].length < 100)? 15 : 12,
+                          fontSize: 20.sp,
                           fontFamily: 'Noto Sans KR',
                           fontWeight: FontWeight.w700,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     SizedBox(
-                      height: ScreenUtil().setHeight(5),
+                      height: 5.h,
                     ),
                     Container(
                       width: ScreenUtil().setWidth(280),
@@ -123,7 +122,7 @@ class _SearchListItemState extends State<SearchListItem> {
           ),
         ),
         SizedBox(
-          height: ScreenUtil().setHeight(10),
+          height: 10.h,
         )
       ],
     );

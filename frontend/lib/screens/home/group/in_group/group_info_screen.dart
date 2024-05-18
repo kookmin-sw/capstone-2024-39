@@ -224,9 +224,9 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           ),
 
           ElevatedButton(
-            onPressed: (){
+            onPressed: () {
               context.push('/voicecall');
-            }, 
+            },
             child: Text('test voice'),
           ),
         ],
@@ -484,6 +484,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             borderRadius: BorderRadius.circular(25),
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconButton(
                 onPressed: () {
@@ -511,11 +513,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               ),
               SizedBox(
                 width: 260.w,
+                height: 40.h,
                 child: TextField(
                   controller: _textControllers,
-                  decoration: const InputDecoration(
-                    hintText: '대표책을 검색해주세요.',
+                  decoration: InputDecoration(
+                    hintText: (clubData['book'] == null)?'대표책을 설정해주세요.':'대표책을 검색해주세요.',
                     border: InputBorder.none,
+                  ),
+                  style: TextStyle(
+                    fontSize: 18.sp,
                   ),
                   onChanged: (value) {
                     setState(() {});
@@ -645,8 +651,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         decoration: ShapeDecoration(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
-                            side: const BorderSide(
-                              width: 2,
+                            side: BorderSide(
+                              width: 2.w,
                               strokeAlign: BorderSide.strokeAlignOutside,
                               color: Color(0xFFEEF1F4),
                             ),
@@ -675,13 +681,13 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                             }
                           },
                           borderRadius: BorderRadius.circular(15),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               '가입하기',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 15,
+                                fontSize: 15.sp,
                                 fontFamily: 'Noto Sans KR',
                                 fontWeight: FontWeight.w700,
                               ),
@@ -785,6 +791,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                     context.push('/homework_list', extra: {
                                       "clubId": clubData['id'],
                                       "managerId": clubData['managerId'],
+                                      "bookInfo": clubData['book'],
                                     }).then((value) async {
                                       await _clubGetInfo();
                                       await _clubGetAssign();
@@ -988,11 +995,11 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           cnt++;
           tasks.add(_buildTaskEntry(context, post, true));
           tasks.add(Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: Colors.grey,
-                  width: 1,
+                  width: 1.w,
                 ),
               ),
             ),
@@ -1014,11 +1021,11 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             cnt++;
             tasks.add(_buildTaskEntry(context, post, true));
             tasks.add(Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 1,
+                    width: 1.w,
                   ),
                 ),
               ),
@@ -1043,11 +1050,11 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           cnt++;
           tasks.add(_buildTaskEntry(context, post, false));
           tasks.add(Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
                   color: Colors.grey,
-                  width: 1,
+                  width: 1.w,
                 ),
               ),
             ),

@@ -107,7 +107,7 @@ class _PostScreenState extends State<PostScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16.h),
                           Text(
                             data['body'],
                             style: const TextStyle(
@@ -128,10 +128,10 @@ class _PostScreenState extends State<PostScreen> {
                             ListTile(
                                 title: Text(comments[index]['writer']),
                                 subtitle: Text(comments[index]['body'])),
-                            const Divider(
-                              height: 2, // 선의 높이를 조절할 수 있습니다.
-                              thickness: 0.2, // 선의 두께를 조절할 수 있습니다.
-                              color: Colors.grey, // 선의 색상을 설정할 수 있습니다.
+                            Divider(
+                              height: 2.h, 
+                              thickness: 0.2,
+                              color: Colors.grey, 
                             ),
                           ],
                         );
@@ -140,11 +140,11 @@ class _PostScreenState extends State<PostScreen> {
                   ),
                   //댓글 입력창
                   Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 8,
-                      bottom: 30,
+                    padding: EdgeInsets.only(
+                      left: 16.w,
+                      right: 16.w,
+                      top: 8.h,
+                      bottom: 30.h,
                     ),
                     decoration: BoxDecoration(
                       border: Border(
@@ -154,28 +154,30 @@ class _PostScreenState extends State<PostScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        SizedBox(
-                          width: 350,
-                          child: TextField(
-                            controller: _commentController,
-                            decoration: InputDecoration(
-                              hintText: ' 댓글을 입력하세요...',
-                              border: InputBorder.none,
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF0E9913)),
+                        Expanded(
+                          child: SizedBox(
+                            width: 350.w,
+                            child: TextField(
+                              controller: _commentController,
+                              decoration: InputDecoration(
+                                hintText: ' 댓글을 입력하세요...',
+                                border: InputBorder.none,
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide:
+                                      const BorderSide(color: Color(0xFF0E9913)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide:
+                                      const BorderSide(color: Colors.blueGrey),
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide:
-                                    const BorderSide(color: Colors.blueGrey),
-                              ),
+                              maxLines: null,
+                              onChanged: (text) {
+                                setState(() {});
+                              },
                             ),
-                            maxLines: null,
-                            onChanged: (text) {
-                              setState(() {});
-                            },
                           ),
                         ),
                         IconButton(

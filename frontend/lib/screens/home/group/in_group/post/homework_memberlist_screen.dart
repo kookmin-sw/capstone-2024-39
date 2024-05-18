@@ -23,10 +23,12 @@ class HomeworkMemberlistScreen extends StatefulWidget {
 
 class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   List<dynamic> HwList = [];
+  bool LimitCheck = true;
   var secureStorage;
   var id;
   var token;
   var HW;
+  var isbn;
 
   Future<void> initUserInfo() async {
     var _id = await secureStorage.readData("id");
@@ -39,6 +41,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
 
   Future<void> updateHwList() async {
     var _posts = await getAssign(widget.clubId);
+    var _club = await groupSerachforId(widget.clubId);
     var _HwList, _hw;
     for (Map<String, dynamic> hw in _posts) {
       if (hw['id'] == widget.post['id']) {
@@ -50,6 +53,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     setState(() {
       HW = _hw;
       HwList = _HwList;
+      isbn = _club['book']['isbn'];
     });
   }
 
@@ -68,10 +72,23 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     }
   }
 
+  void dateCheck(String date) {
+    DateTime limitDate = DateTime.parse(date);
+    DateTime now = DateTime.now();
+
+    if (limitDate.isBefore(now)) {
+      setState(() {
+        LimitCheck = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    dateCheck(widget.post['endDate']);
+    print(widget.post);
     initUserInfo();
     updateHwList();
   }
@@ -95,20 +112,27 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
           ),
           centerTitle: true,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
-            context.push("/bookreport_writing", extra: {
-              "index": typeCheck(HW),
-              "clubId": widget.clubId,
-              "asId": HW['id'],
-            }).then((value) async {
-              updateHwList();
-            });
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: (LimitCheck)
+            ? FloatingActionButton(
+                onPressed: () {
+                  //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
+                  context.push("/bookreport_writing", extra: {
+                    "index": typeCheck(HW),
+                    "clubId": widget.clubId,
+                    "asId": HW['id'],
+                    "isbn": isbn,
+                    "dateInfo": {
+                      "startDate": widget.post['startDate'],
+                      "endDate": widget.post['endDate']
+                    }
+                  }).then((value) async {
+                    updateHwList();
+                  });
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add),
+              )
+            : null,
         body: SingleChildScrollView(
           child: Column(
             children: _buildHWListView(HwList),
@@ -153,11 +177,11 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 0.5,
+                    width: 0.5.w,
                   ),
                 ),
               ),

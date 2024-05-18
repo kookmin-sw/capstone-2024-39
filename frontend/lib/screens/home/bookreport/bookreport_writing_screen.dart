@@ -14,11 +14,15 @@ class BookReportWritingScreen extends StatefulWidget {
     required this.index,
     required this.clubId,
     required this.asId,
+    required this.isbn,
+    required this.dateInfo,
   });
 
   final int index;
   final dynamic clubId;
   final dynamic asId;
+  final dynamic isbn;
+  final dynamic dateInfo;
 
   @override
   State<BookReportWritingScreen> createState() => _BookReportWritingState();
@@ -32,7 +36,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _bookTitleController = TextEditingController();
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
-  bool _isPublic = false;
   String _template = "";
   final TextEditingController _writingController = TextEditingController();
   String? selectedCategory = '단답형';
@@ -40,10 +43,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _answerController = TextEditingController();
   bool _isOX = true;
   List<bool> _multipleanswer = [false, false, false, false];
-  final TextEditingController _answerController1 = TextEditingController();
-  final TextEditingController _answerController2 = TextEditingController();
-  final TextEditingController _answerController3 = TextEditingController();
-  final TextEditingController _answerController4 = TextEditingController();
+  final List<TextEditingController> _answerControllers = List.generate(
+    4,
+    (index) => TextEditingController(),
+  );
   var token;
   List<dynamic> BookData = [];
   String _author = "작가";
@@ -58,6 +61,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   @override
   void initState() {
     super.initState();
+    checkHW();
 
     _initUserState();
     // Initialize _keyboardVisibilityObserver and _keyboardVisibilityObserverWrapper
@@ -84,12 +88,35 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     token = await secureStorage.readData("token");
   }
 
+  void checkHW() async {
+    if (widget.isbn != null) {
+      var bookInfo = await getBookInfo(widget.isbn);
+
+      setState(() {
+        _author = bookInfo['author'];
+        _publisher = bookInfo['publisher'];
+        _isbn = widget.isbn;
+        _publisherDate = bookInfo['publisherDate'];
+        _imageUrl = bookInfo['imageUrl'];
+      });
+    }
+    if (widget.dateInfo != null) {
+      setState(() {
+        _startDate = widget.dateInfo['startDate'];
+        _endDate = widget.dateInfo['endDate'];
+      });
+    }
+  }
+
   @override
   void dispose() {
     // Remove the keyboard visibility listener
     WidgetsBinding.instance.removeObserver(_keyboardVisibilityObserverWrapper);
     _questionController.dispose();
     _answerController.dispose();
+    for (var controller in _answerControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -102,7 +129,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
       _bookTitleController.text = book.title;
       _startDate = book.startDate;
       _endDate = book.endDate;
-      _isPublic = book.isPublic;
       _template = book.template;
     } else {
       // 책이 없는 경우에 대한 처리
@@ -137,16 +163,16 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
+            SizedBox(height: 5.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   const Text('도서: '),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: SizedBox(
-                      width: _screenWidth * 0.7,
+                      width: _screenWidth * 0.7.w,
                       child: TextField(
                         style: const TextStyle(fontSize: 14),
                         controller: _bookTitleController,
@@ -202,7 +228,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 5.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -212,25 +238,25 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFA9AFB7),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 15),
+            SizedBox(height: 5.h),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 10),
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       border: Border.all(
+            //         width: 1.w,
+            //         color: const Color(0xFFA9AFB7),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(height: 5.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   const Text('독서 기간: ', style: TextStyle(color: Colors.black)),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 3.w),
                   TextButton(
                     onPressed: () async {
                       final DateTime? picked = await showDatePicker(
@@ -275,85 +301,89 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Text('공개 여부: ', style: TextStyle(color: Colors.black)),
-                  const SizedBox(width: 3),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isPublic = true;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
-                        ),
-                        borderRadius: BorderRadius.circular(5),
-                        color: _isPublic ? Colors.green : Colors.white,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: const Text(
-                        '공개',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isPublic = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 0.5,
-                        ),
-                        borderRadius: BorderRadius.circular(5),
-                        color: !_isPublic ? Colors.green : Colors.white,
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: const Text(
-                        '비공개',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 15),
+            // SizedBox(height: 20.h),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 20),
+            //   child: Row(
+            //     children: [
+            //       const Text('공개 여부: ', style: TextStyle(color: Colors.black)),
+            //       SizedBox(width: 3.w),
+            //       GestureDetector(
+            //         onTap: () {
+            //           setState(() {
+            //             _isPublic = true;
+            //           });
+            //         },
+            //         child: Container(
+            //           decoration: BoxDecoration(
+            //             border: Border.all(
+            //               color: Colors.black,
+            //               width: 0.5.w,
+            //             ),
+            //             borderRadius: BorderRadius.circular(5),
+            //             color: _isPublic ? Colors.green : Colors.white,
+            //           ),
+            //           padding: const EdgeInsets.symmetric(horizontal: 5),
+            //           child: const Text(
+            //             '공개',
+            //             style: TextStyle(
+            //               color: Colors.black,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       SizedBox(width: 10.w),
+            //       GestureDetector(
+            //         onTap: () {
+            //           setState(() {
+            //             _isPublic = false;
+            //           });
+            //         },
+            //         child: Container(
+            //           decoration: BoxDecoration(
+            //             border: Border.all(
+            //               color: Colors.black,
+            //               width: 0.5.w,
+            //             ),
+            //             borderRadius: BorderRadius.circular(5),
+            //             color: !_isPublic ? Colors.green : Colors.white,
+            //           ),
+            //           padding: const EdgeInsets.symmetric(horizontal: 5),
+            //           child: const Text(
+            //             '비공개',
+            //             style: TextStyle(
+            //               color: Colors.black,
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            SizedBox(height: 5.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    width: 1,
+                    width: 1.w,
                     color: const Color(0xFFA9AFB7),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Expanded(
-                child: _buildTemplateUI(_template),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildTemplateUI(_template),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
           ],
         ),
       ),
@@ -408,16 +438,14 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                           selectedCategory.toString(),
                           _questionController.text,
                           ansnum,
-                          _answerController1.text,
-                          _answerController2.text,
-                          _answerController3.text,
-                          _answerController4.text,
+                          _answerControllers[0].text,
+                          _answerControllers[1].text,
+                          _answerControllers[2].text,
+                          _answerControllers[3].text,
                           _startDate.toString(),
                           _endDate.toString());
                       break;
                     case "O/X":
-                      print(selectedCategory);
-                      print(_isOX);
                       await quizCreate(
                           token,
                           widget.clubId,
@@ -505,11 +533,11 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   controller: _writingController,
                   textAlign: TextAlign.center,
                   maxLines: 10,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '인용문을 작성해주세요',
                     hintStyle: TextStyle(
                       // 힌트 텍스트 정중앙 정렬
-                      height: 15,
+                      height: 15.h,
                     ),
                     border: InputBorder.none,
                   ),
@@ -543,14 +571,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     fontSize: 15,
                     fontFamily: 'Noto Sans KR',
                     fontWeight: FontWeight.w400,
-                    height: 0,
                     letterSpacing: -0.17,
                   ),
                 ),
-                const SizedBox(width: 3),
+                SizedBox(width: 3.w),
                 SizedBox(
-                  width: 121,
-                  height: 22,
+                  width: 121.w,
+                  height: 22.h,
                   child: DropdownButton<String>(
                     value: selectedCategory,
                     onChanged: (String? newValue) {
@@ -570,18 +597,21 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       fontFamily: 'Noto Sans KR',
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
-                      height: 0,
                     ),
                     underline: Container(),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
-              child: Expanded(
-                child: _buildQuizUI(selectedCategory!),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _buildQuizUI(selectedCategory!),
+                  ),
+                ],
               ),
             ),
           ],
@@ -597,20 +627,20 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 150.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 150.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
@@ -619,10 +649,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            width: _screenWidth * 0.7.w,
                             child: TextField(
                               style: const TextStyle(fontSize: 14),
                               controller: _questionController,
@@ -644,10 +674,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               child: Row(
                 children: [
                   const Text('A: '),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: SizedBox(
-                      width: _screenWidth * 0.7,
+                      width: _screenWidth * 0.7.w,
                       child: TextField(
                         style: const TextStyle(fontSize: 14),
                         controller: _answerController,
@@ -667,20 +697,20 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 150.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 150.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
@@ -689,10 +719,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            width: _screenWidth * 0.7.w,
                             child: TextField(
                               style: const TextStyle(fontSize: 14),
                               controller: _questionController,
@@ -709,10 +739,11 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     onPressed: () {
@@ -724,14 +755,14 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: _isOX ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       minimumSize: const Size(140, 140),
                     ),
                     child: const Text('O'),
                   ),
-                  const SizedBox(width: 30),
+                  SizedBox(width: 30.w),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -742,7 +773,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: !_isOX ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                       minimumSize: const Size(140, 140),
@@ -758,20 +789,20 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 150.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 150.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
@@ -780,10 +811,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            width: _screenWidth * 0.7.w,
                             child: TextField(
                               style: const TextStyle(fontSize: 14),
                               controller: _questionController,
@@ -800,9 +831,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
                   for (int i = 0; i < 4; i++)
@@ -831,31 +862,31 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                         color: Colors.grey),
                               ),
                             ),
-                            const SizedBox(width: 5),
+                            SizedBox(width: 5.w),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 0.5,
+                                    width: 0.5.w,
                                   ),
                                   color: _multipleanswer[i]
                                       ? Colors.green
                                       : Colors.white,
                                 ),
-                                height: 24,
+                                height: 24.h,
                                 alignment: Alignment.center,
                                 child: Row(
                                   children: [
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10.w),
                                     const Text('A: '),
                                     Expanded(
                                       child: SizedBox(
-                                        width: _screenWidth * 0.7,
+                                        width: _screenWidth * 0.7.w,
                                         child: TextField(
                                           style: const TextStyle(fontSize: 10),
-                                          controller: _answerController1,
+                                          controller: _answerControllers[i],
                                           decoration: const InputDecoration(
                                             hintText: '답을 입력해주세요.',
                                             contentPadding: EdgeInsets.all(10),

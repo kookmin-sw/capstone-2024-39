@@ -10,11 +10,13 @@ import 'package:provider/provider.dart';
 class HomeworkListScreen extends StatefulWidget {
   final String managerId;
   final int clubId;
+  final dynamic bookInfo;
 
   const HomeworkListScreen({
     super.key,
     required this.managerId,
     required this.clubId,
+    required this.bookInfo,
   });
 
   @override
@@ -23,6 +25,7 @@ class HomeworkListScreen extends StatefulWidget {
 
 class _HomeworkListScreenState extends State<HomeworkListScreen> {
   List<dynamic> posts = [];
+  bool isBook = true;
   var secureStorage;
   var id;
   var token;
@@ -46,10 +49,19 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
     });
   }
 
+  void checkBook(dynamic Book){
+    if(Book == null){
+      setState(() {
+        isBook = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    checkBook(widget.bookInfo);
     initUserInfo();
     updatePostList();
   }
@@ -73,7 +85,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
           ),
           centerTitle: true,
         ),
-        floatingActionButton: (id == widget.managerId)
+        floatingActionButton: (id == widget.managerId && isBook)
             ? FloatingActionButton(
                 onPressed: () {
                   context
@@ -134,11 +146,11 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 0.5,
+                    width: 0.5.w,
                   ),
                 ),
               ),
