@@ -5,28 +5,29 @@ import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 
-//멤버들 과제 리스트
+//책의 컨텐츠 목록
 
-class HomeworkMemberlistScreen extends StatefulWidget {
-  final Map<String, dynamic> post;
-  final int clubId;
+class BookContentScreen extends StatefulWidget {
+  final dynamic posts;
+  final String type;
+  final String isbn;
 
-  const HomeworkMemberlistScreen({
+  const BookContentScreen({
     super.key,
-    required this.post,
-    required this.clubId,
+    required this.posts,
+    required this.type,
+    required this.isbn,
   });
 
   @override
-  State<HomeworkMemberlistScreen> createState() => _HomeworkMemberistState();
+  State<BookContentScreen> createState() => _BookContentState();
 }
 
-class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
-  List<dynamic> HwList = [];
+class _BookContentState extends State<BookContentScreen> {
+  List<dynamic> posts = [];
   var secureStorage;
   var id;
   var token;
-  var HW;
 
   Future<void> initUserInfo() async {
     var _id = await secureStorage.readData("id");
@@ -37,24 +38,23 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     });
   }
 
-  Future<void> updateHwList() async {
-    var _posts = await getAssign(widget.clubId);
-    var _HwList, _hw;
-    for (Map<String, dynamic> hw in _posts) {
-      if (hw['id'] == widget.post['id']) {
-        _HwList = hw['contentList'];
-        _hw = hw;
-        break;
-      }
+  Future<void> updatePostList() async {
+    var _posts;
+    if (widget.type == "Quiz") {
+      _posts = await bookQuizLoad(widget.isbn);
+    } else {
+      _posts = await bookcontentLoad(widget.isbn, widget.type);
+    }
+    if (_posts.runtimeType == Map<String, dynamic>) {
+      _posts = [];
     }
     setState(() {
-      HW = _hw;
-      HwList = _HwList;
+      posts = _posts;
     });
   }
 
-  int typeCheck(Map<String, dynamic> hw) {
-    switch (hw['type']) {
+  int typeCheck(String types) {
+    switch (types) {
       case "Review":
         return 996;
       case "ShortReview":
@@ -71,9 +71,13 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   @override
   void initState() {
     super.initState();
+
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     initUserInfo();
-    updateHwList();
+    setState(() {
+      posts = widget.posts;
+    });
+    // updatePostList();
   }
 
   @override
@@ -85,7 +89,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
           title: Text(
-            widget.post['name'],
+            widget.type,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 25,
@@ -97,13 +101,15 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
-            context.push("/bookreport_writing", extra: {
-              "index": typeCheck(HW),
-              "clubId": widget.clubId,
-              "asId": HW['id'],
-            }).then((value) async {
-              updateHwList();
+            context.push(
+              '/bookreport_writing',
+              extra: {
+                "index": typeCheck(widget.type),
+                "clubId": null,
+                "asId": null,
+              },
+            ).then((result) async {
+              updatePostList();
             });
           },
           shape: const CircleBorder(),
@@ -111,14 +117,14 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
         ),
         body: SingleChildScrollView(
           child: Column(
-            children: _buildHWListView(HwList),
+            children: _buildPostListView(posts),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildHWListView(List<dynamic> posts) {
+  List<Widget> _buildPostListView(List<dynamic> posts) {
     List<Widget> items = [];
 
     for (Map<String, dynamic> post in posts) {
@@ -131,7 +137,6 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
               child: Ink(
                 child: InkWell(
                   onTap: () {
-                    // print(post);
                     context.push(
                       '/bookreport_viewing',
                       extra: post,
@@ -140,7 +145,9 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      post['title'],
+                      (widget.type == "Quiz")
+                          ? post['description']
+                          : post['title'],
                       style: const TextStyle(
                         fontSize: 20,
                         fontFamily: 'Noto Sans KR',

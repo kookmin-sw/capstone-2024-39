@@ -94,8 +94,6 @@ class _SearchState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final secureStorage =
-        Provider.of<SecureStorageService>(context, listen: false);
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => Scaffold(
@@ -113,82 +111,86 @@ class _SearchState extends State<SearchScreen> {
           ),
           centerTitle: true,
         ),
-        body: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(), // 로딩 애니매이션
-              )
-            : Center(
-                child: Column(
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        height: ScreenUtil().setHeight(120),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0E9913),
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(50),
-                            bottomRight: Radius.circular(50),
-                          ),
+        body: Center(
+          child: Column(
+            children: [
+              Container(
+                  width: double.infinity,
+                  height: ScreenUtil().setHeight(120),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF0E9913),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(50),
+                      bottomRight: Radius.circular(50),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin:
+                            EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w),
+                        padding: EdgeInsets.only(left: 10.w),
+                        height: ScreenUtil().setHeight(40),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF2F2F2),
+                          borderRadius: BorderRadius.circular(25),
                         ),
-                        child: Column(
+                        child: Row(
                           children: [
-                            Container(
-                              margin: EdgeInsets.only(
-                                  top: 20.h, left: 20.w, right: 20.w),
-                              padding: EdgeInsets.only(left: 10.w),
-                              height: ScreenUtil().setHeight(40),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF2F2F2),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      if (_isFieldEmpty(_textControllers)) {
-                                        // 검색 x
-                                        // BookData = [];
-                                      } else {
-                                        _SearchData(_textControllers.text);
-                                        _scrollController.animateTo(0,
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            curve: Curves.easeInOut);
-                                      }
-                                    },
-                                    icon: const Icon(Icons.search),
-                                  ),
-                                  SizedBox(
-                                    width: ScreenUtil().setWidth(260),
-                                    child: TextField(
-                                      controller: _textControllers,
-                                      decoration: const InputDecoration(
-                                        hintText: '책 제목을 검색해주세요',
-                                        border: InputBorder.none,
-                                      ),
-                                      onChanged: (value) {
-                                        setState(() {});
-                                      },
-                                      onSubmitted: (value) {
-                                        if (_isFieldEmpty(_textControllers)) {
-                                          // 검색 x
-                                          // BookData = [];
-                                        } else {
-                                          _SearchData(_textControllers.text);
-                                          _scrollController.animateTo(0,
-                                              duration: const Duration(
-                                                  milliseconds: 500),
-                                              curve: Curves.easeInOut);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
+                            IconButton(
+                              onPressed: () {
+                                if (_isFieldEmpty(_textControllers)) {
+                                  // 검색 x
+                                  // BookData = [];
+                                } else {
+                                  _SearchData(_textControllers.text);
+                                  _scrollController.animateTo(0,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut);
+                                }
+                              },
+                              icon: const Icon(Icons.search),
+                            ),
+                            SizedBox(
+                              width: ScreenUtil().setWidth(260),
+                              child: TextField(
+                                controller: _textControllers,
+                                decoration: const InputDecoration(
+                                  hintText: '책 제목을 검색해주세요',
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                                onSubmitted: (value) {
+                                  if (_isFieldEmpty(_textControllers)) {
+                                    // 검색 x
+                                    // BookData = [];
+                                  } else {
+                                    _SearchData(_textControllers.text);
+                                    _scrollController.animateTo(0,
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                        curve: Curves.easeInOut);
+                                  }
+                                },
                               ),
                             ),
                           ],
-                        )),
-                    Expanded(
+                        ),
+                      ),
+                    ],
+                  )),
+              _isLoading
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: 200.h),
+                        child: const CircularProgressIndicator(),
+                      ), // 로딩 애니매이션
+                    )
+                  : Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         controller: _scrollController,
@@ -201,7 +203,7 @@ class _SearchState extends State<SearchScreen> {
                                 await secureStorage.saveData('age', '23');
                                 await secureStorage.saveData('gender', '남자');
                               },
-                              child: Text('테스트'),
+                              child: Text('한지민'),
                             ),
                             ElevatedButton(
                               onPressed: () async {
@@ -245,13 +247,12 @@ class _SearchState extends State<SearchScreen> {
                               onPressed: () async {
                                 await secureStorage.deleteData("token");
                                 await secureStorage.deleteData("id");
-                                await secureStorage.deleteAllData();
                               },
                               child: Text('토큰 삭제'),
                             ),
                             if (GroupData.isNotEmpty)
                               SizedBox(
-                                height: 200, // 높이 조정
+                                height: 200.h, // 높이 조정
                                 child: ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: GroupData.length,
@@ -279,9 +280,9 @@ class _SearchState extends State<SearchScreen> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -25,17 +25,21 @@ class HomeworkMakeScreen extends StatefulWidget {
 
 class _HomeworkMakeState extends State<HomeworkMakeScreen> {
   var secureStorage;
+  final List<String> type = ["독후감", "인용구", "한줄평", "퀴즈"];
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
   //각 항목을 입력했는지 확인
   bool _enableName = false;
+  bool _enableType = false;
   bool _enableDate = true;
 
-  final TextEditingController _textController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
 
   @override
   void dispose() {
-    _textController.dispose();
+    _nameController.dispose();
+    _typeController.dispose();
     super.dispose();
   }
 
@@ -44,7 +48,7 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
   }
 
   bool _isCreateButtonEnabled() {
-    if (_enableName && _enableDate) {
+    if (_enableName && _enableDate && _enableType) {
       return true;
     }
     return false;
@@ -71,19 +75,40 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
             children: [
               // 과제 이름 설정
               TextField(
-                controller: _textController,
+                controller: _nameController,
                 decoration: const InputDecoration(
                   labelText: '과제 이름',
                   hintText: '과제이름',
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _enableName = !_isFieldEmpty(_textController);
+                    _enableName = !_isFieldEmpty(_nameController);
                   });
                 },
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 16.h),
+              // 과제 타입 설정
+              DropdownButtonFormField(
+                decoration: const InputDecoration(
+                  labelText: '과제 주제',
+                ),
+                items: type
+                    .map((type) => DropdownMenuItem(
+                          value: type,
+                          child: Text(type),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _typeController.text = value.toString();
+                    _enableType = !_isFieldEmpty(_typeController);
+                  });
+                },
+              ),
+              SizedBox(height: 16.h),
+              // 기한 설정
               dueDate(),
+              SizedBox(height: 16.h),
               // 생성하기 버튼
               ElevatedButton(
                 onPressed: _isCreateButtonEnabled()
@@ -93,10 +118,11 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
                         String result = await assignCreate(
                             token,
                             widget.clubId,
-                            _textController.text,
+                            _nameController.text,
+                            _typeController.text,
                             _startDate.toString().substring(0, 10),
                             _endDate.toString().substring(0, 10));
-                        if(result == '과제 생성 완료'){
+                        if (result == '과제 생성 완료') {
                           context.pop(true);
                         }
                       }
@@ -113,54 +139,66 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
   }
 
   Widget dueDate() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextButton(
-          onPressed: () async {
-            final DateTime? picked = await showDatePicker(
-              context: context,
-              initialDate: _startDate,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2101),
-            );
-            if (picked != null && picked != _startDate) {
-              setState(() {
-                _startDate = picked;
-                _enableDate = !_startDate.isAfter(_endDate);
-              });
-            }
-          },
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 5)),
+        const Text(
+          "기한 설정",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
           ),
-          child: Text(_startDate.toString().substring(0, 10)),
         ),
-        const Text(' ~ '),
-        TextButton(
-          onPressed: () async {
-            final DateTime? picked = await showDatePicker(
-              context: context,
-              initialDate: _endDate,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2101),
-            );
-            if (picked != null && picked != _endDate) {
-              setState(() {
-                if (picked.toString().substring(0, 10) ==
-                    _endDate.toString().substring(0, 10)) {
-                } else {
-                  _endDate = picked;
+        Row(
+          children: [
+            TextButton(
+              onPressed: () async {
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: _startDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (picked != null && picked != _startDate) {
+                  setState(() {
+                    _startDate = picked;
+                    _enableDate = !_startDate.isAfter(_endDate);
+                  });
                 }
-                _enableDate = !_startDate.isAfter(_endDate);
-              });
-            }
-          },
-          style: ButtonStyle(
-            padding: MaterialStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 5)),
-          ),
-          child: Text(_endDate.toString().substring(0, 10)),
+              },
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 5)),
+              ),
+              child: Text(_startDate.toString().substring(0, 10)),
+            ),
+            const Text(' ~ '),
+            TextButton(
+              onPressed: () async {
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: _endDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2101),
+                );
+                if (picked != null && picked != _endDate) {
+                  setState(() {
+                    if (picked.toString().substring(0, 10) ==
+                        _endDate.toString().substring(0, 10)) {
+                    } else {
+                      _endDate = picked;
+                    }
+                    _enableDate = !_startDate.isAfter(_endDate);
+                  });
+                }
+              },
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 5)),
+              ),
+              child: Text(_endDate.toString().substring(0, 10)),
+            ),
+          ],
         ),
       ],
     );

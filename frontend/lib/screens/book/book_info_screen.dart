@@ -1,11 +1,15 @@
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/http.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:provider/provider.dart';
 
 class BookInfoScreen extends StatefulWidget {
-  final Map<String, dynamic> data;
+  final Map<String, dynamic> data; //책 정보
 
   const BookInfoScreen({
     super.key,
@@ -17,6 +21,10 @@ class BookInfoScreen extends StatefulWidget {
 }
 
 class _BookInfoState extends State<BookInfoScreen> {
+  var secureStorage;
+  var id, token;
+  var review, shortreview, quotation, quiz;
+  // var userInfo;
   List<bool> _selectType = [true, false, false];
 
   List<Widget> postType(BuildContext context, List<String> type) {
@@ -57,11 +65,50 @@ class _BookInfoState extends State<BookInfoScreen> {
     return temp;
   }
 
+  Future<void> updateBookcontent() async {
+    var _review, _shortreview, _quotation, _quiz;
+    _review = await bookcontentLoad(widget.data['isbn'], 'Review');
+    _quotation = await bookcontentLoad(widget.data['isbn'], 'Quotation');
+    _shortreview = await bookcontentLoad(widget.data['isbn'], 'ShortReview');
+    _quiz = await bookQuizLoad(widget.data['isbn']);
+
+    setState(() {
+      review = _review;
+      shortreview = _shortreview;
+      quotation = _quotation;
+      quiz = _quiz;
+      // print(review);
+      // print(shortreview);
+      // print(quotation);
+      // print(quiz);
+    });
+  }
+
+  Future<void> _initUserState() async {
+    try {
+      var _id = await secureStorage.readData('id');
+      var _token = await secureStorage.readData('token');
+      // var _userInfo = await getUserInfo(id, token);
+      setState(() {
+        // userInfo = _userInfo;
+        id = _id;
+        token = _token;
+      });
+    } catch (e) {
+      setState(() {
+        // userInfo = null;
+        id = null;
+        token = null;
+      });
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // print(widget.data);
+    secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    _initUserState();
+    updateBookcontent();
   }
 
   @override
@@ -121,17 +168,17 @@ class _BookInfoState extends State<BookInfoScreen> {
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 10.0,
-                          right: 10.0,
-                          bottom: 20.0,
+                        padding: EdgeInsets.only(
+                          left: 10.w,
+                          right: 20.w,
+                          bottom: 20.h,
                         ),
                         child: SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: Container(
                             child: Text(
                               widget.data['description'],
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 12,
                                 fontFamily: 'Noto Sans KR',
@@ -173,7 +220,13 @@ class _BookInfoState extends State<BookInfoScreen> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(6),
                         onTap: () {
-                          context.push('/homework_list');
+                          context.push('/book_content', extra: {
+                            "posts": quiz,
+                            "type": "Quiz",
+                            "isbn": widget.data['isbn'],
+                          }).then((value) async {
+                            updateBookcontent();
+                          });
                         },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,6 +249,14 @@ class _BookInfoState extends State<BookInfoScreen> {
                             SizedBox(
                               height: 5.h,
                             ),
+                            Expanded(
+                              child: ListView(
+                                shrinkWrap: true,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 50.0),
+                                children: _buildTaskList(context, '퀴즈'),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -206,7 +267,7 @@ class _BookInfoState extends State<BookInfoScreen> {
                     Column(
                       children: [
                         Row(
-                          children: postType(context, ['독후감', '인용구', '한줄']),
+                          children: postType(context, ['독후감', '한줄평', '인용구']),
                         ),
                         Ink(
                           width: 350.w,
@@ -227,11 +288,60 @@ class _BookInfoState extends State<BookInfoScreen> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(6),
                             onTap: () {
-                              context.push('/homework_list');
+                              var post, type;
+                              if (_selectType[0]) {
+                                post = review;
+                                type = "Review";
+                              } else if (_selectType[1]) {
+                                post = shortreview;
+                                type = "ShortReview";
+                              } else if (_selectType[2]) {
+                                post = quotation;
+                                type = "Quotation";
+                              }
+                              context.push('/book_content', extra: {
+                                "posts": post,
+                                "type": type,
+                                "isbn": widget.data['isbn'],
+                              }).then((value) async {
+                                updateBookcontent();
+                              });
                             },
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [],
+                              children: [
+                                (_selectType[0])
+                                    ? Expanded(
+                                        child: ListView(
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 50.0),
+                                          children:
+                                              _buildTaskList(context, '독후감'),
+                                        ),
+                                      )
+                                    : (_selectType[1])
+                                        ? Expanded(
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 50.0),
+                                              children: _buildTaskList(
+                                                  context, '한줄평'),
+                                            ),
+                                          )
+                                        : Expanded(
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 50.0),
+                                              children: _buildTaskList(
+                                                  context, '인용구'),
+                                            ),
+                                          ),
+                              ],
                             ),
                           ),
                         ),
@@ -242,6 +352,161 @@ class _BookInfoState extends State<BookInfoScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  //각 게시판의 글들을 리스트로 형성
+  List<Widget> _buildTaskList(BuildContext context, String type) {
+    List<Widget> tasks = [];
+    List<dynamic> temp;
+    int cnt = 0;
+    switch (type) {
+      case '퀴즈':
+        if (quiz == null) {
+          break;
+        }
+        temp = quiz;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
+        for (var post in temp) {
+          if (cnt > 4) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, true));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+      case '독후감':
+        if (review == null) {
+          break;
+        }
+        temp = review;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
+        for (var post in temp) {
+          if (cnt > 3) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, false));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+      case '한줄평':
+        if (shortreview == null) {
+          break;
+        }
+        temp = shortreview;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
+        for (var post in temp) {
+          if (cnt > 3) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, false));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+      case '인용구':
+        if (quotation == null) {
+          break;
+        }
+        temp = quotation;
+        // temp.sort((a, b) {
+        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
+        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
+        //   return dateTimeB.compareTo(dateTimeA);
+        // });
+        for (var post in temp) {
+          if (cnt > 3) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, false));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return tasks;
+  }
+
+  //각 게시판의 최신글
+  Widget _buildTaskEntry(BuildContext context, var post, bool isQuiz) {
+    return InkWell(
+      onTap: () {
+        // 퀴즈나 다른 컨텐츠 모두 눌러도 가능하도록
+        context.push(
+          '/bookreport_viewing',
+          extra: post,
+        );
+      },
+      child: Container(
+        width: 50.w,
+        margin: const EdgeInsets.only(bottom: 2), // 각 항목 사이의 간격 설정
+        padding: const EdgeInsets.all(4), // 내부 패딩 설정
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 3.0,
+          ),
+          child: Text(
+            isQuiz ? post['description'] : post['title'],
+          ),
         ),
       ),
     );

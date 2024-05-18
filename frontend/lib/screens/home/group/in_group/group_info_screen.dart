@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
@@ -54,6 +56,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   var token; // 유저 token
   var clubData; // 현재 모임의 데이터
   var userdata; // 유저 정보
+  var clubHwList; // 그룹의 과제 리스트
 
   //그룹 멤버인지 확인
   Future<bool> userState(var id, var token) async {
@@ -67,52 +70,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
       }
     }
     return false;
-  }
-
-  //각 게시판의 글들을 리스트로 형성
-  List<Widget> _buildTaskList(
-      BuildContext context, int entryCase, String postName) {
-    List<Widget> tasks = [];
-    for (int i = 0; i < entryCase; i++) {
-      tasks.add(_buildTaskEntry(context, i, postName));
-      tasks.add(Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey,
-              width: 1,
-            ),
-          ),
-        ),
-      ));
-    }
-    return tasks;
-  }
-
-  //각 게시판의 최신글
-  Widget _buildTaskEntry(BuildContext context, int index, String entryName) {
-    return InkWell(
-      onTap: () {
-        //글 목록 탭 됐을 때
-        print('${entryName} ${index + 1} 탭됨');
-      },
-      child: Container(
-        width: 50.w,
-        margin: const EdgeInsets.only(bottom: 2), // 각 항목 사이의 간격 설정
-        padding: const EdgeInsets.all(4), // 내부 패딩 설정
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 3.0,
-          ),
-          child: Text(
-            '$entryName${index + 1}',
-          ),
-        ),
-      ),
-    );
   }
 
   // 모임원 한명씩 생성
@@ -191,6 +148,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                           if (result == "모임 탈퇴 완료") {
                             _isGroupMember = false;
                             await _clubGetInfo();
+                            await _clubGetAssign();
                           }
                         }
                       }
@@ -230,6 +188,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                           await groupExpel(token, target, clubData['id']);
                       if (response == "추방 완료") {
                         await _clubGetInfo();
+                        await _clubGetAssign();
                         updateGroupList();
                       }
                     } else {
@@ -243,6 +202,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                           await groupDelegate(token, target, clubData['id']);
                       if (response == "위임 완료") {
                         await _clubGetInfo();
+                        await _clubGetAssign();
                         updateGroupList();
                         setState(() {
                           _isGroupManager = false;
@@ -261,6 +221,13 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 ),
               ),
             ),
+          ),
+
+          ElevatedButton(
+            onPressed: (){
+              context.push('/voicecall');
+            }, 
+            child: Text('test voice'),
           ),
         ],
       ),
@@ -384,6 +351,27 @@ class _GroupInfoState extends State<GroupInfoScreen> {
     );
   }
 
+  // 로그인을 안한 경우
+  void _showLoginlimitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('가입 실패'),
+          content: Text('로그인이 필요한 기능입니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final TextEditingController _textControllers = TextEditingController();
 
   bool _isFieldEmpty(TextEditingController controller) {
@@ -414,8 +402,17 @@ class _GroupInfoState extends State<GroupInfoScreen> {
 
   Future<void> _clubGetInfo() async {
     clubData = await groupSerachforId(widget.clubId);
+
     setState(() {});
-    // print(clubData);
+  }
+
+  Future<void> _clubGetAssign() async {
+    clubHwList = await getAssign(widget.clubId);
+    if (clubHwList.runtimeType == Map<String, dynamic>) {
+      clubHwList = null;
+    }
+
+    setState(() {});
   }
 
   // // _memberCheckStates 초기화
@@ -443,25 +440,35 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   }
 
   Future<void> _initUserState() async {
-    final secureStorage =
-        Provider.of<SecureStorageService>(context, listen: false);
-    bool isGroupManager = false;
-    id = await secureStorage.readData("id");
-    token = await secureStorage.readData("token");
-    bool isGroupMember = await userState(id, token);
-    await _clubGetInfo();
+    try {
+      final secureStorage =
+          Provider.of<SecureStorageService>(context, listen: false);
+      bool isGroupManager = false;
+      id = await secureStorage.readData("id");
+      token = await secureStorage.readData("token");
+      bool isGroupMember = await userState(id, token);
 
-    if (id == clubData['managerId']) {
-      isGroupManager = true;
+      await _clubGetInfo();
+
+      await _clubGetAssign();
+
+      if (id == clubData['managerId']) {
+        isGroupManager = true;
+      }
+
+      setState(() {
+        _textControllers.clear();
+        _isGroupMember = isGroupMember;
+        _isGroupManager = isGroupManager;
+        updateGroupList();
+      });
+    } catch (e) {
+      setState(() {
+        _isGroupMember = false;
+        _isGroupManager = false;
+        updateGroupList();
+      });
     }
-
-    setState(() {
-      _textControllers.clear();
-      _isGroupMember = isGroupMember;
-      _isGroupManager = isGroupManager;
-      updateGroupList();
-      // print(clubData['book']);
-    });
   }
 
   Widget _searchWidget() {
@@ -490,6 +497,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     }).then((result) async {
                       if (result == true) {
                         await _clubGetInfo();
+                        await _clubGetAssign();
                         setState(() {
                           // print(clubData['book']);
                         });
@@ -523,6 +531,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                       }).then((result) async {
                         if (result == true) {
                           await _clubGetInfo();
+                          await _clubGetAssign();
                           setState(() {
                             // print(clubData['book']);
                           });
@@ -646,13 +655,17 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         ),
                         child: InkWell(
                           onTap: () async {
-                            if (clubData['maximum'] == clubData['memberCnt']) {
+                            if (id == null || token == null) {
+                              _showLoginlimitDialog();
+                            } else if (clubData['maximum'] ==
+                                clubData['memberCnt']) {
                               _showMaxlimitDialog();
                             } else {
                               // 회원 가입 동작
                               String result =
                                   await groupJoin(token, widget.clubId);
                               await _clubGetInfo();
+                              await _clubGetAssign();
                               if (result == "모임 가입 완료") {
                                 setState(() {
                                   _isGroupMember = true;
@@ -768,10 +781,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(6),
                                 onTap: () {
-                                  context.push('/homework_list', extra: {
-                                    "clubId": clubData['id'],
-                                    "managerId": clubData['managerId'],
-                                  });
+                                  if (_isGroupMember) {
+                                    context.push('/homework_list', extra: {
+                                      "clubId": clubData['id'],
+                                      "managerId": clubData['managerId'],
+                                    }).then((value) async {
+                                      await _clubGetInfo();
+                                      await _clubGetAssign();
+                                    });
+                                  }
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -799,8 +817,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                         shrinkWrap: true,
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 50.0),
-                                        children:
-                                            _buildTaskList(context, 10, '과제'),
+                                        children: _buildTaskList(context, '과제'),
                                       ),
                                     ),
                                   ],
@@ -830,10 +847,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(6),
                                 onTap: () {
-                                  context.push('/notice_list', extra: {
-                                    "clubId": clubData['id'],
-                                    "managerId": clubData['managerId'],
-                                  });
+                                  if (_isGroupMember) {
+                                    context.push('/notice_list', extra: {
+                                      "clubId": clubData['id'],
+                                      "managerId": clubData['managerId'],
+                                    }).then((value) async {
+                                      await _clubGetInfo();
+                                      await _clubGetAssign();
+                                    });
+                                  }
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -862,7 +884,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 50.0),
                                         children:
-                                            _buildTaskList(context, 10, '공지사항'),
+                                            _buildTaskList(context, '공지사항'),
                                       ),
                                     ),
                                   ],
@@ -892,10 +914,15 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(6),
                                 onTap: () {
-                                  context.push('/post_list', extra: {
-                                    "clubId": clubData['id'],
-                                    "managerId": clubData['managerId'],
-                                  });
+                                  if (_isGroupMember) {
+                                    context.push('/post_list', extra: {
+                                      "clubId": clubData['id'],
+                                      "managerId": clubData['managerId'],
+                                    }).then((value) async {
+                                      await _clubGetInfo();
+                                      await _clubGetAssign();
+                                    });
+                                  }
                                 },
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -924,7 +951,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 50.0),
                                         children:
-                                            _buildTaskList(context, 10, '게시판'),
+                                            _buildTaskList(context, '게시판'),
                                       ),
                                     ),
                                   ],
@@ -938,6 +965,147 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                   ],
                 ),
               )),
+    );
+  }
+
+  //각 게시판의 글들을 리스트로 형성
+  List<Widget> _buildTaskList(BuildContext context, String type) {
+    List<Widget> tasks = [];
+    List<dynamic> temp;
+    int cnt = 0;
+    switch (type) {
+      case '게시판':
+        temp = clubData['posts'];
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["createdAt"]);
+          DateTime dateTimeB = DateTime.parse(b["createdAt"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
+        for (var post in temp) {
+          if (cnt > 3) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, true));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+      case '공지사항':
+        temp = clubData['posts'];
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["createdAt"]);
+          DateTime dateTimeB = DateTime.parse(b["createdAt"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
+        for (var post in temp) {
+          if (post['isSticky'] == true) {
+            if (cnt > 3) {
+              break;
+            }
+            cnt++;
+            tasks.add(_buildTaskEntry(context, post, true));
+            tasks.add(Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1,
+                  ),
+                ),
+              ),
+            ));
+          }
+        }
+        break;
+      case '과제':
+        if (clubHwList == null) {
+          break;
+        }
+        temp = clubHwList;
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["endDate"]);
+          DateTime dateTimeB = DateTime.parse(b["endDate"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
+        for (var post in temp) {
+          if (cnt > 3) {
+            break;
+          }
+          cnt++;
+          tasks.add(_buildTaskEntry(context, post, false));
+          tasks.add(Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey,
+                  width: 1,
+                ),
+              ),
+            ),
+          ));
+        }
+        break;
+      default:
+        break;
+    }
+
+    return tasks;
+  }
+
+  //각 게시판의 최신글
+  Widget _buildTaskEntry(BuildContext context, var post, bool isPost) {
+    return InkWell(
+      onTap: () {
+        //글 목록 탭 됐을 때
+        if (isPost) {
+          if (_isGroupMember) {
+            context.push('/post', extra: {
+              'postId': post['id'],
+              'clubId': post['clubId'],
+            }).then((value) async {
+              await _clubGetInfo();
+              await _clubGetAssign();
+            });
+          }
+        }
+        //과제가 탭 됐을 때
+        else {
+          if (_isGroupMember) {
+            context.push('/homeworkmember_make', extra: {
+              'post': post,
+              'clubId': widget.clubId,
+            }).then((value) async {
+              await _clubGetInfo();
+              await _clubGetAssign();
+            });
+          }
+        }
+      },
+      child: Container(
+        width: 50.w,
+        margin: const EdgeInsets.only(bottom: 2), // 각 항목 사이의 간격 설정
+        padding: const EdgeInsets.all(4), // 내부 패딩 설정
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(
+            left: 3.0,
+          ),
+          child: Text(
+            (isPost) ? post['title'] : post['name'],
+          ),
+        ),
+      ),
     );
   }
 }
