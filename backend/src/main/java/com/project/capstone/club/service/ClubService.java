@@ -96,7 +96,7 @@ public class ClubService {
             throw new ClubException(INVALID_TARGET);
         }
         checkIsManagerAndTargetIsClubMember(managerId, memberId, clubId);
-        clubRepository.updateManager(memberId);
+        clubRepository.updateManager(memberId, clubId);
     }
 
     @Transactional
