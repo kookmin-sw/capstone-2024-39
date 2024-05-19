@@ -2,9 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/screens/home/group/group_screen.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:frontend/screens/home/search/search_screen_util.dart'
     as SearchUtil;
 import 'package:frontend/http.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 
 //그룹 대표책 설정 페이지
@@ -47,13 +50,8 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
           backgroundColor: const Color(0xFF0E9913),
           title: const Text(
             '대표책 검색',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
           ),
+          titleTextStyle: textStyle(22, null, true),
           centerTitle: true,
         ),
         body: Center(
@@ -67,11 +65,18 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
                       SizedBox(
                         height: 5.h,
                       ),
-                      if(BookData.isNotEmpty)
+                      if (BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)
-                          SearchUtil.SearchListItem(data: BookData[i], type: "select", clubId: widget.clubId,),
-                      if(BookData.isEmpty)
-                        const Text('검색된 책이 없습니다.'),
+                          SearchUtil.SearchListItem(
+                            data: BookData[i],
+                            type: "select",
+                            clubId: widget.clubId,
+                          ),
+                      if (BookData.isEmpty)
+                        Text(
+                          '검색된 책이 없습니다.',
+                          style: textStyle(14, null, true),
+                        ),
                     ],
                   ),
                 ),
@@ -82,4 +87,13 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
       ),
     );
   }
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

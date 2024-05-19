@@ -5,6 +5,7 @@ import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/http.dart';
+
 //검색의 리스트 아이템 템플릿
 
 class SearchListItem extends StatefulWidget {
@@ -42,7 +43,7 @@ class _SearchListItemState extends State<SearchListItem> {
             onTap: () async{
               switch (widget.type) {
                 case "search":
-                  var result = await bookAdd(widget.data);
+                  await bookAdd(widget.data);
                   // print(result);
                   // if(result == "도서 추가 완료"){ // 새로운 책
                     
@@ -90,12 +91,7 @@ class _SearchListItemState extends State<SearchListItem> {
                       width: 280.w,
                       child: Text(
                         widget.data['title'],
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20.sp,
-                          fontFamily: 'Noto Sans KR',
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: textStyle(20, Colors.black, true),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -106,12 +102,7 @@ class _SearchListItemState extends State<SearchListItem> {
                       width: ScreenUtil().setWidth(280),
                       child: Text(
                         "${(widget.data['author'] == '') ? '저자 미상' : widget.data['author']} | ${widget.data['publisher']}",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 11.sp,
-                          fontFamily: 'Noto Sans KR',
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: textStyle(11, Colors.black, false),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -127,4 +118,13 @@ class _SearchListItemState extends State<SearchListItem> {
       ],
     );
   }
+}
+
+TextStyle textStyle(int fontsize, Color color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke)?FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

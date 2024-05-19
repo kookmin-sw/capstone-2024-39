@@ -1,16 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'dart:async';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
-import 'package:get/get.dart';
+import 'package:frontend/screens/home/group/group_screen.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
+import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend/screens/home/group/in_group/groupbook_select_screen.dart';
 
 //그룹 상세 페이지
 
@@ -76,6 +73,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   Widget _generateMember(String memName, int index) {
     return ListTile(
       title: Text(memName),
+      titleTextStyle: textStyle(18, Colors.black, true),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       trailing: Visibility(
         visible: _isManage && _isGroupManager,
@@ -117,6 +115,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   //모임원 목록 사이드 바
   Widget _buildGroupList(BuildContext context) {
     return Drawer(
+      width: MediaQuery.of(context).size.width * 0.5,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -128,10 +127,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               children: [
                 Text(
                   userdata['name'],
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                  ),
+                  style: textStyle(23, null, true),
                 ),
                 IconButton(
                     onPressed: () async {
@@ -149,6 +145,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                             _isGroupMember = false;
                             await _clubGetInfo();
                             await _clubGetAssign();
+                            context.pop();
                           }
                         }
                       }
@@ -156,6 +153,10 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     icon: _isGroupManager
                         ? const Icon(Icons.settings)
                         : const Icon(Icons.logout)),
+                Text(
+                  _isGroupManager ? '설정' : '나가기',
+                  style: textStyle(13, null, false),
+                ),
               ],
             ),
           ),
@@ -216,19 +217,20 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                     _isManage = false;
                   });
                 },
-                child: const Text(
+                child: Text(
                   '확인',
+                  style: textStyle(12, null, false),
                 ),
               ),
             ),
           ),
 
-          ElevatedButton(
-            onPressed: () {
-              context.push('/voicecall');
-            },
-            child: Text('test voice'),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     context.push('/voicecall');
+          //   },
+          //   child: Text('test voice'),
+          // ),
         ],
       ),
     );
@@ -240,20 +242,28 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("마지막으로 확인하겠습니다"),
-              content: Text("나가시겠습니까?"),
+              title: const Text("마지막으로 확인하겠습니다"),
+              titleTextStyle: textStyle(20, Colors.black, true),
+              content: const Text("나가시겠습니까?"),
+              contentTextStyle: textStyle(14, Colors.black, false),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false); // 취소 버튼 클릭 시 false 반환
                   },
-                  child: Text("취소"),
+                  child: Text(
+                    "취소",
+                    style: textStyle(13, null, false),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true); // 확인 버튼 클릭 시 true 반환
                   },
-                  child: Text("확인"),
+                  child: Text(
+                    "확인",
+                    style: textStyle(13, null, false),
+                  ),
                 ),
               ],
             );
@@ -272,25 +282,42 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             child: ListBody(
               children: [
                 ListTile(
-                  title: const Text('추방하기'),
+                  title: Text(
+                    '추방하기',
+                    style: textStyle(18, null, true),
+                  ),
                   onTap: () {
-                    setState(() {
-                      _isKicked = true;
-                      _isManage = true;
-                      updateGroupList();
-                    });
-                    Navigator.pop(context);
+                    if (clubData['memberCnt'] == 1) {
+                      context.pop();
+                      _showlimitDialog("최소인원");
+                    } else {
+                      setState(() {
+                        _isKicked = true;
+                        _isManage = true;
+                        updateGroupList();
+                      });
+
+                      context.pop();
+                    }
                   },
                 ),
                 ListTile(
-                  title: const Text('모임장 위임하기'),
+                  title: Text(
+                    '모임장 위임하기',
+                    style: textStyle(18, null, true),
+                  ),
                   onTap: () {
-                    setState(() {
-                      _isKicked = false;
-                      _isManage = true;
-                      updateGroupList();
-                    });
-                    Navigator.pop(context);
+                    if (clubData['memberCnt'] == 1) {
+                      context.pop();
+                      _showlimitDialog("최소인원");
+                    } else {
+                      setState(() {
+                        _isKicked = false;
+                        _isManage = true;
+                        updateGroupList();
+                      });
+                      context.pop();
+                    }
                   },
                 ),
               ],
@@ -308,20 +335,30 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("마지막으로 확인하겠습니다"),
-              content: (kickState) ? Text("추방하시겠습니까?") : Text("임명하시겠습니까?"),
+              title: const Text("마지막으로 확인하겠습니다."),
+              titleTextStyle: textStyle(20, Colors.black, true),
+              content: (kickState)
+                  ? const Text("추방하시겠습니까?")
+                  : const Text("모임장으로 임명하시겠습니까?"),
+              contentTextStyle: textStyle(15, Colors.black, false),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false); // 취소 버튼 클릭 시 false 반환
                   },
-                  child: Text("취소"),
+                  child: Text(
+                    "취소",
+                    style: textStyle(13, null, false),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true); // 확인 버튼 클릭 시 true 반환
                   },
-                  child: Text("확인"),
+                  child: Text(
+                    "확인",
+                    style: textStyle(13, null, false),
+                  ),
                 ),
               ],
             );
@@ -331,45 +368,83 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   }
 
   // 제한인원 초과 경우
-  void _showMaxlimitDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('가입 실패'),
-          content: Text('모임의 정원이 초과되었습니다.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text("확인"),
-            ),
-          ],
+  void _showlimitDialog(String type) {
+    switch (type) {
+      case "정원초과":
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('가입 실패'),
+              content: const Text('모임의 정원이 초과되었습니다.'),
+              titleTextStyle: textStyle(20, Colors.black, true),
+              contentTextStyle: textStyle(14, Colors.black, false),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: Text(
+                    "확인",
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
-  }
-
-  // 로그인을 안한 경우
-  void _showLoginlimitDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('가입 실패'),
-          content: Text('로그인이 필요한 기능입니다.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text("확인"),
-            ),
-          ],
+        break;
+      case "최소인원":
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('인원 오류'),
+              content: const Text('모임의 최소 인원이 부족합니다.'),
+              titleTextStyle: textStyle(20, Colors.black, true),
+              contentTextStyle: textStyle(14, Colors.black, false),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: Text(
+                    "확인",
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
+        break;
+      case "비로그인":
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('가입 실패'),
+              content: const Text('로그인이 필요한 기능입니다.'),
+              titleTextStyle: textStyle(20, Colors.black, true),
+              contentTextStyle: textStyle(14, Colors.black, false),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: Text(
+                    "확인",
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        break;
+      default:
+        break;
+    }
   }
 
   final TextEditingController _textControllers = TextEditingController();
@@ -402,7 +477,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
 
   Future<void> _clubGetInfo() async {
     clubData = await groupSerachforId(widget.clubId);
-
     setState(() {});
   }
 
@@ -449,7 +523,6 @@ class _GroupInfoState extends State<GroupInfoScreen> {
       bool isGroupMember = await userState(id, token);
 
       await _clubGetInfo();
-
       await _clubGetAssign();
 
       if (id == clubData['managerId']) {
@@ -513,11 +586,13 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               ),
               SizedBox(
                 width: 260.w,
-                height: 40.h,
                 child: TextField(
                   controller: _textControllers,
                   decoration: InputDecoration(
-                    hintText: (clubData['book'] == null)?'대표책을 설정해주세요.':'대표책을 검색해주세요.',
+                    hintText: (clubData['book'] == null)
+                        ? '대표책을 설정해주세요.'
+                        : '대표책을 검색해주세요.',
+                    hintStyle: textStyle(16, Colors.grey, false),
                     border: InputBorder.none,
                   ),
                   style: TextStyle(
@@ -566,12 +641,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             children: [
               Text(
                 '대표책',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.sp,
-                  fontFamily: 'Noto Sans KR',
-                  fontWeight: FontWeight.w700,
-                ),
+                style: textStyle(14, Colors.white, true),
               ),
               Container(
                 width: 80.w,
@@ -596,12 +666,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 width: 250.w,
                 child: Text(
                   clubData['book']['title'],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22.sp,
-                    fontFamily: 'Noto Sans KR',
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textStyle(22, Colors.white, true),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -609,12 +674,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 width: 250.w,
                 child: Text(
                   "${(clubData['book']['author'].length != 0) ? clubData['book']['author'] : '저자 미상'} | ${clubData['book']['publisher']}",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12.sp,
-                    fontFamily: 'Noto Sans KR',
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textStyle(12, Colors.white, true),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -639,6 +699,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 scrolledUnderElevation: 0,
                 backgroundColor: const Color(0xFF0E9913),
                 title: Text(widget.groupName),
+                titleTextStyle: textStyle(20, null, true),
                 centerTitle: true,
                 actions: [
                   Padding(
@@ -654,7 +715,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                             side: BorderSide(
                               width: 2.w,
                               strokeAlign: BorderSide.strokeAlignOutside,
-                              color: Color(0xFFEEF1F4),
+                              color: const Color(0xFFEEF1F4),
                             ),
                             borderRadius: BorderRadius.circular(15),
                           ),
@@ -662,10 +723,10 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                         child: InkWell(
                           onTap: () async {
                             if (id == null || token == null) {
-                              _showLoginlimitDialog();
+                              _showlimitDialog("비로그인");
                             } else if (clubData['maximum'] ==
                                 clubData['memberCnt']) {
-                              _showMaxlimitDialog();
+                              _showlimitDialog("정원초과");
                             } else {
                               // 회원 가입 동작
                               String result =
@@ -685,12 +746,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                             child: Text(
                               '가입하기',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.sp,
-                                fontFamily: 'Noto Sans KR',
-                                fontWeight: FontWeight.w700,
-                              ),
+                              style: textStyle(15, null, true),
                             ),
                           ),
                         ),
@@ -801,19 +857,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(
+                                    Padding(
+                                      padding: const EdgeInsets.only(
                                         left: 5.0,
                                         top: 3.0,
                                       ),
                                       child: Text(
                                         '과제',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontFamily: 'Noto Sans KR',
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: textStyle(15, null, true),
                                       ),
                                     ),
                                     SizedBox(
@@ -867,19 +918,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(
+                                    Padding(
+                                      padding: const EdgeInsets.only(
                                         left: 5.0,
                                         top: 3.0,
                                       ),
                                       child: Text(
                                         '공지사항',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontFamily: 'Noto Sans KR',
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: textStyle(15, null, true),
                                       ),
                                     ),
                                     SizedBox(
@@ -934,19 +980,14 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(
+                                    Padding(
+                                      padding: const EdgeInsets.only(
                                         left: 5.0,
                                         top: 3.0,
                                       ),
                                       child: Text(
                                         '게시판',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontFamily: 'Noto Sans KR',
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: textStyle(15, null, true),
                                       ),
                                     ),
                                     SizedBox(
@@ -1110,9 +1151,19 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           ),
           child: Text(
             (isPost) ? post['title'] : post['name'],
+            style: textStyle(14, null, false),
           ),
         ),
       ),
     );
   }
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

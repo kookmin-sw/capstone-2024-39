@@ -46,8 +46,9 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
     "X-Naver-Client-Secret": NaverSecret,
   });
   final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
   while (iter != 100) {
-    if (data['total'] <= iter) {
+    if (data['total'] <= iter) {  
       break;
     } else if (data['items'][iter]['title'].toString().contains('시리즈')) {
     } else if (data['items'][iter]['title'].toString().contains('세트')) {
@@ -111,7 +112,7 @@ Future<dynamic> login(String email) async {
     }),
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
-
+  // print(data);
   return data;
 }
 
@@ -132,7 +133,7 @@ Future<dynamic> getUserInfo(String id, String token) async {
 
 //모임 목록 가져오기(주제를 기반으로)›
 Future<List<List<dynamic>>> groupSerachforTopic(List<String> topic) async {
-  List<List<dynamic>> groupList = [[], [], [], [], [], []];
+  List<List<dynamic>> groupList = [[], [], [], [], [], [], [], []];
   for (int i = 0; i < topic.length; i++) {
     String temp = topic[i];
     var address = Uri.parse(BASE_URL + "/club/search/topic?topic=$temp");
@@ -359,7 +360,7 @@ Future<List<dynamic>> bookcontentLoad(String ISBN, String content) async {
   for (int i = 0; i < data.length; i++) {
     contentList.add(data[i]);
   }
-  print(data);
+  // print(data);
   return contentList;
 }
 
@@ -673,6 +674,36 @@ Future<String> addBooksToLibrary(
     body: json.encode(books),
   );
   final data = res.body;
+  // print(data);
+  return data;
+}
+
+
+// 추천 리스트 받아오기(로그인)
+Future<dynamic> getRecommend(String token) async {
+  var address = Uri.parse(BASE_URL + "/rec/member");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
+}
+
+// 추천 리스트 받아오기(비로그인)
+Future<dynamic> getRecommendAnony() async {
+  var address = Uri.parse(BASE_URL + "/rec/anonymous");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
   // print(data);
   return data;
 }

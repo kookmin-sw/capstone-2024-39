@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 //책의 컨텐츠 목록
 
@@ -35,7 +36,6 @@ class _BookContentState extends State<BookContentScreen> {
     setState(() {
       id = _id;
       token = _token;
-      print(id);
     });
   }
 
@@ -77,6 +77,8 @@ class _BookContentState extends State<BookContentScreen> {
     initUserInfo();
     setState(() {
       posts = widget.posts;
+      print(posts);
+      print(widget.type);
     });
     // updatePostList();
   }
@@ -90,34 +92,31 @@ class _BookContentState extends State<BookContentScreen> {
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
           title: Text(
-            widget.type,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            contentType(widget.type),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
-        floatingActionButton: (id != null && token != null)?FloatingActionButton(
-          onPressed: () {
-            context.push(
-              '/bookreport_writing',
-              extra: {
-                "index": typeCheck(widget.type),
-                "clubId": null,
-                "asId": null,
-                "isbn": widget.isbn,
-                "dateInfo":null,
-              },
-            ).then((result) async {
-              updatePostList();
-            });
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-        ):null,
+        floatingActionButton: (id != null && token != null)
+            ? FloatingActionButton(
+                onPressed: () {
+                  context.push(
+                    '/bookreport_writing',
+                    extra: {
+                      "index": typeCheck(widget.type),
+                      "clubId": null,
+                      "asId": null,
+                      "isbn": widget.isbn,
+                      "dateInfo": null,
+                    },
+                  ).then((result) async {
+                    updatePostList();
+                  });
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add),
+              )
+            : null,
         body: SingleChildScrollView(
           child: Column(
             children: _buildPostListView(posts),
@@ -145,19 +144,60 @@ class _BookContentState extends State<BookContentScreen> {
                       extra: post,
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      (widget.type == "Quiz")
-                          ? post['description']
-                          : post['title'],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Noto Sans KR',
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.17,
+                  // child: Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Text(
+                  //     (widget.type == "Quiz")
+                  //         ? post['description']
+                  //         : post['title'],
+                  //     style: textStyle(20, null, true),
+                  //   ),
+                  // ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  (widget.type == "Quiz")
+                                      ? post['description']
+                                      : post['title'],
+                                  style: textStyle(18, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  "작성자 ${post['writer']}",
+                                  style: textStyle(12, null, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  (widget.type != 'Quiz')
+                                      ? contentType(post['type'])
+                                      : quizType(post['type']),
+                                  style: textStyle(13, null, false),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -178,4 +218,53 @@ class _BookContentState extends State<BookContentScreen> {
     }
     return items;
   }
+}
+
+String contentType(String type) {
+  switch (type) {
+    case 'Review':
+      return '독후감';
+    case 'ShortReview':
+      return '한줄평';
+    case 'Quotation':
+      return '인용구';
+    default:
+      return '퀴즈';
+  }
+}
+
+String quizType(String quiz) {
+  switch (quiz) {
+    case 'ShortAnswer':
+      return '단답형';
+    case 'MultipleChoice':
+      return '객관식';
+    case 'OX':
+      return 'O/X';
+    default:
+      return '';
+  }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+
+  return formattedDate;
+}
+
+bool limitDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  DateTime nowTime = DateTime.now();
+
+  return dateTime.isAfter(nowTime);
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

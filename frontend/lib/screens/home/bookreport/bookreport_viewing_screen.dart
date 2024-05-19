@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
   final dynamic contentData;
@@ -16,8 +17,8 @@ class BookReportViewingScreen extends StatefulWidget {
 class _BookReportViewingState extends State<BookReportViewingScreen> {
   final TextEditingController _answerController = TextEditingController();
   // List<dynamic> _contentData = [];
-  final dynamic _startDate = DateTime.now();
-  final dynamic _endDate = DateTime.now();
+  dynamic _startDate = DateTime.now();
+  dynamic _endDate = DateTime.now();
   //bool _isPublic = false;
   String _template = '';
   String _writer = '';
@@ -40,11 +41,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       _writer = content['writer'];
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
-      print(_template);
+      _booktitle = content['book']['title'];
+      _startDate = formatDate(content['startDate']);
+      _endDate = formatDate(content['endDate']);
+      print(_startDate);
+      print(_endDate);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
-        _booktitle = content['book']['title'];
       } else {
         _category = quizCategory(content['type']);
         _answer = content['answer'];
@@ -106,12 +110,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_template),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Noto Sans KR',
-          fontWeight: FontWeight.w700,
-          fontSize: 20,
-        ),
+        titleTextStyle: textStyle(22, Colors.white, true),
         backgroundColor: const Color(0xFF0E9913),
         centerTitle: true,
         leading: IconButton(
@@ -123,35 +122,99 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
+            (_template != '퀴즈')
+                ? Column(
+                    children: [
+                      SizedBox(height: 10.h),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            Text(
+                              '제목 : ',
+                              style: textStyle(15, null, false),
+                            ),
+                            Text(
+                              _title,
+                              style: textStyle(15, null, false),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 1,
+                              color: const Color(0xFFA9AFB7),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
+            SizedBox(height: 10.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
-                  Text(_title),
+                  Text(
+                    _booktitle,
+                    style: textStyle(15, null, true),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
-                  Text(_booktitle),
+                  Text(
+                    '$_author | $_publisher',
+                    style: textStyle(13, null, false),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text('$_author | $_publisher',
-                      style: const TextStyle(color: Colors.black)),
-                ],
-              ),
+            SizedBox(height: 10.h),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 20.w),
+                  child: Text(
+                    '독서기간 :',
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5.w),
+                  child: Text(
+                    _startDate,
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 10.w),
+                  child: Text(
+                    '~',
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 10.w),
+                  child: Text(
+                    _endDate,
+                    style: textStyle(13, null, false),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 10.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
@@ -163,18 +226,18 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
-                child: _buildTemplateUI(_template),
-              ),
+                    child: _buildTemplateUI(_template),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
           ],
         ),
       ),
@@ -184,9 +247,15 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   Widget _buildTemplateUI(String template) {
     switch (template) {
       case "독후감":
-        return Text(_body);
+        return Text(
+          _body,
+          style: textStyle(14, null, false),
+        );
       case "한줄평":
-        return Text(_body);
+        return Text(
+          _body,
+          style: textStyle(14, null, false),
+        );
       case "인용구":
         return Align(
           alignment: Alignment.center,
@@ -196,6 +265,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Text(
                   _body,
+                  style: textStyle(14, null, false),
                   textAlign: TextAlign.center,
                   maxLines: 10,
                 ),
@@ -218,16 +288,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
           children: [
             Row(
               children: [
-                const Text(
+                Text(
                   '카테고리: ',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontFamily: 'Noto Sans KR',
-                    fontWeight: FontWeight.w400,
-                    height: 0,
-                    letterSpacing: -0.17,
-                  ),
+                  style: textStyle(15, null, false),
                 ),
                 const SizedBox(width: 3),
                 SizedBox(
@@ -235,25 +298,19 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                   height: 22,
                   child: Text(
                     _category,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Noto Sans KR',
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                      height: 0,
-                    ),
+                    style: textStyle(14, null, false),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 0),
               child: Row(
                 children: [
                   Expanded(
-                child: _buildQuizUI(_category),
-              ),
+                    child: _buildQuizUI(_category),
+                  ),
                 ],
               ),
             ),
@@ -633,4 +690,19 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       },
     );
   }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

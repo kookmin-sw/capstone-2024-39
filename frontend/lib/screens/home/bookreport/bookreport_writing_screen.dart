@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
 import 'package:go_router/go_router.dart';
@@ -91,21 +92,24 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   }
 
   void checkHW() async {
+    print(widget.isbn);
+    print(widget.dateInfo);
     if (widget.isbn != null) {
       var bookInfo = await getBookInfo(widget.isbn);
-
+      print(bookInfo);
       setState(() {
+        _bookTitleController.text = bookInfo['title'];
         _author = bookInfo['author'];
         _publisher = bookInfo['publisher'];
         _isbn = widget.isbn;
-        _publisherDate = bookInfo['publisherDate'];
+        _publisherDate = bookInfo['publishDate'];
         _imageUrl = bookInfo['imageUrl'];
       });
     }
     if (widget.dateInfo != null) {
       setState(() {
-        _startDate = widget.dateInfo['startDate'];
-        _endDate = widget.dateInfo['endDate'];
+        _startDate = DateTime.parse(widget.dateInfo['startDate']);
+        _endDate = DateTime.parse(widget.dateInfo['endDate']);
       });
     }
   }
@@ -166,7 +170,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 5.h),
-            Padding(
+            (_template != '퀴즈')?Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
@@ -187,7 +191,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   ),
                 ],
               ),
-            ),
+            ):Container(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -459,7 +463,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 }
                 context.pop(true);
               },
-              child: const Text('저장'),
+              child: Text(
+                '저장',
+                style: textStyle(13, null, false),
+              ),
             ),
           ),
         ),

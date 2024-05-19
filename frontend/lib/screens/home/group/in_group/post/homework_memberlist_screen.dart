@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 //멤버들 과제 리스트
 
@@ -54,6 +55,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
       HW = _hw;
       HwList = _HwList;
       isbn = _club['book']['isbn'];
+      print(HW);
     });
   }
 
@@ -88,7 +90,6 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     dateCheck(widget.post['endDate']);
-    print(widget.post);
     initUserInfo();
     updateHwList();
   }
@@ -103,12 +104,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
           backgroundColor: const Color(0xFF0E9913),
           title: Text(
             widget.post['name'],
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
@@ -161,17 +157,47 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
                       extra: post,
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      post['title'],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Noto Sans KR',
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.17,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  post['title'],
+                                  style: textStyle(20, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  HwType(post['type']),
+                                  style: textStyle(14, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  "작성자 ${post['writer']}",
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -192,4 +218,32 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     }
     return items;
   }
+}
+
+String HwType(String type) {
+  switch (type) {
+    case 'Review':
+      return '독후감';
+    case 'ShortReview':
+      return '한줄평';
+    case 'Quotation':
+      return '인용구';
+    default:
+      return '퀴즈';
+  }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

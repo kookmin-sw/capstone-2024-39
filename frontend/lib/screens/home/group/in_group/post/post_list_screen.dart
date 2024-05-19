@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 //게시글 목록 페이지
 
@@ -40,14 +41,9 @@ class _PostListScreenState extends State<PostListScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
+          title: Text(
             '게시판',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
@@ -94,32 +90,85 @@ class _PostListScreenState extends State<PostListScreen> {
                       "clubId": post['clubId'],
                     });
                   },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  post['title'],
+                                  style: textStyle(20, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  "작성자 ${post['writer']}",
+                                  style: textStyle(12, null, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 14.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  formatDate(post['createdAt']),
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                              (post['isSticky'])
+                                  ? Padding(
+                                      padding: EdgeInsets.only(left: 14.w),
+                                      child: Text('공지사항',
+                                          style:
+                                              textStyle(12, Colors.red, true)),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                        ],
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          post['title'],
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'Noto Sans KR',
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: -0.17,
+                        child: Container(
+                          width: 30.w,
+                          height: 47.h,
+                          decoration: ShapeDecoration(
+                            color: const Color(0xFFE4E7EA),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3)),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 4.h),
+                                child: Text(
+                                  '${post['commentResponseList'].length}',
+                                  style: textStyle(13, null, false),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 4.h,
+                              ),
+                              Text(
+                                '댓글',
+                                style: textStyle(13, Colors.grey, false),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      (post['isSticky'])
-                          ? Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Text(
-                                '공지사항',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            )
-                          : Container(),
                     ],
                   ),
                 ),
@@ -141,4 +190,19 @@ class _PostListScreenState extends State<PostListScreen> {
     }
     return items;
   }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

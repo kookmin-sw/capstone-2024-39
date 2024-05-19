@@ -1,13 +1,14 @@
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 class BookInfoScreen extends StatefulWidget {
   final Map<String, dynamic> data; //책 정보
@@ -53,8 +54,8 @@ class _BookInfoState extends State<BookInfoScreen> {
             child: Text(
               type[i],
               style: TextStyle(
-                color: _selectType[i] ? Color(0xFF0E9913) : Colors.black,
-                fontSize: 16,
+                color: _selectType[i] ? const Color(0xFF0E9913) : Colors.black,
+                fontSize: 16.sp,
                 fontFamily: 'Noto Sans KR',
                 fontWeight: FontWeight.w700,
               ),
@@ -78,10 +79,10 @@ class _BookInfoState extends State<BookInfoScreen> {
       shortreview = _shortreview;
       quotation = _quotation;
       quiz = _quiz;
-      print(review);
-      print(shortreview);
-      print(quotation);
-      print(quiz);
+      // print(review);
+      // print(shortreview);
+      // print(quotation);
+      // print(quiz);
     });
   }
 
@@ -129,15 +130,7 @@ class _BookInfoState extends State<BookInfoScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: Text(
-            widget.data['title'],
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          title: Text("책 정보", style: textStyle(22, Colors.white, true)),
           centerTitle: true,
         ),
         body: _isLoading
@@ -156,55 +149,67 @@ class _BookInfoState extends State<BookInfoScreen> {
                         bottomRight: Radius.circular(50),
                       ),
                     ),
-                    child: Container(
-                      child: Row(
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20.0),
-                                child: Container(
-                                  width: ScreenUtil().setWidth(80),
-                                  height: ScreenUtil().setHeight(105),
-                                  decoration: ShapeDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(widget.data['image']),
-                                      fit: BoxFit.fill,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(3)),
+                    child: Row(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20.0),
+                              child: Container(
+                                width: ScreenUtil().setWidth(80),
+                                height: ScreenUtil().setHeight(105),
+                                decoration: ShapeDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(widget.data['image']),
+                                    fit: BoxFit.fill,
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                left: 10.w,
-                                right: 20.w,
-                                bottom: 20.h,
-                              ),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.vertical,
-                                child: Container(
-                                  child: Text(
-                                    widget.data['description'],
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 12,
-                                      fontFamily: 'Noto Sans KR',
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3)),
                                 ),
                               ),
                             ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: 20.w,
+                              bottom: 20.h,
+                            ),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.data['title'],
+                                    style: textStyle(20, Colors.white, true),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Text(
+                                    "${(widget.data['author'] == '') ? '저자 미상' : widget.data['author']} | ${widget.data['publisher']}",
+                                    style: textStyle(14, Colors.white, true),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Text(
+                                    widget.data['description'],
+                                    style: textStyle(13, Colors.white, false),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                   Expanded(
@@ -213,7 +218,7 @@ class _BookInfoState extends State<BookInfoScreen> {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 30,
+                            height: 30.h,
                           ),
                           Ink(
                             width: 350.w,
@@ -245,19 +250,14 @@ class _BookInfoState extends State<BookInfoScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(
+                                  Padding(
+                                    padding: const EdgeInsets.only(
                                       left: 5.0,
                                       top: 3.0,
                                     ),
                                     child: Text(
                                       '퀴즈',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontFamily: 'Noto Sans KR',
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: textStyle(16, null, true),
                                     ),
                                   ),
                                   SizedBox(
@@ -276,7 +276,7 @@ class _BookInfoState extends State<BookInfoScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 30,
+                            height: 30.h,
                           ),
                           Column(
                             children: [
@@ -385,11 +385,11 @@ class _BookInfoState extends State<BookInfoScreen> {
           break;
         }
         temp = quiz;
-        // temp.sort((a, b) {
-        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
-        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
-        //   return dateTimeB.compareTo(dateTimeA);
-        // });
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["endDate"]);
+          DateTime dateTimeB = DateTime.parse(b["endDate"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
         for (var post in temp) {
           if (cnt > 4) {
             break;
@@ -413,13 +413,13 @@ class _BookInfoState extends State<BookInfoScreen> {
           break;
         }
         temp = review;
-        // temp.sort((a, b) {
-        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
-        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
-        //   return dateTimeB.compareTo(dateTimeA);
-        // });
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["endDate"]);
+          DateTime dateTimeB = DateTime.parse(b["endDate"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
         for (var post in temp) {
-          if (cnt > 3) {
+          if (cnt > 4) {
             break;
           }
           cnt++;
@@ -441,13 +441,13 @@ class _BookInfoState extends State<BookInfoScreen> {
           break;
         }
         temp = shortreview;
-        // temp.sort((a, b) {
-        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
-        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
-        //   return dateTimeB.compareTo(dateTimeA);
-        // });
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["endDate"]);
+          DateTime dateTimeB = DateTime.parse(b["endDate"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
         for (var post in temp) {
-          if (cnt > 3) {
+          if (cnt > 4) {
             break;
           }
           cnt++;
@@ -469,13 +469,13 @@ class _BookInfoState extends State<BookInfoScreen> {
           break;
         }
         temp = quotation;
-        // temp.sort((a, b) {
-        //   DateTime dateTimeA = DateTime.parse(a["endDate"]);
-        //   DateTime dateTimeB = DateTime.parse(b["endDate"]);
-        //   return dateTimeB.compareTo(dateTimeA);
-        // });
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["endDate"]);
+          DateTime dateTimeB = DateTime.parse(b["endDate"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
         for (var post in temp) {
-          if (cnt > 3) {
+          if (cnt > 4) {
             break;
           }
           cnt++;
@@ -523,9 +523,26 @@ class _BookInfoState extends State<BookInfoScreen> {
           ),
           child: Text(
             isQuiz ? post['description'] : post['title'],
+            style: textStyle(14, null, false),
           ),
         ),
       ),
     );
   }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

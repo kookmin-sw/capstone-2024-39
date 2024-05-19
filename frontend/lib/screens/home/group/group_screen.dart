@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
+import 'package:frontend/screens/home/search/search_screen_util.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
@@ -58,7 +60,6 @@ class _GroupState extends State<GroupScreen> {
   Future<void> _makeGroupList() async {
     _GroupList = await groupSerachforTopic(realThema);
     await _initUserState();
-    _GroupList.add([]); //추천 받아오기
   }
 
   @override
@@ -68,8 +69,8 @@ class _GroupState extends State<GroupScreen> {
   }
 
   Future<void> _initUserState() async {
-    List<dynamic> myList = [];
-
+    List<dynamic> myList = [], recBook = [];
+    dynamic recList;
     try {
       var id = await secureStorage.readData('id');
       var token = await secureStorage.readData('token');
@@ -80,13 +81,25 @@ class _GroupState extends State<GroupScreen> {
         myList.add(temp);
       }
 
+      recList = await getRecommend(token);
+      print(recList);
+      for (int i = 0; i < recList['isbnList'].length; i++) {
+        recBook.add(await SearchISBNBook(recList['isbnList'][i]));
+      }
+
+      // print(recBook);
       setState(() {
         userInfo = _userInfo;
-        _GroupList.add(myList);
+        _GroupList[6] = myList;
+        _GroupList[7] = recBook;
       });
     } catch (e) {
+      recList = await getRecommendAnony();
+      for (int i = 0; i < recList['isbnList'].length; i++) {
+        recBook.add(await SearchISBNBook(recList['isbnList'][i]));
+      }
       setState(() {
-        _GroupList.add(myList);
+        _GroupList[7] = recBook;
       });
     }
   }
@@ -109,7 +122,7 @@ class _GroupState extends State<GroupScreen> {
   }
 
   //테마별로 리스트 버튼 구현 + 스크롤 이동 구현
-  Widget _ThemaList(
+  Widget ThemaList(
     BuildContext context,
     List<String> Thema,
   ) {
@@ -139,14 +152,12 @@ class _GroupState extends State<GroupScreen> {
                       },
                       icon: Icon(
                         ThemaIcon[j],
+                        color: Colors.white,
                       ),
                     ),
                     Text(
                       Thema[j],
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: textStyle(13, Colors.white, false),
                     ),
                   ],
                 ),
@@ -174,19 +185,36 @@ class _GroupState extends State<GroupScreen> {
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 Thema[index],
+                style: textStyle(14, Colors.black, true),
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(_GroupList[index].length, (int i) {
-                  return GroupListItem(
-                    data: _GroupList[index][i],
-                    userInfo: userInfo,
-                  );
-                }),
+            if (index != 7)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(_GroupList[index].length, (int i) {
+                    return GroupListItem(
+                      data: _GroupList[index][i],
+                      userInfo: userInfo,
+                    );
+                  }),
+                ),
               ),
-            ),
+            if (index == 7)
+              SizedBox(
+                width: double.infinity,
+                height: 120.h,
+                child: PageView.builder(
+                  itemCount: _GroupList[index].length,
+                  itemBuilder: (context, i) {
+                    return SearchListItem(
+                      data: _GroupList[index][i],
+                      type: "search",
+                      clubId: 0,
+                    );
+                  },
+                ),
+              ),
           ],
         ),
         SizedBox(
@@ -204,14 +232,9 @@ class _GroupState extends State<GroupScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
+          title: Text(
             '모임',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
@@ -246,14 +269,13 @@ class _GroupState extends State<GroupScreen> {
                 child: SizedBox(
                   width: 390.w,
                   height: 90.h,
-                  child: _ThemaList(context, Thema),
+                  child: ThemaList(context, Thema),
                 ),
               ),
               _isLoading
                   ? Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 100.h),
+                        padding: EdgeInsets.symmetric(vertical: 100.h),
                         child: const CircularProgressIndicator(),
                       ), // 로딩 애니매이션
                     )
@@ -269,25 +291,32 @@ class _GroupState extends State<GroupScreen> {
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           scrollDirection: Axis.vertical,
-                          child: Column(
-                            children: [
-                              //0
-                              groupList(0),
-                              //1
-                              groupList(1),
-                              //2
-                              groupList(2),
-                              //3
-                              groupList(3),
-                              //4
-                              groupList(4),
-                              //5
-                              groupList(5),
-                              //내 모임
-                              groupList(6),
-                              //추천
-                              groupList(7),
-                            ],
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: 10.w,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //0
+                                groupList(0),
+                                //1
+                                groupList(1),
+                                //2
+                                groupList(2),
+                                //3
+                                groupList(3),
+                                //4
+                                groupList(4),
+                                //5
+                                groupList(5),
+                                //내 모임
+                                groupList(6),
+                                //추천
+                                groupList(7),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -298,4 +327,13 @@ class _GroupState extends State<GroupScreen> {
       ),
     );
   }
+}
+
+TextStyle textStyle(int fontsize, Color color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke)?FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

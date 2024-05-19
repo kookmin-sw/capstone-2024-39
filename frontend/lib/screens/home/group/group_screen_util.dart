@@ -25,8 +25,8 @@ class _GroupListItemState extends State<GroupListItem> {
   final bool LoginCheck = true;
 
   bool memberCheck(dynamic data) {
-    print(data);
-    if(widget.userInfo == null){
+    // print(data);
+    if (widget.userInfo == null) {
       return false;
     }
     for (dynamic member in data['memberList']) {
@@ -63,7 +63,7 @@ class _GroupListItemState extends State<GroupListItem> {
               side: BorderSide(
                 width: 2.w,
                 strokeAlign: BorderSide.strokeAlignOutside,
-                color: Color(0xFFEEF1F4),
+                color: const Color(0xFFEEF1F4),
               ),
               borderRadius: BorderRadius.circular(15),
             ),
@@ -133,13 +133,12 @@ class _GroupListItemState extends State<GroupListItem> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('주제:${widget.data['topic']}',
-                            style: TextStyle(fontSize: 13.sp)),
+                        Text('주제 : ${widget.data['topic']}',
+                            style: textStyle(13, null, false)),
                         SizedBox(height: 4.h),
                         Text(
                           widget.data['name'],
-                          style: TextStyle(
-                              fontSize: 15.sp, fontWeight: FontWeight.bold),
+                          style: textStyle(15, null, true),
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(
@@ -158,13 +157,10 @@ class _GroupListItemState extends State<GroupListItem> {
                             SizedBox(width: 3.w),
                             Text(
                                 '${widget.data['memberCnt']} / ${widget.data['maximum']}',
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: (widget.data['memberCnt'] ==
-                                          widget.data['maximum'])
-                                      ? Colors.red
-                                      : null,
-                                )),
+                                style: (widget.data['memberCnt'] ==
+                                        widget.data['maximum'])
+                                    ? textStyle(14, Colors.red, true)
+                                    : textStyle(14, null, false)),
                           ],
                         ),
                         SizedBox(
@@ -174,7 +170,7 @@ class _GroupListItemState extends State<GroupListItem> {
                             (widget.data['publicstatus'] == 'PUBLIC')
                                 ? '공개'
                                 : '비공개',
-                            style: TextStyle(fontSize: 13.sp)),
+                            style: textStyle(13, null, false)),
                       ],
                     ),
                   ),
@@ -197,14 +193,19 @@ void _showWrongDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('비밀번호를 틀렸습니다.'),
-        content: Text('다시 입력해주세요.'),
+        title: const Text('비밀번호를 틀렸습니다.'),
+        titleTextStyle: textStyle(20, Colors.black, true),
+        content: const Text('다시 입력해주세요.'),
+        contentTextStyle: textStyle(14, Colors.black, false),
         actions: [
           TextButton(
             onPressed: () {
               context.pop();
             },
-            child: const Text("확인"),
+            child: Text(
+              "확인",
+              style: textStyle(14, null, false),
+            ),
           ),
         ],
       );
@@ -220,6 +221,7 @@ Future<int> _showPasswordDialog(BuildContext context, int password) async {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("비밀번호를 입력해주세요."),
+            titleTextStyle: textStyle(20, Colors.black, true),
             content: TextField(
               controller: _textController,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -238,11 +240,23 @@ Future<int> _showPasswordDialog(BuildContext context, int password) async {
                     }
                   }
                 },
-                child: const Text("확인"),
+                child: Text(
+                  "확인",
+                  style: textStyle(14, null, false),
+                ),
               ),
             ],
           );
         },
       ) ??
       2; //기본값 2
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

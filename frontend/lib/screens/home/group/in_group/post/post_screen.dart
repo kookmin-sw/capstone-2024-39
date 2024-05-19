@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:frontend/http.dart';
 import 'dart:async';
 import 'package:frontend/provider/secure_storage_provider.dart';
@@ -64,6 +61,7 @@ class _PostScreenState extends State<PostScreen> {
     setState(() {
       data = tempdata;
       comments = data['commentResponseList'];
+      print(data);
     });
   }
 
@@ -72,7 +70,7 @@ class _PostScreenState extends State<PostScreen> {
     return ScreenUtilInit(
       designSize: const Size(390, 675),
       builder: (context, child) => _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(), // 로딩 애니매이션
             )
           : Scaffold(
@@ -81,12 +79,7 @@ class _PostScreenState extends State<PostScreen> {
                 backgroundColor: const Color(0xFF0E9913),
                 title: Text(
                   (data['isSticky']) ? "공지사항" : "게시글",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontFamily: 'Noto Sans KR',
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textStyle(22, Colors.white, true),
                 ),
                 centerTitle: true,
               ),
@@ -96,22 +89,32 @@ class _PostScreenState extends State<PostScreen> {
                   //본문 내용 + 댓글창
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            data['title'],
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Padding(
+                            padding: EdgeInsets.all(13.w),
+                            child: Text(data['title'], style: textStyle(23, null, false)),
                           ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            data['body'],
-                            style: const TextStyle(
-                              fontSize: 16,
+                          Padding(
+                            padding: EdgeInsets.only(left:13.w, bottom: 5.h),
+                            child: Text("작성자 ${data['writer']}",style: textStyle(15, null, false),),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left:13.w, bottom: 5.h),
+                            child: Text(formatDate(data['createdAt']), style: textStyle(12, Colors.grey, false)),
+                          ),
+                          Divider(
+                            height: 1.h,
+                            thickness: 0.2,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 5.h),
+                          Padding(
+                            padding: EdgeInsets.all(14.w),
+                            child: Text(
+                              data['body'],
+                              style: textStyle(16, null, false),
                             ),
                           ),
                         ],
@@ -119,19 +122,46 @@ class _PostScreenState extends State<PostScreen> {
                     ),
                   ),
                   // 댓글창
+                  Divider(
+                    height: 1.h,
+                    thickness: 0.2,
+                    color: Colors.grey,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                      "댓글 ${comments.length}",
+                      style: textStyle(16, null, false),
+                    ),
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: comments.length,
                       itemBuilder: (context, index) {
                         return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ListTile(
-                                title: Text(comments[index]['writer']),
-                                subtitle: Text(comments[index]['body'])),
+                              title: Text(comments[index]['writer']),
+                              titleTextStyle: textStyle(16, Colors.black, true),
+                              subtitle: Padding(
+                                padding: EdgeInsets.only(top: 5.h),
+                                child: Text(comments[index]['body']),
+                              ),
+                              subtitleTextStyle:
+                                  textStyle(16, Colors.black, false),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 15.w, bottom: 8.h),
+                              child: Text(
+                                formatDate(comments[index]['createdAt']),
+                                style: textStyle(12, Colors.grey, false),
+                              ),
+                            ),
                             Divider(
-                              height: 2.h, 
+                              height: 1.h,
                               thickness: 0.2,
-                              color: Colors.grey, 
+                              color: Colors.grey,
                             ),
                           ],
                         );
@@ -161,11 +191,12 @@ class _PostScreenState extends State<PostScreen> {
                               controller: _commentController,
                               decoration: InputDecoration(
                                 hintText: ' 댓글을 입력하세요...',
+                                hintStyle: textStyle(17, Colors.grey, false),
                                 border: InputBorder.none,
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),
-                                  borderSide:
-                                      const BorderSide(color: Color(0xFF0E9913)),
+                                  borderSide: const BorderSide(
+                                      color: Color(0xFF0E9913)),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10.0),
@@ -206,4 +237,19 @@ class _PostScreenState extends State<PostScreen> {
             ),
     );
   }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }
