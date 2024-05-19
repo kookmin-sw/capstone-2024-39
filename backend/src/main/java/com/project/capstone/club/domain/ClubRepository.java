@@ -22,4 +22,5 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     void updateBook(Book book, Long id);
 
     List<Club> findClubsByBook(Book book);
+    void deleteClubById(Long id);
 }

@@ -87,4 +87,11 @@ public class ClubController {
         List<ClubResponse> clubResponseList = clubService.getClubByBookTitle(title);
         return ResponseEntity.ok().body(clubResponseList);
     }
+
+    // 모임 삭제하기
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteClub(@RequestParam Long clubId) {
+        clubService.deleteClub(clubId);
+        return ResponseEntity.ok().body("모임 삭제 완료");
+    }
 }

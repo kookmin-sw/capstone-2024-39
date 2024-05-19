@@ -160,4 +160,11 @@ public class ClubService {
         }
         return clubResponseList;
     }
+    @Transactional
+    public void deleteClub(Long clubId) {
+        Club club = clubRepository.findClubById(clubId).orElseThrow(
+                () -> new ClubException(CLUB_NOT_FOUND)
+        );
+        clubRepository.deleteClubById(clubId);
+    }
 }
