@@ -14,12 +14,13 @@ public interface ClubRepository extends JpaRepository<Club, Long> {
     List<Club> findClubsByNameContaining(String name);
     Optional<Club> findClubById(Long id);
     @Modifying(clearAutomatically = true)
-    @Query("update Club c set c.managerId = :id")
-    void updateManager(UUID id);
+    @Query("update Club c set c.managerId = :id where c.id = :clubId")
+    void updateManager(UUID id, Long clubId);
 
     @Modifying(clearAutomatically = true)
     @Query("update Club c set c.book = :book where c.id = :id")
     void updateBook(Book book, Long id);
 
     List<Club> findClubsByBook(Book book);
+    void deleteClubById(Long id);
 }

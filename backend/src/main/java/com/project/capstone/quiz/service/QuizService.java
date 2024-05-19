@@ -47,7 +47,7 @@ public class QuizService {
     private final ClubRepository clubRepository;
     private final AssignmentRepository assignmentRepository;
     private final RecommendService recommendService;
-    private final static String QUIZ_TYPE = "퀴즈";
+    private final static String QUIZ_TYPE = "Quiz";
 
     public void createQuiz(String userId, CreateQuizRequest request, Long clubId, Long asId) {
         Member member = memberRepository.findMemberById(UUID.fromString(userId)).orElseThrow(

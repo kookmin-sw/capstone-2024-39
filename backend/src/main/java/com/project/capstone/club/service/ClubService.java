@@ -96,7 +96,7 @@ public class ClubService {
             throw new ClubException(INVALID_TARGET);
         }
         checkIsManagerAndTargetIsClubMember(managerId, memberId, clubId);
-        clubRepository.updateManager(memberId);
+        clubRepository.updateManager(memberId, clubId);
     }
 
     @Transactional
@@ -159,5 +159,12 @@ public class ClubService {
             }
         }
         return clubResponseList;
+    }
+    @Transactional
+    public void deleteClub(Long clubId) {
+        Club club = clubRepository.findClubById(clubId).orElseThrow(
+                () -> new ClubException(CLUB_NOT_FOUND)
+        );
+        clubRepository.deleteClubById(clubId);
     }
 }
