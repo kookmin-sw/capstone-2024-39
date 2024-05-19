@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
@@ -197,9 +196,29 @@ class _SearchState extends State<SearchScreen> {
                         child: Column(
                           children: [
                             if (check && GroupData.isEmpty)
-                              Text(
-                                "모임 검색 결과가 없습니다.",
-                                style: textStyle(15, Colors.black, true),
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  Text(
+                                    "모임 검색 결과가 없습니다.",
+                                    style: textStyle(15, Colors.black, true),
+                                  ),
+                                ],
+                              ),
+
+                            if (check && BookData.isEmpty)
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  Text(
+                                    "책 검색 결과가 없습니다.",
+                                    style: textStyle(15, Colors.black, true),
+                                  ),
+                                ],
                               ),
                             ElevatedButton(
                               onPressed: () async {
@@ -302,7 +321,7 @@ class _SearchState extends State<SearchScreen> {
 TextStyle textStyle(int fontsize, Color color, bool isStroke) {
   return TextStyle(
     fontSize: fontsize.sp,
-    fontWeight: (isStroke)?FontWeight.bold : FontWeight.normal,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
     fontFamily: 'Noto Sans KR',
     color: color,
   );

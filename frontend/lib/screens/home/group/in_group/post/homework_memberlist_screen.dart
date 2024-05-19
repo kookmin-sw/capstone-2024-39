@@ -25,6 +25,7 @@ class HomeworkMemberlistScreen extends StatefulWidget {
 class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   List<dynamic> HwList = [];
   bool LimitCheck = true;
+  dynamic hwType;
   var secureStorage;
   var id;
   var token;
@@ -46,7 +47,12 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     var _HwList, _hw;
     for (Map<String, dynamic> hw in _posts) {
       if (hw['id'] == widget.post['id']) {
-        _HwList = hw['contentList'];
+        if (hw['type'] == 'Quiz') {
+          _HwList = hw['quizList'];
+        } else {
+          _HwList = hw['contentList'];
+        }
+        hwType = hw['type'];
         _hw = hw;
         break;
       }
@@ -55,7 +61,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
       HW = _hw;
       HwList = _HwList;
       isbn = _club['book']['isbn'];
-      print(HW);
+      // print(HwList);
     });
   }
 
@@ -92,6 +98,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     dateCheck(widget.post['endDate']);
     initUserInfo();
     updateHwList();
+    // print(HwList);
   }
 
   @override
@@ -121,7 +128,7 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
                       "startDate": widget.post['startDate'],
                       "endDate": widget.post['endDate']
                     }
-                  }).then((value) async {
+                  }).then((value) {
                     updateHwList();
                   });
                 },
@@ -168,7 +175,9 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
                               Padding(
                                 padding: EdgeInsets.only(left: 10.w, top: 10.w),
                                 child: Text(
-                                  post['title'],
+                                  (hwType == 'Quiz')
+                                      ? post['description']
+                                      : post['title'],
                                   style: textStyle(20, null, false),
                                   overflow: TextOverflow.ellipsis,
                                 ),

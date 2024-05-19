@@ -293,7 +293,6 @@ Future<dynamic> quizCreate(
     String endDate) async {
   var address;
   if (clubId == null) {
-    // print(clubId);
     address = Uri.parse("$BASE_URL/quiz/create?");
   } else {
     address = Uri.parse("$BASE_URL/quiz/create?clubId=$clubId&asId=$asId");
@@ -325,7 +324,6 @@ Future<dynamic> quizCreate(
     }),
   );
   final data = res.body;
-  // print(data);
   return data;
 }
 

@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +37,6 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   var token;
 
   void initializeClubContentData(dynamic content) {
-    print(content);
     setState(() {
       _template = contentTypeCheck(content['type']);
       _writer = content['writer'];
@@ -44,8 +45,6 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       _booktitle = content['book']['title'];
       _startDate = formatDate(content['startDate']);
       _endDate = formatDate(content['endDate']);
-      print(_startDate);
-      print(_endDate);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
@@ -137,6 +136,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                             Text(
                               _title,
                               style: textStyle(15, null, false),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -161,9 +161,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
-                  Text(
-                    _booktitle,
-                    style: textStyle(15, null, true),
+                  Expanded(
+                    child: Text(
+                      _booktitle,
+                      style: textStyle(15, null, true),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

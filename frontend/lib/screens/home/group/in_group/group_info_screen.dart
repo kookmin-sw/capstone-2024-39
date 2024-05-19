@@ -219,7 +219,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 },
                 child: Text(
                   '확인',
-                  style: textStyle(12, null, false),
+                  style: textStyle(14, null, false),
                 ),
               ),
             ),
@@ -524,7 +524,8 @@ class _GroupInfoState extends State<GroupInfoScreen> {
 
       await _clubGetInfo();
       await _clubGetAssign();
-
+      print(clubData['managerId']);
+      print(id);
       if (id == clubData['managerId']) {
         isGroupManager = true;
       }
@@ -661,6 +662,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
         Padding(
           padding: EdgeInsets.only(top: 30.h),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 width: 250.w,
@@ -674,15 +676,37 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 width: 250.w,
                 child: Text(
                   "${(clubData['book']['author'].length != 0) ? clubData['book']['author'] : '저자 미상'} | ${clubData['book']['publisher']}",
-                  style: textStyle(12, Colors.white, true),
+                  style: textStyle(13, Colors.white, true),
                   overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              SizedBox(height: 10.h,),
+              Text('[최근 공지사항]',style: textStyle(13, Colors.white, true),),
+              SizedBox(height: 2.h,),
+              SizedBox(
+                width: 250.w,
+                child: recentSticky(),
               ),
             ],
           ),
         )
       ],
     );
+  }
+
+  Widget recentSticky() {
+    var temp = clubData['posts'];
+    temp.sort((a, b) {
+      DateTime dateTimeA = DateTime.parse(a["createdAt"]);
+      DateTime dateTimeB = DateTime.parse(b["createdAt"]);
+      return dateTimeB.compareTo(dateTimeA);
+    });
+    for (var post in temp) {
+      if (post['isSticky'] == true) {
+        return _buildTaskEntry(context, post, true, Colors.white);
+      }
+    }
+    return Container();
   }
 
   @override
@@ -699,7 +723,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
                 scrolledUnderElevation: 0,
                 backgroundColor: const Color(0xFF0E9913),
                 title: Text(widget.groupName),
-                titleTextStyle: textStyle(20, null, true),
+                titleTextStyle: textStyle(25, null, true),
                 centerTitle: true,
                 actions: [
                   Padding(
@@ -1034,7 +1058,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             break;
           }
           cnt++;
-          tasks.add(_buildTaskEntry(context, post, true));
+          tasks.add(_buildTaskEntry(context, post, true, null));
           tasks.add(Container(
             decoration: BoxDecoration(
               border: Border(
@@ -1060,7 +1084,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
               break;
             }
             cnt++;
-            tasks.add(_buildTaskEntry(context, post, true));
+            tasks.add(_buildTaskEntry(context, post, true, null));
             tasks.add(Container(
               decoration: BoxDecoration(
                 border: Border(
@@ -1089,7 +1113,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
             break;
           }
           cnt++;
-          tasks.add(_buildTaskEntry(context, post, false));
+          tasks.add(_buildTaskEntry(context, post, false, null));
           tasks.add(Container(
             decoration: BoxDecoration(
               border: Border(
@@ -1110,7 +1134,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
   }
 
   //각 게시판의 최신글
-  Widget _buildTaskEntry(BuildContext context, var post, bool isPost) {
+  Widget _buildTaskEntry(BuildContext context, var post, bool isPost, var colors) {
     return InkWell(
       onTap: () {
         //글 목록 탭 됐을 때
@@ -1141,7 +1165,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
       child: Container(
         width: 50.w,
         margin: const EdgeInsets.only(bottom: 2), // 각 항목 사이의 간격 설정
-        padding: const EdgeInsets.all(4), // 내부 패딩 설정
+        // padding: const EdgeInsets.all(4), // 내부 패딩 설정
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -1151,7 +1175,7 @@ class _GroupInfoState extends State<GroupInfoScreen> {
           ),
           child: Text(
             (isPost) ? post['title'] : post['name'],
-            style: textStyle(14, null, false),
+            style: textStyle(15, colors, false),
           ),
         ),
       ),

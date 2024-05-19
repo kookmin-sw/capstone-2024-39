@@ -170,28 +170,30 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 5.h),
-            (_template != '퀴즈')?Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Text('제목: '),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      width: _screenWidth * 0.7.w,
-                      child: TextField(
-                        style: const TextStyle(fontSize: 14),
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          hintText: '제목을 입력하세요.',
-                          border: InputBorder.none,
+            (_template != '퀴즈')
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        const Text('제목: '),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: SizedBox(
+                            width: _screenWidth * 0.7.w,
+                            child: TextField(
+                              style: const TextStyle(fontSize: 14),
+                              controller: _titleController,
+                              decoration: const InputDecoration(
+                                hintText: '제목을 입력하세요.',
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ):Container(),
+                  )
+                : Container(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -385,8 +387,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       _startDate.toString(),
                       _endDate.toString());
                 } else {
-                  // print(selectedCategory);
-                  // print(_answerController.text);
                   switch (selectedCategory) {
                     case "객관식":
                       var ansnum;

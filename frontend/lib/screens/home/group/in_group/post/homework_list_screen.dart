@@ -47,6 +47,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
     }
     setState(() {
       posts = _posts;
+      print(posts);
     });
   }
 
@@ -138,7 +139,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
                                 padding: EdgeInsets.only(left: 10.w, top: 10.w),
                                 child: Text(
                                   post['name'],
-                                  style: textStyle(20, null, false),
+                                  style: textStyle(18, null, false),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -217,7 +218,9 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
                               Padding(
                                 padding: EdgeInsets.only(top: 4.h),
                                 child: Text(
-                                  '${post['contentList'].length}',
+                                  (post['type'] == 'Quiz')
+                                      ? '${post['quizList'].length}'
+                                      : '${post['contentList'].length}',
                                   style: textStyle(13, null, false),
                                 ),
                               ),
