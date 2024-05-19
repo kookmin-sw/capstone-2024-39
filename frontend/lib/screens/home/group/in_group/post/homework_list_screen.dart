@@ -4,17 +4,20 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 //과제 목록 페이지
 
 class HomeworkListScreen extends StatefulWidget {
   final String managerId;
   final int clubId;
+  final dynamic bookInfo;
 
   const HomeworkListScreen({
     super.key,
     required this.managerId,
     required this.clubId,
+    required this.bookInfo,
   });
 
   @override
@@ -23,6 +26,7 @@ class HomeworkListScreen extends StatefulWidget {
 
 class _HomeworkListScreenState extends State<HomeworkListScreen> {
   List<dynamic> posts = [];
+  bool isBook = true;
   var secureStorage;
   var id;
   var token;
@@ -38,18 +42,28 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
 
   Future<void> updatePostList() async {
     var _posts = await getAssign(widget.clubId);
-    if(_posts.runtimeType == Map<String,dynamic>){
+    if (_posts.runtimeType == Map<String, dynamic>) {
       _posts = [];
     }
     setState(() {
       posts = _posts;
+      print(posts);
     });
+  }
+
+  void checkBook(dynamic Book) {
+    if (Book == null) {
+      setState(() {
+        isBook = false;
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    checkBook(widget.bookInfo);
     initUserInfo();
     updatePostList();
   }
@@ -62,18 +76,13 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
+          title: Text(
             '과제',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
-        floatingActionButton: (id == widget.managerId)
+        floatingActionButton: (id == widget.managerId && isBook)
             ? FloatingActionButton(
                 onPressed: () {
                   context
@@ -82,9 +91,7 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
                     extra: widget.clubId,
                   )
                       .then((result) async {
-                    if (result == true) {
-                      updatePostList();
-                    }
+                    updatePostList();
                   });
                 },
                 shape: const CircleBorder(),
@@ -116,29 +123,130 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
                     context.push('/homeworkmember_make', extra: {
                       'post': post,
                       'clubId': widget.clubId,
-                    }); 
+                    }).then((value) async {
+                      updatePostList();
+                    });
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      post['name'],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Noto Sans KR',
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.17,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  post['name'],
+                                  style: textStyle(18, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  HwType(post['type']),
+                                  style: textStyle(14, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  '과제기한:',
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  post['startDate'],
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  '~',
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  post['endDate'],
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  (limitDate(post['endDate']))
+                                      ? "제출가능"
+                                      : "제출마감",
+                                  style: (limitDate(post['endDate']))
+                                      ? textStyle(12, Colors.grey, false)
+                                      : textStyle(12, Colors.red, true),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          width: 30.w,
+                          height: 47.h,
+                          decoration: ShapeDecoration(
+                            color: const Color(0xFFE4E7EA),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3)),
+                          ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 4.h),
+                                child: Text(
+                                  (post['type'] == 'Quiz')
+                                      ? '${post['quizList'].length}'
+                                      : '${post['contentList'].length}',
+                                  style: textStyle(13, null, false),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 4.h,
+                              ),
+                              Text(
+                                '과제',
+                                style: textStyle(13, Colors.grey, false),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 0.5,
+                    width: 0.5.w,
                   ),
                 ),
               ),
@@ -149,4 +257,42 @@ class _HomeworkListScreenState extends State<HomeworkListScreen> {
     }
     return items;
   }
+}
+
+String HwType(String type) {
+  switch (type) {
+    case 'Review':
+      return '독후감';
+    case 'ShortReview':
+      return '한줄평';
+    case 'Quotation':
+      return '인용구';
+    case 'Quiz':
+      return '퀴즈';
+    default:
+      return '';
+  }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+
+  return formattedDate;
+}
+
+bool limitDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  DateTime nowTime = DateTime.now();
+
+  return dateTime.isAfter(nowTime);
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

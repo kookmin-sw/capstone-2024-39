@@ -10,6 +10,30 @@ const String NaverBookSearchURL =
 const String NaverBookISBNSearchURL =
     "https://openapi.naver.com/v1/search/book_adv.xml";
 
+const String AgoraTokenURL =
+    'https://agora-token-service-example.up.railway.app';
+
+//아고라 토큰 가져오기
+Future<dynamic> agoraToken(String uid, String channel) async {
+  var address = Uri.parse(AgoraTokenURL + "/fetchToken");
+  http.Response res = await http.post(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: json.encode({
+      "tokenType": "rtc",
+      "uid": uid,
+      "role": "publisher",
+      "channel": channel,
+    }),
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+
+  return data;
+}
+
 //네이버 책 검색
 Future<List<dynamic>> SearchBook(String SearchString) async {
   List<dynamic> bookData = [];
@@ -22,8 +46,9 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
     "X-Naver-Client-Secret": NaverSecret,
   });
   final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
   while (iter != 100) {
-    if (data['total'] <= iter) {
+    if (data['total'] <= iter) {  
       break;
     } else if (data['items'][iter]['title'].toString().contains('시리즈')) {
     } else if (data['items'][iter]['title'].toString().contains('세트')) {
@@ -87,7 +112,7 @@ Future<dynamic> login(String email) async {
     }),
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
-
+  // print(data);
   return data;
 }
 
@@ -108,7 +133,7 @@ Future<dynamic> getUserInfo(String id, String token) async {
 
 //모임 목록 가져오기(주제를 기반으로)›
 Future<List<List<dynamic>>> groupSerachforTopic(List<String> topic) async {
-  List<List<dynamic>> groupList = [[], [], [], [], [], []];
+  List<List<dynamic>> groupList = [[], [], [], [], [], [], [], []];
   for (int i = 0; i < topic.length; i++) {
     String temp = topic[i];
     var address = Uri.parse(BASE_URL + "/club/search/topic?topic=$temp");
@@ -212,6 +237,7 @@ Future<dynamic> contentCreate(
   var address;
   // print(clubId);
   if (clubId == null) {
+    // print(clubId);
     address = Uri.parse("$BASE_URL/content/create?");
   } else {
     address = Uri.parse("$BASE_URL/content/create?clubId=$clubId&asId=$asId");
@@ -240,8 +266,8 @@ Future<dynamic> contentCreate(
     }),
   );
   final data = res.body;
-  //final data = json.decode(utf8.decode(res.bodyBytes));
-  print(data);
+  // final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
   return data;
 }
 
@@ -267,7 +293,6 @@ Future<dynamic> quizCreate(
     String endDate) async {
   var address;
   if (clubId == null) {
-    print(clubId);
     address = Uri.parse("$BASE_URL/quiz/create?");
   } else {
     address = Uri.parse("$BASE_URL/quiz/create?clubId=$clubId&asId=$asId");
@@ -299,7 +324,6 @@ Future<dynamic> quizCreate(
     }),
   );
   final data = res.body;
-  print(data);
   return data;
 }
 
@@ -334,6 +358,7 @@ Future<List<dynamic>> bookcontentLoad(String ISBN, String content) async {
   for (int i = 0; i < data.length; i++) {
     contentList.add(data[i]);
   }
+  // print(data);
   return contentList;
 }
 
@@ -388,7 +413,7 @@ Future<String> groupOut(String token, int clubId) async {
 Future<String> groupExpel(String token, String memberId, int clubId) async {
   var address =
       Uri.parse(BASE_URL + "/club/expel?memberId=$memberId&clubId=$clubId");
-  http.Response res = await http.get(
+  http.Response res = await http.delete(
     address,
     headers: {
       "Content-Type": "application/json",
@@ -396,6 +421,7 @@ Future<String> groupExpel(String token, String memberId, int clubId) async {
     },
   );
   final data = res.body;
+  // print(data);
   return data;
 }
 
@@ -432,6 +458,7 @@ Future<String> groupBookSelect(
     body: json.encode({
       "isbn": bookdata['isbn'],
       "title": bookdata['title'],
+      "description" : bookdata['description'],
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
       "publishDate": formattedDate,
@@ -450,6 +477,7 @@ Future<String> bookAdd(Map<String, dynamic> bookdata) async {
       RegExp(r'(\d{4})(\d{2})(\d{2})'),
       (Match m) => '${m[1]}-${m[2]}-${m[3]}'));
   String formattedDate = DateFormat('yyyy-MM-dd').format(parsedDate);
+  // print(bookdata);
   var address = Uri.parse(BASE_URL + "/book/add");
   http.Response res = await http.post(
     address,
@@ -459,6 +487,7 @@ Future<String> bookAdd(Map<String, dynamic> bookdata) async {
     body: json.encode({
       "isbn": bookdata['isbn'],
       "title": bookdata['title'],
+      "description" : bookdata['description'],
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
       "publishDate": formattedDate,
@@ -643,6 +672,36 @@ Future<String> addBooksToLibrary(
     body: json.encode(books),
   );
   final data = res.body;
-  print(data);
+  // print(data);
+  return data;
+}
+
+
+// 추천 리스트 받아오기(로그인)
+Future<dynamic> getRecommend(String token) async {
+  var address = Uri.parse(BASE_URL + "/rec/member");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
+  return data;
+}
+
+// 추천 리스트 받아오기(비로그인)
+Future<dynamic> getRecommendAnony() async {
+  var address = Uri.parse(BASE_URL + "/rec/anonymous");
+  http.Response res = await http.get(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  // print(data);
   return data;
 }

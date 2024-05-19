@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart'
     as GroupUtil;
 import 'package:frontend/screens/home/search/search_screen_util.dart'
@@ -100,14 +100,9 @@ class _SearchState extends State<SearchScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
+          title: Text(
             '검색',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
@@ -116,7 +111,7 @@ class _SearchState extends State<SearchScreen> {
             children: [
               Container(
                   width: double.infinity,
-                  height: ScreenUtil().setHeight(120),
+                  height: 120.h,
                   decoration: const BoxDecoration(
                     color: Color(0xFF0E9913),
                     borderRadius: BorderRadius.only(
@@ -130,12 +125,14 @@ class _SearchState extends State<SearchScreen> {
                         margin:
                             EdgeInsets.only(top: 20.h, left: 20.w, right: 20.w),
                         padding: EdgeInsets.only(left: 10.w),
-                        height: ScreenUtil().setHeight(40),
+                        height: 40.h,
                         decoration: BoxDecoration(
                           color: const Color(0xFFF2F2F2),
                           borderRadius: BorderRadius.circular(25),
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             IconButton(
                               onPressed: () {
@@ -153,13 +150,16 @@ class _SearchState extends State<SearchScreen> {
                               icon: const Icon(Icons.search),
                             ),
                             SizedBox(
-                              width: ScreenUtil().setWidth(260),
+                              width: 260.w,
                               child: TextField(
                                 controller: _textControllers,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: '책 제목을 검색해주세요',
+                                  hintStyle: textStyle(18, Colors.grey, false),
                                   border: InputBorder.none,
+                                  alignLabelWithHint: true,
                                 ),
+                                style: textStyle(18, Colors.black, true),
                                 onChanged: (value) {
                                   setState(() {});
                                 },
@@ -185,8 +185,7 @@ class _SearchState extends State<SearchScreen> {
               _isLoading
                   ? Center(
                       child: Padding(
-                        padding: EdgeInsets.only(
-                          top: 200.h),
+                        padding: EdgeInsets.only(top: 200.h),
                         child: const CircularProgressIndicator(),
                       ), // 로딩 애니매이션
                     )
@@ -196,12 +195,42 @@ class _SearchState extends State<SearchScreen> {
                         controller: _scrollController,
                         child: Column(
                           children: [
-                            if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
+                            if (check && GroupData.isEmpty)
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  Text(
+                                    "모임 검색 결과가 없습니다.",
+                                    style: textStyle(15, Colors.black, true),
+                                  ),
+                                ],
+                              ),
+
+                            if (check && BookData.isEmpty)
+                              Column(
+                                children: [
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  Text(
+                                    "책 검색 결과가 없습니다.",
+                                    style: textStyle(15, Colors.black, true),
+                                  ),
+                                ],
+                              ),
                             ElevatedButton(
                               onPressed: () async {
-                                await secureStorage.saveData('name', '이현준');
-                                await secureStorage.saveData('age', '23');
-                                await secureStorage.saveData('gender', '남자');
+                                dynamic userInfo =
+                                    await login("test13@gmail.com");
+                                // dynamic userInfo = await singup("test13@gmail.com", "한지민", ?, "여자");
+                                print(userInfo['token']);
+                                print(userInfo['id']);
+                                await secureStorage.saveData(
+                                    "token", userInfo['token']);
+                                await secureStorage.saveData(
+                                    "id", userInfo['id']);
                               },
                               child: Text('한지민'),
                             ),
@@ -247,6 +276,7 @@ class _SearchState extends State<SearchScreen> {
                               onPressed: () async {
                                 await secureStorage.deleteData("token");
                                 await secureStorage.deleteData("id");
+                                await secureStorage.deleteAllData();
                               },
                               child: Text('토큰 삭제'),
                             ),
@@ -286,4 +316,13 @@ class _SearchState extends State<SearchScreen> {
       ),
     );
   }
+}
+
+TextStyle textStyle(int fontsize, Color color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

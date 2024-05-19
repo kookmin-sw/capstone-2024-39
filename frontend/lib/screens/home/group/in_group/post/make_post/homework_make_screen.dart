@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
-import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 
 //모임 생성 페이지
@@ -67,6 +65,7 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
       builder: (context, child) => Scaffold(
         appBar: AppBar(
           title: const Text('과제 만들기'),
+          titleTextStyle: textStyle(22, const Color(0xFF0E9913), true),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -76,9 +75,12 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
               // 과제 이름 설정
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                style: textStyle(18, null, false),
+                decoration: InputDecoration(
                   labelText: '과제 이름',
-                  hintText: '과제이름',
+                  hintText: '과제명',
+                  labelStyle: textStyle(18, null, true),
+                  hintStyle: textStyle(16, Colors.grey, false),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -89,13 +91,17 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
               SizedBox(height: 16.h),
               // 과제 타입 설정
               DropdownButtonFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: '과제 주제',
+                  labelStyle: textStyle(18, null, true),
                 ),
                 items: type
                     .map((type) => DropdownMenuItem(
                           value: type,
-                          child: Text(type),
+                          child: Text(
+                            type,
+                            style: textStyle(18, null, false),
+                          ),
                         ))
                     .toList(),
                 onChanged: (value) {
@@ -123,12 +129,13 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
                             _startDate.toString().substring(0, 10),
                             _endDate.toString().substring(0, 10));
                         if (result == '과제 생성 완료') {
-                          context.pop(true);
+                          context.pop();
                         }
                       }
                     : null,
-                child: const Text(
+                child: Text(
                   '생성하기',
+                  style: textStyle(14, null, false),
                 ),
               ),
             ],
@@ -142,12 +149,12 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        SizedBox(
+          height: 10.h,
+        ),
+        Text(
           "기한 설정",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: textStyle(18, null, true),
         ),
         Row(
           children: [
@@ -203,4 +210,13 @@ class _HomeworkMakeState extends State<HomeworkMakeScreen> {
       ],
     );
   }
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

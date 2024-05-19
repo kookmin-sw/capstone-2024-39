@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 //멤버들 과제 리스트
 
@@ -23,10 +24,13 @@ class HomeworkMemberlistScreen extends StatefulWidget {
 
 class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
   List<dynamic> HwList = [];
+  bool LimitCheck = true;
+  dynamic hwType;
   var secureStorage;
   var id;
   var token;
   var HW;
+  var isbn;
 
   Future<void> initUserInfo() async {
     var _id = await secureStorage.readData("id");
@@ -39,10 +43,16 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
 
   Future<void> updateHwList() async {
     var _posts = await getAssign(widget.clubId);
+    var _club = await groupSerachforId(widget.clubId);
     var _HwList, _hw;
     for (Map<String, dynamic> hw in _posts) {
       if (hw['id'] == widget.post['id']) {
-        _HwList = hw['contentList'];
+        if (hw['type'] == 'Quiz') {
+          _HwList = hw['quizList'];
+        } else {
+          _HwList = hw['contentList'];
+        }
+        hwType = hw['type'];
         _hw = hw;
         break;
       }
@@ -50,6 +60,8 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     setState(() {
       HW = _hw;
       HwList = _HwList;
+      isbn = _club['book']['isbn'];
+      // print(HwList);
     });
   }
 
@@ -68,12 +80,25 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     }
   }
 
+  void dateCheck(String date) {
+    DateTime limitDate = DateTime.parse(date);
+    DateTime now = DateTime.now();
+
+    if (limitDate.isBefore(now)) {
+      setState(() {
+        LimitCheck = false;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
+    dateCheck(widget.post['endDate']);
     initUserInfo();
     updateHwList();
+    // print(HwList);
   }
 
   @override
@@ -86,29 +111,31 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
           backgroundColor: const Color(0xFF0E9913),
           title: Text(
             widget.post['name'],
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
-            context.push("/bookreport_writing", extra: {
-              "index": typeCheck(HW),
-              "clubId": widget.clubId,
-              "asId": HW['id'],
-            }).then((value) async {
-              updateHwList();
-            });
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: (LimitCheck)
+            ? FloatingActionButton(
+                onPressed: () {
+                  //퀴즈 999, 인용구 998, 한줄평 997, 독후감 996
+                  context.push("/bookreport_writing", extra: {
+                    "index": typeCheck(HW),
+                    "clubId": widget.clubId,
+                    "asId": HW['id'],
+                    "isbn": isbn,
+                    "dateInfo": {
+                      "startDate": widget.post['startDate'],
+                      "endDate": widget.post['endDate']
+                    }
+                  }).then((value) {
+                    updateHwList();
+                  });
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add),
+              )
+            : null,
         body: SingleChildScrollView(
           child: Column(
             children: _buildHWListView(HwList),
@@ -137,27 +164,59 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
                       extra: post,
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      post['title'],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontFamily: 'Noto Sans KR',
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.17,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  (hwType == 'Quiz')
+                                      ? post['description']
+                                      : post['title'],
+                                  style: textStyle(20, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 10.w, top: 10.w),
+                                child: Text(
+                                  HwType(post['type']),
+                                  style: textStyle(14, null, false),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 10.w, bottom: 5.h, top: 5.h),
+                                child: Text(
+                                  "작성자 ${post['writer']}",
+                                  style: textStyle(12, Colors.grey, false),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: Colors.grey,
-                    width: 0.5,
+                    width: 0.5.w,
                   ),
                 ),
               ),
@@ -168,4 +227,32 @@ class _HomeworkMemberistState extends State<HomeworkMemberlistScreen> {
     }
     return items;
   }
+}
+
+String HwType(String type) {
+  switch (type) {
+    case 'Review':
+      return '독후감';
+    case 'ShortReview':
+      return '한줄평';
+    case 'Quotation':
+      return '인용구';
+    default:
+      return '퀴즈';
+  }
+}
+
+String formatDate(String dateString) {
+  DateTime dateTime = DateTime.parse(dateString);
+  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

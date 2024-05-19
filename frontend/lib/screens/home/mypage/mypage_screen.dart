@@ -182,42 +182,44 @@ class _MypageScreenState extends State<MypageScreen>
 class LoggedWidget extends StatelessWidget {
   const LoggedWidget({super.key});
 
+  
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-      future: Provider.of<SecureStorageService>(context, listen: false)
-          .readData("name"),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          final name = snapshot.data ?? '';
-          return Container(
-            padding: EdgeInsets.all(15.w),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[200],
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.account_circle,
-                  size: 70.w,
-                ),
-                SizedBox(width: 16.w),
-                Text(
-                  name,
-                  style:
-                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+            future: Provider.of<SecureStorageService>(context, listen: false)
+                .readData("name"),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final name = snapshot.data ?? '';
+                return Container(
+                  padding: EdgeInsets.all(15.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[200],
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.account_circle,
+                        size: 70.w,
+                      ),
+                      SizedBox(width: 16.w),
+                      Text(
+                        name,
+                        style: TextStyle(
+                            fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
           );
-        }
-      },
-    );
   }
 }
 

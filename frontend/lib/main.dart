@@ -95,10 +95,14 @@ final GoRouter router = GoRouter(
         int index = extraData['index'] as int;
         dynamic clubId = extraData['clubId'] as dynamic;
         dynamic asId = extraData['asId'] as dynamic;
+        dynamic isbn = extraData['isbn'] as dynamic;
+        dynamic dateInfo = extraData['dateInfo'] as dynamic;
         return BookReportWritingScreen(
           index: index,
           clubId: clubId,
           asId: asId,
+          isbn: isbn,
+          dateInfo: dateInfo,
         );
       },
     ),
@@ -142,9 +146,11 @@ final GoRouter router = GoRouter(
         Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
         int clubId = extraData['clubId'] as int;
         String managerId = extraData['managerId'] as String;
+        dynamic bookInfo = extraData['bookInfo'] as dynamic;
         return HomeworkListScreen(
           clubId: clubId,
           managerId: managerId,
+          bookInfo: bookInfo,
         );
       },
     ),
@@ -267,6 +273,7 @@ class App extends StatelessWidget {
         // 다른 프로바이더도 여기에 추가
       ],
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         routerConfig: router,
         theme: ThemeData(
           fontFamily: 'pretendard',
