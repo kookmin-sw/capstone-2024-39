@@ -34,10 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtProvider.resolveToken(request);
+        log.info(request.getRequestURI());
         try {
             String id = jwtProvider.validateTokenAndGetId(token);
             Authentication authentication = jwtProvider.createAuthentication(id);
-            log.info(authentication.getName());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (SecurityException e) {
             request.setAttribute("exception", new AuthException(SIGNATURE_NOT_FOUND));
@@ -54,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (UsernameNotFoundException e) {
             request.setAttribute("exception", new MemberException(MEMBER_NOT_FOUND));
         } catch (Exception e) {
+            log.info(e.getMessage());
             request.setAttribute("exception", new Exception());
         }
 

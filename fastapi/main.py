@@ -68,7 +68,7 @@ async def get_embedding(embedding_request: EmbeddingRequest):
 async def recommend(recommend_request: RecommendRequest):
     input_isbn_list = recommend_request.isbnList
     input_size = len(input_isbn_list)
-    recommend_num = 2
+    recommend_num = 10
     v = index.fetch(ids=input_isbn_list, namespace="embeddings")
     v = v['vectors']
 
