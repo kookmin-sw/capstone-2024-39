@@ -1,14 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/group/group_screen_util.dart';
-import 'package:frontend/screens/home/search/search_screen_util.dart'
-    as SearchUtil;
+import 'package:frontend/screens/home/search/search_screen_util.dart';
 import 'package:frontend/http.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
-import 'package:go_router/go_router.dart';
+import 'package:frontend/env.dart';
 
 //그룹 대표책 설정 페이지
 List<dynamic> BookData = [];
@@ -67,7 +61,7 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
                       ),
                       if (BookData.isNotEmpty)
                         for (int i = 0; i < BookData.length; i++)
-                          SearchUtil.SearchListItem(
+                          SearchListItem(
                             data: BookData[i],
                             type: "select",
                             clubId: widget.clubId,
@@ -87,13 +81,4 @@ class _GroupBookSelectState extends State<GroupBookSelectScreen> {
       ),
     );
   }
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

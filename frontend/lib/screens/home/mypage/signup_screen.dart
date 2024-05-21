@@ -4,6 +4,7 @@ import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/env.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -95,135 +96,118 @@ class _SignupState extends State<SignupScreen> {
                       SizedBox(
                         width: 330.w,
                         height: 39.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0.w,
-                              top: 0.h,
-                              child: Container(
-                                width: 330.w,
-                                height: 39.h,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        width: 1, color: Color(0xFFA8AFB6)),
-                                    borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          width: 330.w,
+                          height: 39.h,
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                  width: 1, color: Color(0xFFA8AFB6)),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  width: 330.w,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 30.w),
+                                    child: TextFormField(
+                                      style: textStyle(14, null, false),
+                                      controller: _nameController,
+                                      decoration: InputDecoration(
+                                        hintText: '이름',
+                                        hintStyle: textStyle(14, Colors.grey, false),
+                                        border: InputBorder.none,
+                                      ),
+                                      validator: _validateName,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      width: 330.w,
-                                      child: TextField(
-                                        style: const TextStyle(fontSize: 14),
-                                        controller: _nameController,
-                                        decoration: const InputDecoration(
-                                          hintText: '이름',
-                                          border: InputBorder.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 30.h),
                       SizedBox(
                         width: 330.w,
                         height: 39.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0.w,
-                              top: 0.h,
-                              child: Container(
-                                width: 330.w,
-                                height: 39.h,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        width: 1, color: Color(0xFFA8AFB6)),
-                                    borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          width: 330.w,
+                          height: 39.h,
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                  width: 1, color: Color(0xFFA8AFB6)),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  width: 330.w,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 30.w),
+                                    child: TextFormField(
+                                      style: textStyle(14, null, false),
+                                      controller: _ageController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        hintText: '나이',
+                                        hintStyle: textStyle(14, Colors.grey, false),
+                                        border: InputBorder.none,
+                                      ),
+                                      validator: _validateAge,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      width: 330.w,
-                                      child: TextFormField(
-                                        style: const TextStyle(fontSize: 14),
-                                        controller: _ageController,
-                                        keyboardType: TextInputType.number,
-                                        decoration: const InputDecoration(
-                                          hintText: '나이',
-                                          border: InputBorder.none,
-                                        ),
-                                        validator: _validateAge,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 30.h),
                       SizedBox(
                         width: 330.w,
                         height: 39.h,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0.w,
-                              top: 0.h,
-                              child: Container(
-                                width: 330.w,
-                                height: 39.h,
-                                decoration: ShapeDecoration(
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                        width: 1, color: Color(0xFFA8AFB6)),
-                                    borderRadius: BorderRadius.circular(25),
+                        child: Container(
+                          width: 330.w,
+                          height: 39.h,
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                  width: 1, color: Color(0xFFA8AFB6)),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: SizedBox(
+                                  width: 330.w,
+                                  child: Padding(
+                                    padding:  EdgeInsets.only(left: 30.w),
+                                    child: TextFormField(
+                                      style: textStyle(14, null, false),
+                                      controller: _genderController,
+                                      decoration:  InputDecoration(
+                                        hintText: '성별',
+                                        hintStyle: textStyle(14, Colors.grey, false),
+                                        border: InputBorder.none,
+                                      ),
+                                      validator: _validateGender,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              left: 20.w,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      width: 330.w,
-                                      child: TextFormField(
-                                        style: const TextStyle(fontSize: 14),
-                                        controller: _genderController,
-                                        decoration: const InputDecoration(
-                                          hintText: '성별',
-                                          border: InputBorder.none,
-                                        ),
-                                        validator: _validateAge,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 50.h),

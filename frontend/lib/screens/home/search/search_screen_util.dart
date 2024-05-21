@@ -5,6 +5,7 @@ import 'package:frontend/screens/home/search/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/env.dart';
 
 //검색의 리스트 아이템 템플릿
 
@@ -118,13 +119,4 @@ class _SearchListItemState extends State<SearchListItem> {
       ],
     );
   }
-}
-
-TextStyle textStyle(int fontsize, Color color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke)?FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

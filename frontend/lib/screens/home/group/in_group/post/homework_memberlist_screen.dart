@@ -5,6 +5,7 @@ import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 
 //멤버들 과제 리스트
 
@@ -240,19 +241,4 @@ String HwType(String type) {
     default:
       return '퀴즈';
   }
-}
-
-String formatDate(String dateString) {
-  DateTime dateTime = DateTime.parse(dateString);
-  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
-  return formattedDate;
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

@@ -36,7 +36,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => const HomeScreen(),
-    ),
+    ),  
     GoRoute(
       name: 'search',
       path: '/search',

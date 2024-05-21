@@ -267,7 +267,7 @@ Future<dynamic> contentCreate(
   );
   final data = res.body;
   // final data = json.decode(utf8.decode(res.bodyBytes));
-  // print(data);
+  print(data);
   return data;
 }
 

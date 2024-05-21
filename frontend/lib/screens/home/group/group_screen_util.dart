@@ -1,9 +1,8 @@
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/http.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/env.dart';
 
 //그룹 탭의 리스트 아이템 템플릿
 
@@ -250,13 +249,4 @@ Future<int> _showPasswordDialog(BuildContext context, int password) async {
         },
       ) ??
       2; //기본값 2
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

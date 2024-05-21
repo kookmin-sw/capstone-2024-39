@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
-import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:frontend/screens/home/search/search_screen_util.dart';
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/env.dart';
 
 final List<String> realThema = [
   '예술과 문학',
@@ -327,13 +325,4 @@ class _GroupState extends State<GroupScreen> {
       ),
     );
   }
-}
-
-TextStyle textStyle(int fontsize, Color color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke)?FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

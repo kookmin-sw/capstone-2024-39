@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
-import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
-import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/env.dart';
 
 class PostMakeScreen extends StatefulWidget {
   final String managerId;
@@ -185,13 +183,4 @@ class _PostMakeState extends State<PostMakeScreen> {
               ),
             ));
   }
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

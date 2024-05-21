@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 
 //게시글 목록 페이지
 
@@ -190,19 +190,4 @@ class _PostListScreenState extends State<PostListScreen> {
     }
     return items;
   }
-}
-
-String formatDate(String dateString) {
-  DateTime dateTime = DateTime.parse(dateString);
-  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
-  return formattedDate;
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

@@ -3,7 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 import 'package:provider/provider.dart';
+
 
 class BookReportViewingScreen extends StatefulWidget {
   final dynamic contentData;
@@ -41,8 +43,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
       _booktitle = content['book']['title'];
-      _startDate = formatDate(content['startDate']);
-      _endDate = formatDate(content['endDate']);
+      _startDate = _formatDate(content['startDate']);
+      _endDate = _formatDate(content['endDate']);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
@@ -292,6 +294,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
         return Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   '카테고리: ',
@@ -300,7 +303,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 SizedBox(width: 3.w),
                 SizedBox(
                   width: 121.w,
-                  height: 22.h,
+                  height: 22.h,//여기 함 확인
                   child: Text(
                     _category,
                     style: textStyle(14, null, false),
@@ -393,9 +396,11 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: Text(
-                              _body,
-                              style: TextStyle(fontSize: 14.sp),
+                            child: SizedBox(
+                              child: Text(
+                                _body,
+                                style: textStyle(14, null, false),
+                              ),
                             ),
                           ),
                         ],
@@ -412,13 +417,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                   const Text('A: '),
                   SizedBox(width: 10.w),
                   Expanded(
-                    child: TextField(
-                      style: TextStyle(fontSize: 14.sp),
-                      controller: _answerController,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: '답을 입력하세요',
-                        hintStyle: TextStyle(fontSize: 14.sp),
+                    child: SizedBox(
+                      child: TextField(
+                        style: textStyle(14, null, false),
+                        controller: _answerController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '답을 입력하세요',
+                            hintStyle: textStyle(14, Colors.grey, false)),
                       ),
                     ),
                   ),
@@ -454,9 +460,11 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: Text(
-                              _body,
-                              style: TextStyle(fontSize: 14.sp),
+                            child: SizedBox(
+                              child: Text(
+                                _body,
+                                style: textStyle(14, null, false),
+                              ),
                             ),
                           ),
                         ],
@@ -467,48 +475,45 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               ),
             ),
             SizedBox(height: 15.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _oxanswer = true;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: _oxanswer ? Colors.green : Colors.white,
-                      elevation: 0,
-                      side: BorderSide(width: 0.5.w),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r)),
-                      minimumSize: Size(140.w, 140.h),
-                    ),
-                    child: Text('O', style: TextStyle(fontSize: 24.sp)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _oxanswer = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: _oxanswer ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: const BorderSide(width: 0.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                  SizedBox(width: 30.w),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _oxanswer = false;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: !_oxanswer ? Colors.green : Colors.white,
-                      elevation: 0,
-                      side: BorderSide(width: 0.5.w),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.r)),
-                      minimumSize: Size(140.w, 140.h),
-                    ),
-                    child: Text('X', style: TextStyle(fontSize: 24.sp)),
+                  child: const Text('O'),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _oxanswer = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: !_oxanswer ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: const BorderSide(width: 0.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                ],
-              ),
+                  child: const Text('X'),
+                ),
+              ],
             ),
           ],
         );
@@ -539,9 +544,11 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: Text(
-                              _body,
-                              style: TextStyle(fontSize: 14.sp),
+                            child: SizedBox(
+                              child: Text(
+                                _body,
+                                style: textStyle(14, null, false),
+                              ),
                             ),
                           ),
                         ],
@@ -596,14 +603,17 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                                 height: 24.h,
                                 alignment: Alignment.center,
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(width: 10.w),
                                     Text('A: ',
                                         style: TextStyle(fontSize: 14.sp)),
                                     Expanded(
-                                      child: Text(
-                                        _exampleList[i] ?? '',
-                                        style: TextStyle(fontSize: 14.sp),
+                                      child: SizedBox(
+                                        child: Text(
+                                          _exampleList[i] ?? '',
+                                          style: textStyle(12, null, false),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -667,17 +677,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   }
 }
 
-String formatDate(String dateString) {
+String _formatDate(String dateString) {
   DateTime dateTime = DateTime.parse(dateString);
   String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
   return formattedDate;
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

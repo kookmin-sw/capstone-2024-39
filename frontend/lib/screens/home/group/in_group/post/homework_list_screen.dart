@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 
 //과제 목록 페이지
 
@@ -273,26 +273,9 @@ String HwType(String type) {
       return '';
   }
 }
-
-String formatDate(String dateString) {
-  DateTime dateTime = DateTime.parse(dateString);
-  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
-
-  return formattedDate;
-}
-
 bool limitDate(String dateString) {
   DateTime dateTime = DateTime.parse(dateString);
   DateTime nowTime = DateTime.now();
 
   return dateTime.isAfter(nowTime);
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

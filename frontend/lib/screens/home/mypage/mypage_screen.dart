@@ -7,6 +7,7 @@ import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class MypageScreen extends StatefulWidget {
   const MypageScreen({super.key});
@@ -70,11 +71,22 @@ class _MypageScreenState extends State<MypageScreen>
   dynamic userInfo;
   int? userId;
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initUserState();
+    _loadData(500);
+  }
+
+  Future<void> _loadData(int term) async {
+    Timer(Duration(milliseconds: term), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<void> _initUserState() async {
@@ -154,45 +166,52 @@ class _MypageScreenState extends State<MypageScreen>
           backgroundColor: const Color(0xFF0E9913),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            if (isLogin)
-              LoggedWidget(
-                name: name ?? '이름 없음',
-                age: age ?? '0',
-                gender: gender ?? '성별 없음',
-                updateLoginStatus: _updateLoginStatus,
+        body: _isLoading
+            ? Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 100.h),
+                  child: const CircularProgressIndicator(),
+                ), // 로딩 애니매이션
               )
-            else
-              LoginWidget(updateLoginStatus: _updateLoginStatus),
-            TabBar(
-              labelColor: Colors.black,
-              indicatorColor: Colors.black,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.tab,
-              unselectedLabelColor: const Color(0xFF6E767F),
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
-              controller: _tabController,
-              tabs: const [
-                Tab(text: '독후감'),
-                Tab(text: '나만의 서재'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+            : Column(
                 children: [
-                  BookReportWidget(books: books),
-                  MyLibraryWidget(
-                    libraries: libraries,
-                    onLibraryUpdated: _initUserState,
-                    token: token ?? '',
+                  if (isLogin)
+                    LoggedWidget(
+                      name: name ?? '이름 없음',
+                      age: age ?? '0',
+                      gender: gender ?? '성별 없음',
+                      updateLoginStatus: _updateLoginStatus,
+                    )
+                  else
+                    LoginWidget(updateLoginStatus: _updateLoginStatus),
+                  TabBar(
+                    labelColor: Colors.black,
+                    indicatorColor: Colors.black,
+                    indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    unselectedLabelColor: const Color(0xFF6E767F),
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(text: '독후감'),
+                      Tab(text: '나만의 서재'),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        BookReportWidget(books: books),
+                        MyLibraryWidget(
+                          libraries: libraries,
+                          onLibraryUpdated: _initUserState,
+                          token: token ?? '',
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -344,6 +363,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     final secureStorage =
         Provider.of<SecureStorageService>(context, listen: false);
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    print(googleUser);
 
     if (googleUser != null) {
       userInfo = await login(googleUser.email);
@@ -351,7 +371,10 @@ class _LoginWidgetState extends State<LoginWidget> {
       print('로그인');
       if (userInfo['exceptionCode'] != null) {
         context.push('/signup').then((_) {
-          widget.updateLoginStatus(true);
+          setState(() {
+            widget.updateLoginStatus(true);
+            //여기서 유저정보 업데이트 관련 함수 실행 필요
+          });
         });
       } else {
         await secureStorage.saveData("token", userInfo['token']);

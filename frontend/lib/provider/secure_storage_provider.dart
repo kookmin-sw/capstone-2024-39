@@ -90,6 +90,9 @@ class TmpBook {
   String author;
   String publisher;
   String writing;
+  String isbn;
+  String description;
+  String publisherDate;
 
   TmpBook({
     required this.title,
@@ -101,6 +104,9 @@ class TmpBook {
     required this.author,
     required this.publisher,
     required this.writing,
+    required this.isbn,
+    required this.description,
+    required this.publisherDate,
   });
 
   factory TmpBook.fromJson(Map<String, dynamic> json) {
@@ -114,6 +120,9 @@ class TmpBook {
       author: json['author'],
       publisher: json['publisher'],
       writing: json['writing'],
+      isbn: json['isbn'],
+      description: json['description'],
+      publisherDate: json['publisherDate'],
     );
   }
 
@@ -128,6 +137,9 @@ class TmpBook {
       'author': author,
       'publisher': publisher,
       'writing': writing,
+      'isbn': isbn,
+      'description': description,
+      'publisherDate': publisherDate,
     };
   }
 }
