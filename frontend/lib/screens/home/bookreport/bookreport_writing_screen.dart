@@ -778,7 +778,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                         SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            //width: _screenWidth * 0.7,
                             child: TextField(
                               style: textStyle(14, null, false),
                               controller: _questionController,
@@ -866,7 +865,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                         SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            //width: _screenWidth * 0.7,
                             child: TextField(
                               style: textStyle(14, null, false),
                               controller: _questionController,

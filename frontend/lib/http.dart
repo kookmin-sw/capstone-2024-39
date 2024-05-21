@@ -323,7 +323,9 @@ Future<dynamic> quizCreate(
       "endDate": endDate,
     }),
   );
-  final data = res.body;
+  //final data = res.body;
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  print(data);
   return data;
 }
 
@@ -693,6 +695,7 @@ Future<dynamic> getRecommend(String token) async {
   return data;
 }
 
+//서재 삭제하기
 Future<String> deleteLibrary(String token, String groupName) async {
   var address =
       Uri.parse("$BASE_URL/member/my-book/rm/group?groupName=$groupName");
