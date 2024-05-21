@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/screens/home/group/group_screen.dart';
 import 'package:provider/provider.dart';
@@ -95,10 +96,12 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                 decoration: const InputDecoration(
                   labelText: '모임 주제',
                 ),
-                items: realThema.map((theme) => DropdownMenuItem(
-                      value: theme,
-                      child: Text(theme),
-                    )).toList(),
+                items: realThema
+                    .map((theme) => DropdownMenuItem(
+                          value: theme,
+                          child: Text(theme),
+                        ))
+                    .toList(),
                 onChanged: (value) {
                   setState(() {
                     _textControllers[1].text = value.toString();
@@ -152,14 +155,20 @@ class _GroupMakeState extends State<GroupMakeScreen> {
                         }
                       });
                     },
-                    children: const [
+                    children: [
                       Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('공개'),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '공개',
+                          style: textStyle(14, null, false),
+                        ),
                       ),
                       Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('비공개'),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '비공개',
+                          style: textStyle(14, null, false),
+                        ),
                       ),
                     ],
                   ),
@@ -187,51 +196,45 @@ class _GroupMakeState extends State<GroupMakeScreen> {
               // 생성하기 버튼
               ElevatedButton(
                 onPressed: _isCreateButtonEnabled()
-                    ? () async {
-                        //모임 목록을 백으로 보내는 코드 작성
-                        String publication;
-                        dynamic result;
-                        var token = await secureStorage.readData("token");
-                        if (_isPublic[0]) {
-                          publication = '공개';
-                          result = await groupCreate(
-                              token,
-                              _textControllers[0].text,
-                              _textControllers[1].text,
-                              int.parse(_textControllers[2].text),
-                              publication,
-                              null);
-                        } else {
-                          publication = '비공개';
-                          result = await groupCreate(
-                              token,
-                              _textControllers[0].text,
-                              _textControllers[1].text,
-                              int.parse(_textControllers[2].text),
-                              publication,
-                              int.parse(_textControllers[3].text));
-                        }
+                    ? (int.parse(_textControllers[2].text) == 0)
+                        ? () {
+                            _showLimitDialog(context);
+                          }
+                        : () async {
+                            //모임 목록을 백으로 보내는 코드 작성
+                            String publication;
+                            dynamic result;
+                            var token = await secureStorage.readData("token");
+                            if (_isPublic[0]) {
+                              publication = '공개';
+                              result = await groupCreate(
+                                  token,
+                                  _textControllers[0].text,
+                                  _textControllers[1].text,
+                                  int.parse(_textControllers[2].text),
+                                  publication,
+                                  null);
+                            } else {
+                              publication = '비공개';
+                              result = await groupCreate(
+                                  token,
+                                  _textControllers[0].text,
+                                  _textControllers[1].text,
+                                  int.parse(_textControllers[2].text),
+                                  publication,
+                                  int.parse(_textControllers[3].text));
+                            }
 
-                        if (result.toString() == "모임 생성 완료") {
-                          context.pop(true);
-                        } else {
-                          // 모임 생성 실패시 코드 작성
-                        }
-                      }
+                            if (result.toString() == "모임 생성 완료") {
+                              context.pop(true);
+                            } else {
+                              // 모임 생성 실패시 코드 작성
+                            }
+                          }
                     : null,
-                child: const Text(
+                child: Text(
                   '생성하기',
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  print(_textControllers[0].text);
-                  print(_textControllers[1].text);
-                  print(_textControllers[2].text);
-                  print(_textControllers[3].text);
-                },
-                child: const Text(
-                  'test',
+                  style: textStyle(13, null, false),
                 ),
               ),
             ],
@@ -240,4 +243,39 @@ class _GroupMakeState extends State<GroupMakeScreen> {
       ),
     );
   }
+}
+
+// 모임인원이 0명인 경우
+void _showLimitDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('제한인원 설정 오류'),
+        titleTextStyle: textStyle(20, Colors.black, true),
+        content: const Text('모임 제한 인원은\n최소 1명 이상으로 설정해야 합니다.'),
+        contentTextStyle: textStyle(14, Colors.black, false),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.pop();
+            },
+            child: Text(
+              "확인",
+              style: textStyle(13, null, false),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

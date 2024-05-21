@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
+import 'package:frontend/screens/home/group/group_screen.dart';
+import 'package:frontend/screens/home/group/group_screen_util.dart';
+import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/http.dart';
@@ -33,7 +37,6 @@ class _PostMakeState extends State<PostMakeScreen> {
   bool _isFieldEmpty(TextEditingController controller) {
     return controller.text.trim().isEmpty;
   }
-  
 
   Future<void> _checkManager() async {
     if (widget.managerId == await secureStorage.readData('id')) {
@@ -76,14 +79,9 @@ class _PostMakeState extends State<PostMakeScreen> {
               appBar: AppBar(
                 scrolledUnderElevation: 0,
                 backgroundColor: const Color(0xFF0E9913),
-                title: const Text(
+                title: Text(
                   '게시글',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontFamily: 'Noto Sans KR',
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: textStyle(22, Colors.white, true),
                 ),
                 centerTitle: true,
               ),
@@ -92,27 +90,25 @@ class _PostMakeState extends State<PostMakeScreen> {
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: ElevatedButton(
-                      onPressed: ()async {
-                        if(_isFieldEmpty(_postTitleController)){
-
-                        }
-                        else if(_isFieldEmpty(_postbodyController)){
-
-                        }
-                        else{
+                      onPressed: () async {
+                        if (_isFieldEmpty(_postTitleController)) {
+                        } else if (_isFieldEmpty(_postbodyController)) {
+                        } else {
                           String result = await postCreate(
-                            token,
-                            widget.clubId,
-                            _postTitleController.text,
-                            _postbodyController.text,
-                            isSticky);
-                          if(result == '게시글 생성'){
+                              token,
+                              widget.clubId,
+                              _postTitleController.text,
+                              _postbodyController.text,
+                              isSticky);
+                          if (result == '게시글 생성') {
                             context.pop(true);
                           }
                         }
-                        
                       },
-                      child: const Text('등록')),
+                      child: Text(
+                        '등록',
+                        style: textStyle(14, null, false),
+                      )),
                 ),
               ),
               body: Padding(
@@ -125,16 +121,20 @@ class _PostMakeState extends State<PostMakeScreen> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Text('제목: '),
+                          Text(
+                            '제목: ',
+                            style: textStyle(15, null, false),
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: SizedBox(
                               width: _screenWidth * 0.7,
                               child: TextField(
-                                style: const TextStyle(fontSize: 14),
+                                style: textStyle(14, null, false),
                                 controller: _postTitleController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: '제목을 입력하세요.',
+                                  hintStyle: textStyle(14, null, false),
                                   border: InputBorder.none,
                                 ),
                               ),
@@ -146,7 +146,10 @@ class _PostMakeState extends State<PostMakeScreen> {
                         visible: isGroupManager,
                         child: Row(
                           children: [
-                            const Text('공지사항'),
+                            Text(
+                              '공지사항',
+                              style: textStyle(15, null, false),
+                            ),
                             Checkbox(
                               value: isSticky,
                               onChanged: (newValue) {
@@ -167,11 +170,12 @@ class _PostMakeState extends State<PostMakeScreen> {
                         ),
                       ),
                       TextField(
-                        style: const TextStyle(fontSize: 14),
+                        style: textStyle(14, null, false),
                         controller: _postbodyController,
                         maxLines: null,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: ' 자유롭게 글을 작성해주세요.',
+                          hintStyle: textStyle(14, Colors.grey, false),
                           border: InputBorder.none,
                         ),
                       ),
@@ -181,4 +185,13 @@ class _PostMakeState extends State<PostMakeScreen> {
               ),
             ));
   }
+}
+
+TextStyle textStyle(int fontsize, var color, bool isStroke) {
+  return TextStyle(
+    fontSize: fontsize.sp,
+    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
+    fontFamily: 'Noto Sans KR',
+    color: color,
+  );
 }

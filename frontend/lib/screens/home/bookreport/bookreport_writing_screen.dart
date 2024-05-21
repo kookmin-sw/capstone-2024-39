@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/bookreport/bookreport_viewing_screen.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
 import 'package:go_router/go_router.dart';
@@ -13,11 +14,15 @@ class BookReportWritingScreen extends StatefulWidget {
     required this.index,
     required this.clubId,
     required this.asId,
+    required this.isbn,
+    required this.dateInfo,
   });
 
   final int index;
   final dynamic clubId;
   final dynamic asId;
+  final dynamic isbn;
+  final dynamic dateInfo;
 
   @override
   State<BookReportWritingScreen> createState() => _BookReportWritingState();
@@ -38,10 +43,10 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _answerController = TextEditingController();
   bool _isOX = true;
   List<bool> _multipleanswer = [false, false, false, false];
-  final TextEditingController _answerController1 = TextEditingController();
-  final TextEditingController _answerController2 = TextEditingController();
-  final TextEditingController _answerController3 = TextEditingController();
-  final TextEditingController _answerController4 = TextEditingController();
+  final List<TextEditingController> _answerControllers = List.generate(
+    4,
+    (index) => TextEditingController(),
+  );
   var token;
   List<dynamic> BookData = [];
   String _author = "작가";
@@ -59,6 +64,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   @override
   void initState() {
     super.initState();
+    checkHW();
 
     _initUserState();
     _loadBooks();
@@ -86,12 +92,38 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     token = await secureStorage.readData("token");
   }
 
+  void checkHW() async {
+    print(widget.isbn);
+    print(widget.dateInfo);
+    if (widget.isbn != null) {
+      var bookInfo = await getBookInfo(widget.isbn);
+      print(bookInfo);
+      setState(() {
+        _bookTitleController.text = bookInfo['title'];
+        _author = bookInfo['author'];
+        _publisher = bookInfo['publisher'];
+        _isbn = widget.isbn;
+        _publisherDate = bookInfo['publishDate'];
+        _imageUrl = bookInfo['imageUrl'];
+      });
+    }
+    if (widget.dateInfo != null) {
+      setState(() {
+        _startDate = DateTime.parse(widget.dateInfo['startDate']);
+        _endDate = DateTime.parse(widget.dateInfo['endDate']);
+      });
+    }
+  }
+
   @override
   void dispose() {
     // Remove the keyboard visibility listener
     WidgetsBinding.instance.removeObserver(_keyboardVisibilityObserverWrapper);
     _questionController.dispose();
     _answerController.dispose();
+    for (var controller in _answerControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -526,8 +558,11 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                   textAlign: TextAlign.center,
                   maxLines: 10,
                   decoration: InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '인용문을 작성해주세요',
                     hintStyle: TextStyle(
+                      // 힌트 텍스트 정중앙 정렬
+                      height: 15.h,
                       height: 15.h,
                     ),
                     border: InputBorder.none,
@@ -562,14 +597,14 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     fontSize: 15.sp,
                     fontFamily: 'Noto Sans KR',
                     fontWeight: FontWeight.w400,
-                    height: 0,
                     letterSpacing: -0.17,
                   ),
                 ),
                 SizedBox(width: 3.w),
+                SizedBox(width: 3.w),
                 SizedBox(
-                  width: 121,
-                  height: 22,
+                  width: 121.w,
+                  height: 22.h,
                   child: DropdownButton<String>(
                     value: selectedCategory,
                     onChanged: (String? newValue) {
@@ -589,13 +624,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       fontFamily: 'Noto Sans KR',
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
-                      height: 0,
                     ),
                     underline: Container(),
                   ),
                 ),
               ],
             ),
+            SizedBox(height: 15.h),
             SizedBox(height: 15.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 0.w),
@@ -621,6 +656,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           children: [
             SizedBox(
               width: 350.w,
+              height: 150.h,
+              width: 350.w,
               height: 190.h,
               child: Stack(
                 children: [
@@ -629,9 +666,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     top: 0,
                     child: Container(
                       width: 350.w,
+                      height: 150.h,
+                      width: 350.w,
                       height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(width: 1.w),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1.w),
                       ),
@@ -642,6 +683,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
+                        SizedBox(width: 10.w),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
@@ -668,6 +710,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 children: [
                   const Text('A: '),
                   SizedBox(width: 10.w),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: SizedBox(
                       //width: _screenWidth * 0.7,
@@ -691,6 +734,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           children: [
             SizedBox(
               width: 350.w,
+              height: 150.h,
+              width: 350.w,
               height: 190.h,
               child: Stack(
                 children: [
@@ -699,9 +744,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     top: 0,
                     child: Container(
                       width: 350.w,
+                      height: 150.h,
+                      width: 350.w,
                       height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(width: 1.w),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1.w),
                       ),
@@ -712,6 +761,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
+                        SizedBox(width: 10.w),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
@@ -733,9 +783,12 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               ),
             ),
             SizedBox(height: 15.h),
+            SizedBox(height: 15.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.w),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
                     onPressed: () {
@@ -748,12 +801,14 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       backgroundColor: _isOX ? Colors.green : Colors.white,
                       elevation: 0,
                       side: BorderSide(width: 0.5.w),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.r)),
                       minimumSize: const Size(140, 140),
                     ),
                     child: const Text('O'),
                   ),
+                  SizedBox(width: 30.w),
                   SizedBox(width: 30.w),
                   ElevatedButton(
                     onPressed: () {
@@ -765,6 +820,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: !_isOX ? Colors.green : Colors.white,
                       elevation: 0,
+                      side: BorderSide(width: 0.5.w),
                       side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.r)),
@@ -782,6 +838,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           children: [
             SizedBox(
               width: 350.w,
+              height: 150.h,
+              width: 350.w,
               height: 190.h,
               child: Stack(
                 children: [
@@ -790,9 +848,13 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     top: 0,
                     child: Container(
                       width: 350.w,
+                      height: 150.h,
+                      width: 350.w,
                       height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(width: 1.w),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1.w),
                       ),
@@ -803,6 +865,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                     child: Row(
                       children: [
                         const Text('Q: '),
+                        SizedBox(width: 10.w),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
@@ -824,7 +887,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               ),
             ),
             SizedBox(height: 15.h),
+            SizedBox(height: 15.h),
             Padding(
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
@@ -855,6 +920,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                               ),
                             ),
                             SizedBox(width: 5.w),
+                            SizedBox(width: 5.w),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
@@ -862,15 +928,18 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                   border: Border.all(
                                     color: Colors.black,
                                     width: 0.5.w,
+                                    width: 0.5.w,
                                   ),
                                   color: _multipleanswer[i]
                                       ? Colors.green
                                       : Colors.white,
                                 ),
                                 height: 24.h,
+                                height: 24.h,
                                 alignment: Alignment.center,
                                 child: Row(
                                   children: [
+                                    SizedBox(width: 10.w),
                                     SizedBox(width: 10.w),
                                     const Text('A: '),
                                     Expanded(

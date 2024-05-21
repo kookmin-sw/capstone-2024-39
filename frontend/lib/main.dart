@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/book/book_content_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
@@ -95,10 +94,14 @@ final GoRouter router = GoRouter(
         int index = extraData['index'] as int;
         dynamic clubId = extraData['clubId'] as dynamic;
         dynamic asId = extraData['asId'] as dynamic;
+        dynamic isbn = extraData['isbn'] as dynamic;
+        dynamic dateInfo = extraData['dateInfo'] as dynamic;
         return BookReportWritingScreen(
           index: index,
           clubId: clubId,
           asId: asId,
+          isbn: isbn,
+          dateInfo: dateInfo,
         );
       },
     ),
@@ -142,9 +145,11 @@ final GoRouter router = GoRouter(
         Map<String, dynamic> extraData = state.extra as Map<String, dynamic>;
         int clubId = extraData['clubId'] as int;
         String managerId = extraData['managerId'] as String;
+        dynamic bookInfo = extraData['bookInfo'] as dynamic;
         return HomeworkListScreen(
           clubId: clubId,
           managerId: managerId,
+          bookInfo: bookInfo,
         );
       },
     ),
@@ -260,44 +265,42 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(390, 675),
-      builder: (context, _) => MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => SecureStorageService()),
-          // 다른 프로바이더도 여기에 추가
-        ],
-        child: MaterialApp.router(
-          routerConfig: router,
-          theme: ThemeData(
-            fontFamily: 'pretendard',
-            colorScheme: ColorScheme.fromSwatch(
-              backgroundColor: Colors.white,
-              primarySwatch: Colors.green,
-              accentColor: const Color(0xFF09BB10),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SecureStorageService()),
+        // 다른 프로바이더도 여기에 추가
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+        theme: ThemeData(
+          fontFamily: 'pretendard',
+          colorScheme: ColorScheme.fromSwatch(
+            backgroundColor: Colors.white,
+            primarySwatch: Colors.green,
+            accentColor: const Color(0xFF09BB10),
+          ),
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(
+              fontFamily: 'pretendard',
+              fontSize: 20,
+              fontWeight: FontWeight.w200,
             ),
-            textTheme: TextTheme(
-              headlineLarge: TextStyle(
+            titleLarge: TextStyle(
                 fontFamily: 'pretendard',
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w200,
-              ),
-              titleLarge: TextStyle(
-                  fontFamily: 'pretendard',
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w700),
-              titleMedium: TextStyle(
-                  fontFamily: 'pretendard',
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.w500),
-              bodyLarge: TextStyle(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w700,
-              ),
-              bodyMedium: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w500,
-              ),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
+            titleMedium: TextStyle(
+                fontFamily: 'pretendard',
+                fontSize: 20,
+                fontWeight: FontWeight.w500),
+            bodyLarge: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
+            bodyMedium: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
