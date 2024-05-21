@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class BookReportTemplateScreen extends StatelessWidget {
@@ -8,33 +9,36 @@ class BookReportTemplateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('글쓰기'),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Noto Sans KR',
-          fontWeight: FontWeight.w700,
-          fontSize: 20,
+    return ScreenUtilInit(
+      designSize: const Size(390, 675),
+      builder: (context, _) => Scaffold(
+        appBar: AppBar(
+          title: const Text('글쓰기'),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Noto Sans KR',
+            fontWeight: FontWeight.w700,
+            fontSize: 20.sp,
+          ),
+          backgroundColor: const Color(0xFF0E9913),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+          ),
         ),
-        backgroundColor: const Color(0xFF0E9913),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+        backgroundColor: Colors.white,
+        body: GridView.count(
+          crossAxisCount: 2,
+          padding: EdgeInsets.all(16.w),
+          childAspectRatio: 8.0 / 9.0,
+          children: <Widget>[
+            _buildCard(context, '독후감'),
+            _buildCard(context, '한줄평'),
+            _buildCard(context, '인용문구'),
+            _buildCard(context, '퀴즈'),
+          ],
         ),
-      ),
-      backgroundColor: Colors.white,
-      body: GridView.count(
-        crossAxisCount: 2,
-        padding: const EdgeInsets.all(16),
-        childAspectRatio: 8.0 / 9.0,
-        children: <Widget>[
-          _buildCard(context, '독후감'),
-          _buildCard(context, '한줄평'),
-          _buildCard(context, '인용문구'),
-          _buildCard(context, '퀴즈'),
-        ],
       ),
     );
   }
@@ -58,27 +62,17 @@ class BookReportTemplateScreen extends StatelessWidget {
           "clubId": null,
           "asId": null,
         }),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 18.0 / 11.0,
-              child: Image.network(
-                'https://via.placeholder.com/60x86',
-                fit: BoxFit.fitWidth,
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Text(
+              template,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 8.0),
-              child: Text(
-                template,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

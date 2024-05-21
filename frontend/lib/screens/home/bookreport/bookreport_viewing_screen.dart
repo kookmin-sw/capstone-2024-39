@@ -15,10 +15,8 @@ class BookReportViewingScreen extends StatefulWidget {
 
 class _BookReportViewingState extends State<BookReportViewingScreen> {
   final TextEditingController _answerController = TextEditingController();
-  // List<dynamic> _contentData = [];
   final dynamic _startDate = DateTime.now();
   final dynamic _endDate = DateTime.now();
-  //bool _isPublic = false;
   String _template = '';
   String _writer = '';
   String _title = '';
@@ -34,13 +32,11 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   var token;
 
   void initializeClubContentData(dynamic content) {
-    print(content);
     setState(() {
       _template = contentTypeCheck(content['type']);
       _writer = content['writer'];
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
-      print(_template);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
@@ -98,84 +94,88 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
 
   @override
   void dispose() {
+    _answerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_template),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Noto Sans KR',
-          fontWeight: FontWeight.w700,
-          fontSize: 20,
+    return ScreenUtilInit(
+      designSize: const Size(390, 675),
+      builder: (context, child) => Scaffold(
+        appBar: AppBar(
+          title: Text(_template),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Noto Sans KR',
+            fontWeight: FontWeight.w700,
+            fontSize: 20.sp,
+          ),
+          backgroundColor: const Color(0xFF0E9913),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
-        backgroundColor: const Color(0xFF0E9913),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text(_title),
-                ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Text(_title, style: TextStyle(fontSize: 16.sp)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text(_booktitle),
-                ],
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Text(_booktitle, style: TextStyle(fontSize: 14.sp)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text('$_author | $_publisher',
-                      style: const TextStyle(color: Colors.black)),
-                ],
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Text('$_author | $_publisher',
+                        style: TextStyle(color: Colors.black, fontSize: 12.sp)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFA9AFB7),
+              SizedBox(height: 15.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color(0xFFA9AFB7),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildTemplateUI(_template),
-                  ),
-                ],
+              SizedBox(height: 15.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTemplateUI(_template),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-          ],
+              SizedBox(height: 15.h),
+            ],
+          ),
         ),
       ),
     );
@@ -184,31 +184,32 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   Widget _buildTemplateUI(String template) {
     switch (template) {
       case "독후감":
-        return Text(_body);
+        return Text(_body, style: TextStyle(fontSize: 14.sp));
       case "한줄평":
-        return Text(_body);
+        return Text(_body, style: TextStyle(fontSize: 14.sp));
       case "인용구":
         return Align(
           alignment: Alignment.center,
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
                 child: Text(
                   _body,
                   textAlign: TextAlign.center,
                   maxLines: 10,
+                  style: TextStyle(fontSize: 14.sp),
                 ),
               ),
-              const Positioned(
-                left: 0,
-                top: 0,
-                child: Icon(Icons.format_quote),
+              Positioned(
+                left: -5.w,
+                top: 0.w,
+                child: const Icon(Icons.format_quote),
               ),
-              const Positioned(
-                right: 0,
-                bottom: 0,
-                child: Icon(Icons.format_quote),
+              Positioned(
+                right: -5.w,
+                bottom: 0.w,
+                child: const Icon(Icons.format_quote),
               ),
             ],
           ),
@@ -229,10 +230,10 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                     letterSpacing: -0.17,
                   ),
                 ),
-                const SizedBox(width: 3),
+                SizedBox(width: 3.w),
                 SizedBox(
-                  width: 121,
-                  height: 22,
+                  width: 121.w,
+                  height: 22.h,
                   child: Text(
                     _category,
                     style: const TextStyle(
@@ -246,9 +247,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Row(
                 children: [
                   Expanded(
@@ -257,7 +258,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -266,39 +267,24 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                     switch (_category) {
                       case "단답형":
                         if (_answerController.text == _answer) {
-                          // 맞음
                           _showRightDialog();
                         } else {
-                          // 틀림
                           _showWrongDialog();
                         }
                         break;
                       case "O/X":
-                        if (_answer == 'O') {
-                          if (_oxanswer) {
-                            // 맞음
-                            _showRightDialog();
-                          } else {
-                            // 틀림
-                            _showWrongDialog();
-                          }
+                        if ((_answer == 'O' && _oxanswer) ||
+                            (_answer == 'X' && !_oxanswer)) {
+                          _showRightDialog();
                         } else {
-                          if (!_oxanswer) {
-                            //맞음
-                            _showRightDialog();
-                          } else {
-                            //틀림
-                            _showWrongDialog();
-                          }
+                          _showWrongDialog();
                         }
                         break;
                       case "객관식":
                         int check = int.parse(_answer) - 1;
                         if (_multipleanswer[check]) {
-                          // 맞음
                           _showRightDialog();
                         } else {
-                          // 틀림
                           _showWrongDialog();
                         }
                         break;
@@ -330,28 +316,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -362,21 +345,19 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
                   const Text('A: '),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
-                    child: SizedBox(
-                      //width: _screenWidth * 0.7,
-                      child: TextField(
-                        style: const TextStyle(fontSize: 14),
-                        controller: _answerController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '답을 입력하세요',
-                        ),
+                    child: TextField(
+                      style: TextStyle(fontSize: 14.sp),
+                      controller: _answerController,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '답을 입력하세요',
+                        hintStyle: TextStyle(fontSize: 14.sp),
                       ),
                     ),
                   ),
@@ -396,28 +377,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 220,
+                      width: 350.w,
+                      height: 220.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
-                          SizedBox(width: 10.h),
+                          SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -427,9 +405,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -443,14 +421,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: _oxanswer ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
+                          borderRadius: BorderRadius.circular(20.r)),
+                      minimumSize: Size(140.w, 140.h),
                     ),
-                    child: const Text('O'),
+                    child: Text('O', style: TextStyle(fontSize: 24.sp)),
                   ),
-                  const SizedBox(width: 30),
+                  SizedBox(width: 30.w),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -461,12 +439,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: !_oxanswer ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
+                          borderRadius: BorderRadius.circular(20.r)),
+                      minimumSize: Size(140.w, 140.h),
                     ),
-                    child: const Text('X'),
+                    child: Text('X', style: TextStyle(fontSize: 24.sp)),
                   ),
                 ],
               ),
@@ -484,28 +462,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 220,
+                      width: 350.w,
+                      height: 220.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -515,9 +490,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
                   for (int i = 0; i < _exampleList.length; i++)
@@ -529,31 +504,29 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                               onTap: () {
                                 setState(() {
                                   for (int j = 0; j < 4; j++) {
-                                    if (i == j) {
-                                      _multipleanswer[j] = true;
-                                    } else {
-                                      _multipleanswer[j] = false;
-                                    }
+                                    _multipleanswer[j] = i == j;
                                   }
                                 });
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(0),
-                                child: _multipleanswer[i]
-                                    ? const Icon(Icons.check,
-                                        color: Colors.green)
-                                    : const Icon(Icons.check,
-                                        color: Colors.grey),
+                                padding: EdgeInsets.all(0.w),
+                                child: Icon(
+                                  Icons.check,
+                                  color: _multipleanswer[i]
+                                      ? Colors.green
+                                      : Colors.grey,
+                                  size: 24.sp,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 5),
+                            SizedBox(width: 5.w),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(20.r),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 0.5,
+                                    width: 0.5.w,
                                   ),
                                   color: _multipleanswer[i]
                                       ? Colors.green
@@ -564,14 +537,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                                 child: Row(
                                   children: [
                                     SizedBox(width: 10.w),
-                                    const Text('A: '),
+                                    Text('A: ',
+                                        style: TextStyle(fontSize: 14.sp)),
                                     Expanded(
-                                      child: SizedBox(
-                                        //width: _screenWidth * 0.7,
-                                        child: Text(
-                                          _exampleList[i],
-                                          style: const TextStyle(fontSize: 10),
-                                        ),
+                                      child: Text(
+                                        _exampleList[i] ?? '',
+                                        style: TextStyle(fontSize: 14.sp),
                                       ),
                                     ),
                                   ],
@@ -580,7 +551,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                       ],
                     ),
                 ],
@@ -599,8 +570,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('정답'),
-          content: Text('정답을 맞추셨습니다.'),
+          title: const Text('정답'),
+          content: const Text('정답을 맞추셨습니다.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -619,8 +590,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('오답'),
-          content: Text('정답을 틀리셨습니다.'),
+          title: const Text('오답'),
+          content: const Text('정답을 틀리셨습니다.'),
           actions: [
             TextButton(
               onPressed: () {

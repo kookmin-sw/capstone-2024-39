@@ -258,8 +258,6 @@ class _MakeLibraryScreenState extends State<MakeLibraryScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             addBooksToLibrary(token, _appBarTitle, _bookList);
-            print(_appBarTitle);
-            print(_bookList);
             context.pop();
           },
           backgroundColor: const Color(0xFF0E9913),

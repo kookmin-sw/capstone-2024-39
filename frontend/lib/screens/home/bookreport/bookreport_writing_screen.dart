@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
-import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
@@ -25,7 +24,6 @@ class BookReportWritingScreen extends StatefulWidget {
 }
 
 class _BookReportWritingState extends State<BookReportWritingScreen> {
-  final double _screenWidth = 0; // State variable to store screen width
   bool _isKeyboardVisible = false;
 
   // Variables to store user input
@@ -33,7 +31,6 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   final TextEditingController _bookTitleController = TextEditingController();
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now();
-  bool _isPublic = false;
   String _template = "";
   final TextEditingController _writingController = TextEditingController();
   String? selectedCategory = '단답형';
@@ -53,6 +50,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
   String _publisherDate = "";
   String _imageUrl = "";
   String _description = "";
+  List<TmpBook> _books = [];
+  bool _isTmp = false;
 
   late final _KeyboardVisibilityObserverWrapper
       _keyboardVisibilityObserverWrapper;
@@ -62,6 +61,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     super.initState();
 
     _initUserState();
+    _loadBooks();
     // Initialize _keyboardVisibilityObserver and _keyboardVisibilityObserverWrapper
     final keyboardVisibilityObserver =
         _KeyboardVisibilityObserver((bool visible) {
@@ -95,347 +95,396 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     super.dispose();
   }
 
+  Future<void> _loadBooks() async {
+    List<TmpBook> books = await SecureStorageUtil.loadBooks();
+    setState(() {
+      _books = books;
+      if (widget.index < _books.length) {
+        final book = _books[widget.index];
+        _titleController.text = book.title;
+        _bookTitleController.text = book.booktitle;
+        _startDate = book.startDate;
+        _endDate = book.endDate;
+        _template = book.template;
+        _author = book.author;
+        _publisher = book.publisher;
+        _writingController.text = book.writing;
+        _isTmp = true;
+        print(_template);
+      } else {
+        // 책이 없는 경우에 대한 처리
+        _template = widget.index == 999
+            ? "퀴즈"
+            : widget.index == 998
+                ? "인용구"
+                : widget.index == 997
+                    ? "한줄평"
+                    : widget.index == 996
+                        ? "독후감"
+                        : "";
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bookInfoProvider = Provider.of<BookInfoProvider>(context);
-
-    if (widget.index != 0 && widget.index < bookInfoProvider.books.length) {
-      final book = bookInfoProvider.books[widget.index];
-      _bookTitleController.text = book.title;
-      _startDate = book.startDate;
-      _endDate = book.endDate;
-      _isPublic = book.isPublic;
-      _template = book.template;
-    } else {
-      // 책이 없는 경우에 대한 처리
-      _template = widget.index == 999
-          ? "퀴즈"
-          : widget.index == 998
-              ? "인용구"
-              : widget.index == 997
-                  ? "한줄평"
-                  : widget.index == 996
-                      ? "독후감"
-                      : "";
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_template),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontFamily: 'Noto Sans KR',
-          fontWeight: FontWeight.w700,
-          fontSize: 20,
+    return ScreenUtilInit(
+      designSize: const Size(390, 675),
+      builder: (context, _) => Scaffold(
+        appBar: AppBar(
+          title: Text(_template),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Noto Sans KR',
+            fontWeight: FontWeight.w700,
+            fontSize: 20.sp,
+          ),
+          backgroundColor: const Color(0xFF0E9913),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
-        backgroundColor: const Color(0xFF0E9913),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Text('제목: '),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      width: _screenWidth * 0.7,
-                      child: TextField(
-                        style: const TextStyle(fontSize: 14),
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          hintText: '제목을 입력하세요.',
-                          border: InputBorder.none,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    const Text('제목: '),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: SizedBox(
+                        //width: _screenWidth * 0.7,
+                        child: TextField(
+                          style: TextStyle(fontSize: 14.sp),
+                          controller: _titleController,
+                          decoration: const InputDecoration(
+                            hintText: '제목을 입력하세요.',
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Text('독서 기간: ', style: TextStyle(color: Colors.black)),
-                  const SizedBox(width: 3),
-                  TextButton(
-                    onPressed: () async {
-                      final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: _startDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                      );
-                      if (picked != null && picked != _startDate) {
-                        setState(() {
-                          _startDate = picked;
-                        });
-                      }
-                    },
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
-                          const EdgeInsets.symmetric(horizontal: 5)),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    const Text('독서 기간: ',
+                        style: TextStyle(color: Colors.black)),
+                    SizedBox(width: 3.w),
+                    TextButton(
+                      onPressed: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _startDate,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (picked != null && picked != _startDate) {
+                          setState(() {
+                            _startDate = picked;
+                          });
+                        }
+                      },
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(
+                            EdgeInsets.symmetric(horizontal: 5.w)),
+                      ),
+                      child: Text(_startDate.toString().substring(0, 10)),
                     ),
-                    child: Text(_startDate.toString().substring(0, 10)),
-                  ),
-                  const Text(' ~ '),
-                  TextButton(
-                    onPressed: () async {
-                      final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: _endDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                      );
-                      if (picked != null && picked != _endDate) {
-                        setState(() {
-                          _endDate = picked;
-                        });
-                      }
-                    },
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
-                          const EdgeInsets.symmetric(horizontal: 5)),
+                    const Text(' ~ '),
+                    TextButton(
+                      onPressed: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _endDate,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (picked != null && picked != _endDate) {
+                          setState(() {
+                            _endDate = picked;
+                          });
+                        }
+                      },
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(
+                            EdgeInsets.symmetric(horizontal: 5.w)),
+                      ),
+                      child: Text(_endDate.toString().substring(0, 10)),
                     ),
-                    child: Text(_endDate.toString().substring(0, 10)),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFA9AFB7),
+              SizedBox(height: 15.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1.w,
+                      color: const Color(0xFFA9AFB7),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  const Text('도서: '),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      width: _screenWidth * 0.7,
-                      child: TextField(
-                        style: const TextStyle(fontSize: 14),
-                        controller: _bookTitleController,
-                        decoration: const InputDecoration(
-                          hintText: '도서를 입력하세요.',
-                          border: InputBorder.none,
-                        ),
-                        textInputAction: TextInputAction.go,
-                        onSubmitted: (value) async {
-                          BookData =
-                              await SearchBook(_bookTitleController.text);
-                          showDialog(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('도서 검색 결과'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    children: [
-                                      for (int i = 0; i < BookData.length; i++)
-                                        searchutil.BookSearchListItem(
-                                          data: BookData[i],
-                                          type: "search",
-                                          clubId: 0,
-                                          onSelected: (selectedData) {
-                                            print(
-                                                'Selected Data: $selectedData');
-                                            _bookTitleController.text =
-                                                selectedData['title'];
-                                            setState(() {
-                                              _author = selectedData['author'];
-                                              _publisher =
-                                                  selectedData['publisher'];
-                                            });
-                                            _isbn = selectedData['isbn'];
-                                            _publisherDate =
-                                                selectedData['pubdate'];
-                                            _imageUrl = selectedData['image'];
-                                            _description =
-                                                selectedData['description'];
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                    ],
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    const Text('도서: '),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: SizedBox(
+                        //width: _screenWidth * 0.7,
+                        child: TextField(
+                          style: TextStyle(fontSize: 14.sp),
+                          controller: _bookTitleController,
+                          decoration: const InputDecoration(
+                            hintText: '도서를 입력하세요.',
+                            border: InputBorder.none,
+                          ),
+                          textInputAction: TextInputAction.go,
+                          onSubmitted: (value) async {
+                            BookData =
+                                await SearchBook(_bookTitleController.text);
+                            showDialog(
+                              // ignore: use_build_context_synchronously
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('도서 검색 결과'),
+                                  content: SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        for (int i = 0;
+                                            i < BookData.length;
+                                            i++)
+                                          searchutil.BookSearchListItem(
+                                            data: BookData[i],
+                                            type: "search",
+                                            clubId: 0,
+                                            onSelected: (selectedData) {
+                                              print(
+                                                  'Selected Data: $selectedData');
+                                              _bookTitleController.text =
+                                                  selectedData['title'];
+                                              setState(() {
+                                                _author =
+                                                    selectedData['author'];
+                                                _publisher =
+                                                    selectedData['publisher'];
+                                              });
+                                              _isbn = selectedData['isbn'];
+                                              _publisherDate =
+                                                  selectedData['pubdate'];
+                                              _imageUrl = selectedData['image'];
+                                              _description =
+                                                  selectedData['description'];
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          );
-                        },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Text('$_author  |  $_publisher',
-                      style: const TextStyle(color: Colors.black)),
-                ],
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Text('$_author  |  $_publisher',
+                        style: const TextStyle(color: Colors.black)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFA9AFB7),
+              SizedBox(height: 15.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1.w,
+                      color: const Color(0xFFA9AFB7),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildTemplateUI(_template),
-                  ),
-                ],
+              SizedBox(height: 15.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTemplateUI(_template),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 15),
-          ],
+              SizedBox(height: 15.h),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: Visibility(
-        visible: !_isKeyboardVisible,
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Align(
-            alignment: Alignment.bottomRight,
-            child: ElevatedButton(
-              onPressed: () async {
-                // 글 저장 기능 추가
-                //과제 일 때
-                if (_template != '퀴즈') {
-                  await contentCreate(
-                      token,
-                      widget.clubId,
-                      widget.asId,
-                      _isbn,
-                      _bookTitleController.text,
-                      _description,
-                      _author,
-                      _publisher,
-                      _publisherDate,
-                      _imageUrl,
-                      _template,
-                      _titleController.text,
-                      _writingController.text,
-                      _startDate.toString(),
-                      _endDate.toString());
-                } else {
-                  // print(selectedCategory);
-                  // print(_answerController.text);
-                  switch (selectedCategory) {
-                    case "객관식":
-                      var ansnum;
-                      for (int i = 0; i < _multipleanswer.length; i++) {
-                        if (_multipleanswer[i]) {
-                          ansnum = i + 1;
-                          break;
+        floatingActionButton: Visibility(
+          visible: !_isKeyboardVisible,
+          child: Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_isTmp) {
+                        await SecureStorageUtil.deleteBook(widget.index);
+                      }
+                      TmpBook newBook = TmpBook(
+                        title: _titleController.text,
+                        imageUrl: _imageUrl,
+                        startDate: _startDate,
+                        endDate: _endDate,
+                        template: _template,
+                        booktitle: _bookTitleController.text,
+                        author: _author,
+                        publisher: _publisher,
+                        writing: _writingController.text,
+                      );
+                      await SecureStorageUtil.addBook(newBook);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('임시저장 되었습니다.')),
+                      );
+                      context.pop(true);
+                    },
+                    child: const Text('임시저장'),
+                  ),
+                  SizedBox(width: 10.w),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // 글 저장 기능 추가
+                      if (_isTmp) {
+                        SecureStorageUtil.deleteBook(widget.index);
+                      }
+                      //과제 일 때
+                      if (_template != '퀴즈') {
+                        await contentCreate(
+                            token,
+                            widget.clubId,
+                            widget.asId,
+                            _isbn,
+                            _bookTitleController.text,
+                            _description,
+                            _author,
+                            _publisher,
+                            _publisherDate,
+                            _imageUrl,
+                            _template,
+                            _titleController.text,
+                            _writingController.text,
+                            _startDate.toString(),
+                            _endDate.toString());
+                      } else {
+                        // print(selectedCategory);
+                        // print(_answerController.text);
+                        switch (selectedCategory) {
+                          case "객관식":
+                            var ansnum;
+                            for (int i = 0; i < _multipleanswer.length; i++) {
+                              if (_multipleanswer[i]) {
+                                ansnum = i + 1;
+                                break;
+                              }
+                            }
+                            await quizCreate(
+                                token,
+                                widget.clubId,
+                                widget.asId,
+                                _isbn,
+                                _bookTitleController.text,
+                                _author,
+                                _publisher,
+                                _publisherDate,
+                                _imageUrl,
+                                selectedCategory.toString(),
+                                _questionController.text,
+                                ansnum,
+                                _answerController1.text,
+                                _answerController2.text,
+                                _answerController3.text,
+                                _answerController4.text,
+                                _startDate.toString(),
+                                _endDate.toString());
+                            break;
+                          case "O/X":
+                            print(selectedCategory);
+                            print(_isOX);
+                            await quizCreate(
+                                token,
+                                widget.clubId,
+                                widget.asId,
+                                _isbn,
+                                _bookTitleController.text,
+                                _author,
+                                _publisher,
+                                _publisherDate,
+                                _imageUrl,
+                                "OX",
+                                _questionController.text,
+                                _isOX ? "O" : "X",
+                                null,
+                                null,
+                                null,
+                                null,
+                                _startDate.toString(),
+                                _endDate.toString());
+                            break;
+                          case "단답형":
+                            await quizCreate(
+                                token,
+                                widget.clubId,
+                                widget.asId,
+                                _isbn,
+                                _bookTitleController.text,
+                                _author,
+                                _publisher,
+                                _publisherDate,
+                                _imageUrl,
+                                "단답식",
+                                _questionController.text,
+                                _answerController.text,
+                                null,
+                                null,
+                                null,
+                                null,
+                                _startDate.toString(),
+                                _endDate.toString());
+                            break;
+                          default:
                         }
                       }
-                      await quizCreate(
-                          token,
-                          widget.clubId,
-                          widget.asId,
-                          _isbn,
-                          _bookTitleController.text,
-                          _author,
-                          _publisher,
-                          _publisherDate,
-                          _imageUrl,
-                          selectedCategory.toString(),
-                          _questionController.text,
-                          ansnum,
-                          _answerController1.text,
-                          _answerController2.text,
-                          _answerController3.text,
-                          _answerController4.text,
-                          _startDate.toString(),
-                          _endDate.toString());
-                      break;
-                    case "O/X":
-                      print(selectedCategory);
-                      print(_isOX);
-                      await quizCreate(
-                          token,
-                          widget.clubId,
-                          widget.asId,
-                          _isbn,
-                          _bookTitleController.text,
-                          _author,
-                          _publisher,
-                          _publisherDate,
-                          _imageUrl,
-                          "OX",
-                          _questionController.text,
-                          _isOX ? "O" : "X",
-                          null,
-                          null,
-                          null,
-                          null,
-                          _startDate.toString(),
-                          _endDate.toString());
-                      break;
-                    case "단답형":
-                      await quizCreate(
-                          token,
-                          widget.clubId,
-                          widget.asId,
-                          _isbn,
-                          _bookTitleController.text,
-                          _author,
-                          _publisher,
-                          _publisherDate,
-                          _imageUrl,
-                          "단답식",
-                          _questionController.text,
-                          _answerController.text,
-                          null,
-                          null,
-                          null,
-                          null,
-                          _startDate.toString(),
-                          _endDate.toString());
-                      break;
-                    default:
-                  }
-                }
-                context.pop(true);
-              },
-              child: const Text('저장'),
+                      context.pop(true);
+                    },
+                    child: const Text('저장'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -447,7 +496,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
     switch (template) {
       case "독후감":
         return TextField(
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14.sp),
           controller: _writingController,
           maxLines: null,
           decoration: const InputDecoration(
@@ -457,7 +506,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         );
       case "한줄평":
         return TextField(
-          style: const TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: 14.sp),
           controller: _writingController,
           maxLines: null,
           decoration: const InputDecoration(
@@ -471,15 +520,15 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
                 child: TextField(
                   controller: _writingController,
                   textAlign: TextAlign.center,
                   maxLines: 10,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '인용문을 작성해주세요',
                     hintStyle: TextStyle(
-                      height: 15,
+                      height: 15.h,
                     ),
                     border: InputBorder.none,
                   ),
@@ -506,18 +555,18 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
           children: [
             Row(
               children: [
-                const Text(
+                Text(
                   '카테고리: ',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     fontFamily: 'Noto Sans KR',
                     fontWeight: FontWeight.w400,
                     height: 0,
                     letterSpacing: -0.17,
                   ),
                 ),
-                const SizedBox(width: 3),
+                SizedBox(width: 3.w),
                 SizedBox(
                   width: 121,
                   height: 22,
@@ -535,8 +584,8 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                         child: Text(value),
                       );
                     }).toList(),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 14.sp,
                       fontFamily: 'Noto Sans KR',
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
@@ -547,9 +596,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Row(
                 children: [
                   Expanded(
@@ -571,34 +620,34 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 190.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            //width: _screenWidth * 0.7,
                             child: TextField(
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: 14.sp),
                               controller: _questionController,
                               decoration: const InputDecoration(
                                 hintText: '질문을 입력해주세요.',
@@ -614,16 +663,16 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
                   const Text('A: '),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: SizedBox(
-                      width: _screenWidth * 0.7,
+                      //width: _screenWidth * 0.7,
                       child: TextField(
-                        style: const TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 14.sp),
                         controller: _answerController,
                         decoration: const InputDecoration(
                           hintText: '답을 입력해주세요.',
@@ -641,34 +690,34 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 190.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            //width: _screenWidth * 0.7,
                             child: TextField(
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: 14.sp),
                               controller: _questionController,
                               decoration: const InputDecoration(
                                 hintText: '질문을 입력해주세요.',
@@ -683,9 +732,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
                   ElevatedButton(
@@ -698,14 +747,14 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: _isOX ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(20.r)),
                       minimumSize: const Size(140, 140),
                     ),
                     child: const Text('O'),
                   ),
-                  const SizedBox(width: 30),
+                  SizedBox(width: 30.w),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -716,9 +765,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: !_isOX ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(20.r)),
                       minimumSize: const Size(140, 140),
                     ),
                     child: const Text('X'),
@@ -732,34 +781,34 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         return Column(
           children: [
             SizedBox(
-              width: 350,
-              height: 190,
+              width: 350.w,
+              height: 190.h,
               child: Stack(
                 children: [
                   Positioned(
                     left: 0,
                     top: 0,
                     child: Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(width: 1),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(width: 1.w),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Row(
                       children: [
                         const Text('Q: '),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: SizedBox(
-                            width: _screenWidth * 0.7,
+                            //width: _screenWidth * 0.7,
                             child: TextField(
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: 14.sp),
                               controller: _questionController,
                               decoration: const InputDecoration(
                                 hintText: '질문을 입력해주세요.',
@@ -774,9 +823,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
                   for (int i = 0; i < 4; i++)
@@ -797,7 +846,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                 });
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(0),
+                                padding: EdgeInsets.all(0.w),
                                 child: _multipleanswer[i]
                                     ? const Icon(Icons.check,
                                         color: Colors.green)
@@ -805,34 +854,35 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                         color: Colors.grey),
                               ),
                             ),
-                            const SizedBox(width: 5),
+                            SizedBox(width: 5.w),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(20.r),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 0.5,
+                                    width: 0.5.w,
                                   ),
                                   color: _multipleanswer[i]
                                       ? Colors.green
                                       : Colors.white,
                                 ),
-                                height: 24,
+                                height: 24.h,
                                 alignment: Alignment.center,
                                 child: Row(
                                   children: [
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10.w),
                                     const Text('A: '),
                                     Expanded(
                                       child: SizedBox(
-                                        width: _screenWidth * 0.7,
+                                        //width: _screenWidth * 0.7,
                                         child: TextField(
-                                          style: const TextStyle(fontSize: 10),
+                                          style: TextStyle(fontSize: 10.sp),
                                           controller: _answerController1,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             hintText: '답을 입력해주세요.',
-                                            contentPadding: EdgeInsets.all(10),
+                                            contentPadding:
+                                                EdgeInsets.all(10.w),
                                             border: InputBorder.none,
                                           ),
                                         ),

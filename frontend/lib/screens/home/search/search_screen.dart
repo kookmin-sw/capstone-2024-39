@@ -185,8 +185,7 @@ class _SearchState extends State<SearchScreen> {
               _isLoading
                   ? Center(
                       child: Padding(
-                        padding: EdgeInsets.only(
-                          top: 200.h),
+                        padding: EdgeInsets.only(top: 200.h),
                         child: const CircularProgressIndicator(),
                       ), // 로딩 애니매이션
                     )
@@ -199,9 +198,11 @@ class _SearchState extends State<SearchScreen> {
                             if (check && GroupData.isEmpty) Text("검색 결과가 없습니다"),
                             ElevatedButton(
                               onPressed: () async {
-                                await secureStorage.saveData('name', '이현준');
-                                await secureStorage.saveData('age', '23');
-                                await secureStorage.saveData('gender', '남자');
+                                //SecureStorageUtil.deleteAllBooks();
+                                List<TmpBook> tmp =
+                                    await SecureStorageUtil.loadBooks();
+                                //tmp의 첫번째 책 정보 출력
+                                print(tmp[0].template);
                               },
                               child: Text('한지민'),
                             ),
