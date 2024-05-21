@@ -737,48 +737,45 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               ),
             ),
             SizedBox(height: 15.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _isOX = true;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: _isOX ? Colors.green : Colors.white,
-                      elevation: 1,
-                      side: BorderSide(width: 0.5.w),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
-                    ),
-                    child: const Text('O'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isOX = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: _isOX ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: BorderSide(width: 0.5.w),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                  SizedBox(width: 30.w),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _isOX = false;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: !_isOX ? Colors.green : Colors.white,
-                      elevation: 1,
-                      side: BorderSide(width: 0.5.w),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
-                    ),
-                    child: const Text('X'),
+                  child: const Text('O'),
+                ),
+                SizedBox(width: 30.w),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _isOX = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: !_isOX ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: BorderSide(width: 0.5.w),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                ],
-              ),
+                  child: const Text('X'),
+                ),
+              ],
             ),
           ],
         );
@@ -871,7 +868,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                       ? Colors.green
                                       : Colors.white,
                                 ),
-                                height: 24.h,
+                                height: 30.h,
                                 alignment: Alignment.center,
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -889,8 +886,7 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                                           hintText: '답을 입력해주세요.',
                                           hintStyle:
                                               textStyle(14, Colors.grey, false),
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 5.w, vertical: 6.h),
+                                          // contentPadding: EdgeInsets.all(10.w),
                                           border: InputBorder.none,
                                         ),
                                       ),

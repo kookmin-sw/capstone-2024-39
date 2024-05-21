@@ -488,48 +488,45 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               ),
             ),
             const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _oxanswer = true;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: _oxanswer ? Colors.green : Colors.white,
-                      elevation: 0,
-                      side: const BorderSide(width: 0.5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
-                    ),
-                    child: const Text('O'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _oxanswer = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: _oxanswer ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: const BorderSide(width: 0.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                  const SizedBox(width: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _oxanswer = false;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: !_oxanswer ? Colors.green : Colors.white,
-                      elevation: 0,
-                      side: const BorderSide(width: 0.5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
-                    ),
-                    child: const Text('X'),
+                  child: const Text('O'),
+                ),
+                const SizedBox(width: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _oxanswer = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: !_oxanswer ? Colors.green : Colors.white,
+                    elevation: 1,
+                    side: const BorderSide(width: 0.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    minimumSize: const Size(100, 100),
                   ),
-                ],
-              ),
+                  child: const Text('X'),
+                ),
+              ],
             ),
           ],
         );
