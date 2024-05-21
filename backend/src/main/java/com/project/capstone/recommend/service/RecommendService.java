@@ -54,6 +54,7 @@ public class RecommendService {
 
             log.info(res);
         } catch (Exception e) {
+            log.info("embed error: " + e.getMessage());
             throw new RecommendException(COMMUNICATION_FAIL);
         }
 

@@ -42,7 +42,6 @@ public class ClubService {
 
     public List<ClubResponse> searchByTopic(String topic) {
         List<ClubResponse> clubResponseList = new ArrayList<>();
-        log.info(topic);
         List<Club> clubList = clubRepository.findClubsByTopic(topic);
         for (Club club : clubList) {
             clubResponseList.add(new ClubResponse(club));
