@@ -48,7 +48,7 @@ Future<List<dynamic>> SearchBook(String SearchString) async {
   final data = json.decode(utf8.decode(res.bodyBytes));
   // print(data);
   while (iter != 100) {
-    if (data['total'] <= iter) {  
+    if (data['total'] <= iter) {
       break;
     } else if (data['items'][iter]['title'].toString().contains('시리즈')) {
     } else if (data['items'][iter]['title'].toString().contains('세트')) {
@@ -267,7 +267,7 @@ Future<dynamic> contentCreate(
   );
   final data = res.body;
   // final data = json.decode(utf8.decode(res.bodyBytes));
-  // print(data);
+  print(data);
   return data;
 }
 
@@ -458,7 +458,7 @@ Future<String> groupBookSelect(
     body: json.encode({
       "isbn": bookdata['isbn'],
       "title": bookdata['title'],
-      "description" : bookdata['description'],
+      "description": bookdata['description'],
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
       "publishDate": formattedDate,
@@ -487,7 +487,7 @@ Future<String> bookAdd(Map<String, dynamic> bookdata) async {
     body: json.encode({
       "isbn": bookdata['isbn'],
       "title": bookdata['title'],
-      "description" : bookdata['description'],
+      "description": bookdata['description'],
       "author": bookdata['author'],
       "publisher": bookdata['publisher'],
       "publishDate": formattedDate,
@@ -623,6 +623,7 @@ Future<List<dynamic>> getLibrary(String token) async {
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
   for (int i = 0; i < data.length; i++) {
+    print(data[i]);
     libraryList.add(data[i]);
   }
   return libraryList;
@@ -637,8 +638,9 @@ Future<String> addBookToLibrary(
     String author,
     String publisher,
     String publishDate,
-    String imageUrl) async {
-  var address = Uri.parse("$BASE_URL/member/my-book/add");
+    String imageUrl,
+    String groupName) async {
+  var address = Uri.parse("$BASE_URL/member/my-book/add?groupName=$groupName");
   http.Response res = await http.post(
     address,
     headers: {
@@ -676,7 +678,6 @@ Future<String> addBooksToLibrary(
   return data;
 }
 
-
 // 추천 리스트 받아오기(로그인)
 Future<dynamic> getRecommend(String token) async {
   var address = Uri.parse(BASE_URL + "/rec/member");
@@ -689,6 +690,36 @@ Future<dynamic> getRecommend(String token) async {
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
   // print(data);
+  return data;
+}
+
+Future<String> deleteLibrary(String token, String groupName) async {
+  var address =
+      Uri.parse("$BASE_URL/member/my-book/rm/group?groupName=$groupName");
+  http.Response res = await http.delete(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = res.body;
+  return data;
+}
+
+//서재에서 책 삭제하기
+Future<String> deleteBookFromLibrary(
+    String token, String groupName, String isbn) async {
+  var address = Uri.parse(
+      "$BASE_URL/member/my-book/rm/book?groupName=$groupName&isbn=$isbn");
+  http.Response res = await http.delete(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = res.body;
   return data;
 }
 

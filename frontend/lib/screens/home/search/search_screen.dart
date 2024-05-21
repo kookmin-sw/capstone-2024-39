@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
@@ -205,7 +206,6 @@ class _SearchState extends State<SearchScreen> {
                                   ),
                                 ],
                               ),
-
                             if (check && BookData.isEmpty)
                               Column(
                                 children: [

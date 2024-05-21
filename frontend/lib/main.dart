@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/provider/bookinfo_provider.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/book/book_content_screen.dart';
 import 'package:frontend/screens/book/book_info_screen.dart';
@@ -268,7 +267,6 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => BookInfoProvider()),
         ChangeNotifierProvider(create: (_) => SecureStorageService()),
         // 다른 프로바이더도 여기에 추가
       ],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
+import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
+    as searchutil;
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -24,15 +26,33 @@ class Library {
 class LibraryBook {
   String title;
   String author;
+  //String description;
   String publisher;
+  //String publishDate;
+  String isbn;
   String imageUrl;
 
   LibraryBook({
     required this.title,
     required this.author,
+    //required this.description,
     required this.publisher,
+    //required this.publishDate,
+    required this.isbn,
     required this.imageUrl,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'author': author,
+      //'description': description,
+      'publisher': publisher,
+      //'publishDate': publishDate,
+      'isbn': isbn,
+      'imageUrl': imageUrl,
+    };
+  }
 }
 
 class _MypageScreenState extends State<MypageScreen>
@@ -114,7 +134,10 @@ class _MypageScreenState extends State<MypageScreen>
       final book = LibraryBook(
         title: entry['title'],
         author: entry['author'],
+        //description: entry['description'],
         publisher: entry['publisher'],
+        //publishDate: entry['publishDate'],
+        isbn: entry['isbn'],
         imageUrl: entry['imageUrl'],
       );
 
@@ -124,7 +147,6 @@ class _MypageScreenState extends State<MypageScreen>
         libraryMap[groupName] = Library(name: groupName, books: [book]);
       }
     }
-
     return libraryMap.values.toList();
   }
 
@@ -135,11 +157,11 @@ class _MypageScreenState extends State<MypageScreen>
       builder: (context, _) => Scaffold(
         appBar: AppBar(
           title: const Text('마이페이지'),
-          titleTextStyle: const TextStyle(
+          titleTextStyle: TextStyle(
             color: Colors.white,
             fontFamily: 'Noto Sans KR',
             fontWeight: FontWeight.w700,
-            fontSize: 20,
+            fontSize: 20.sp,
           ),
           backgroundColor: const Color(0xFF0E9913),
           centerTitle: true,
@@ -147,14 +169,19 @@ class _MypageScreenState extends State<MypageScreen>
         body: _isLoading
             ? Center(
                 child: Padding(
-                  padding: EdgeInsets.only(top: 80.h),
+                  padding: EdgeInsets.symmetric(vertical: 100.h),
                   child: const CircularProgressIndicator(),
-                ),
+                ), // 로딩 애니매이션
               )
             : Column(
                 children: [
                   if (isLogin)
-                    const LoggedWidget()
+                    LoggedWidget(
+                      name: name ?? '이름 없음',
+                      age: age ?? '0',
+                      gender: gender ?? '성별 없음',
+                      updateLoginStatus: _updateLoginStatus,
+                    )
                   else
                     LoginWidget(updateLoginStatus: _updateLoginStatus),
                   TabBar(
@@ -178,6 +205,7 @@ class _MypageScreenState extends State<MypageScreen>
                         MyLibraryWidget(
                           libraries: libraries,
                           onLibraryUpdated: _initUserState,
+                          token: token ?? '',
                         ),
                       ],
                     ),
@@ -191,51 +219,90 @@ class _MypageScreenState extends State<MypageScreen>
   void _updateLoginStatus(bool isLoggedIn) {
     setState(() {
       isLogin = isLoggedIn;
-      if (isLoggedIn) {
-        _initUserState();
+      if (!isLoggedIn) {
+        books = [];
+        libraries = [];
       }
+      _initUserState();
     });
   }
 }
 
-class LoggedWidget extends StatelessWidget {
-  const LoggedWidget({super.key});
+class LoggedWidget extends StatefulWidget {
+  final void Function(bool isLogin) updateLoginStatus;
+  final String name;
+  final String age;
+  final String gender;
+
+  const LoggedWidget({
+    super.key,
+    required this.name,
+    required this.age,
+    required this.gender,
+    required this.updateLoginStatus,
+  });
 
   @override
+  _LoggedWidgetState createState() => _LoggedWidgetState();
+}
+
+class _LoggedWidgetState extends State<LoggedWidget> {
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: Provider.of<SecureStorageService>(context, listen: false)
-          .readData("name"),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          final name = snapshot.data ?? '';
-          return Container(
-            padding: EdgeInsets.all(15.w),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[200],
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.account_circle,
-                  size: 70.w,
-                ),
-                SizedBox(width: 16.w),
-                Text(
-                  name,
-                  style:
-                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          );
-        }
-      },
+    String genderKR = "";
+    if (widget.gender == "MALE") {
+      genderKR = "남성";
+    } else if (widget.gender == "FEMALE") {
+      genderKR = "여성";
+    }
+
+    return Container(
+      padding: EdgeInsets.all(15.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        color: Colors.white,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.account_circle,
+            size: 70.w,
+          ),
+          SizedBox(width: 15.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.name,
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                '${widget.age}세',
+                style: TextStyle(fontSize: 16.sp),
+              ),
+              Text(
+                genderKR,
+                style: TextStyle(fontSize: 16.sp),
+              ),
+            ],
+          ),
+          const Spacer(),
+          ElevatedButton(
+            onPressed: () async {
+              final secureStorage =
+                  Provider.of<SecureStorageService>(context, listen: false);
+              await secureStorage.deleteData("token");
+              await secureStorage.deleteData("id");
+              await secureStorage.deleteData("name");
+              await secureStorage.deleteData("age");
+              await secureStorage.deleteData("gender");
+              widget.updateLoginStatus(false);
+            },
+            child: const Text('로그아웃'),
+          ),
+          SizedBox(width: 10.w),
+        ],
+      ),
     );
   }
 }
@@ -301,6 +368,7 @@ class _LoginWidgetState extends State<LoginWidget> {
     if (googleUser != null) {
       userInfo = await login(googleUser.email);
       await secureStorage.saveData('userID', googleUser.email);
+      print('로그인');
       if (userInfo['exceptionCode'] != null) {
         context.push('/signup').then((_) {
           setState(() {
@@ -312,7 +380,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         await secureStorage.saveData("token", userInfo['token']);
         await secureStorage.saveData("id", userInfo['id']);
         widget.updateLoginStatus(true);
-      } 
+      }
     }
   }
 }
@@ -321,6 +389,18 @@ class BookReportWidget extends StatelessWidget {
   final List<dynamic> books;
 
   const BookReportWidget({super.key, required this.books});
+
+  String setTemplateType(String type) {
+    if (type == 'Review') {
+      return '독후감';
+    } else if (type == 'ShortReview') {
+      return '한줄평';
+    } else if (type == 'Quotation') {
+      return '인용구';
+    } else {
+      return '퀴즈';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -362,7 +442,7 @@ class BookReportWidget extends StatelessWidget {
                     width: 240.w,
                     height: 45.h,
                     child: Text(
-                      book['type'],
+                      setTemplateType(book['type']),
                       style: TextStyle(
                         color: const Color(0xFF6E767F),
                         fontSize: 9.sp,
@@ -434,12 +514,14 @@ class BookReportWidget extends StatelessWidget {
 
 class MyLibraryWidget extends StatefulWidget {
   final List<Library> libraries;
-  final VoidCallback onLibraryUpdated; // Add this line
+  final VoidCallback onLibraryUpdated;
+  final String token;
 
   const MyLibraryWidget({
     super.key,
     required this.libraries,
-    required this.onLibraryUpdated, // Add this line
+    required this.onLibraryUpdated,
+    required this.token,
   });
 
   @override
@@ -447,6 +529,14 @@ class MyLibraryWidget extends StatefulWidget {
 }
 
 class _MyLibraryWidgetState extends State<MyLibraryWidget> {
+  List<dynamic> BookData = [];
+  final TextEditingController _bookTitleController = TextEditingController();
+
+  Future<void> _searchBookAndSetState(StateSetter updateState) async {
+    BookData = await SearchBook(_bookTitleController.text);
+    updateState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -459,10 +549,227 @@ class _MyLibraryWidgetState extends State<MyLibraryWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  library.name,
-                  style:
-                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      library.name,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (String result) async {
+                        if (result == 'edit') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('${library.name}의 책 목록'),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: library.books.length,
+                                    itemBuilder:
+                                        (BuildContext context, int bookIndex) {
+                                      var book = library.books[bookIndex];
+                                      return ClipRect(
+                                        child: Dismissible(
+                                          key: Key(book.title.toString()),
+                                          direction:
+                                              DismissDirection.endToStart,
+                                          onDismissed: (direction) {
+                                            setState(() {
+                                              deleteBookFromLibrary(
+                                                  widget.token,
+                                                  library.name,
+                                                  book.isbn);
+                                              widget.onLibraryUpdated();
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      '${library.name}에서 ${book.title} 삭제됨')),
+                                            );
+                                          },
+                                          background: Container(
+                                            color: Colors.red,
+                                            alignment: Alignment.centerRight,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10.h),
+                                            child: const Icon(Icons.delete,
+                                                color: Colors.white),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(book.title),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('닫기'),
+                                    onPressed: () {
+                                      widget.onLibraryUpdated();
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (result == 'delete') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('${library.name} 삭제'),
+                                content: const Text('정말 삭제하시겠습니까?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: const Text('취소'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: const Text('삭제'),
+                                    onPressed: () {
+                                      deleteLibrary(widget.token, library.name);
+                                      widget.onLibraryUpdated();
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                          print('Delete ${library.name}');
+                        } else if (result == 'add') {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              BookData = [];
+                              _bookTitleController.clear();
+                              return StatefulBuilder(
+                                builder: (context, setState) {
+                                  return AlertDialog(
+                                    title: const Text('책 추가하기'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              top: 5.h, left: 5.w, right: 5.w),
+                                          padding: EdgeInsets.only(left: 5.w),
+                                          height: 40.h,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF2F2F2),
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.search),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: SizedBox(
+                                                  child: TextField(
+                                                    style: const TextStyle(
+                                                        fontSize: 14),
+                                                    controller:
+                                                        _bookTitleController,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: '도서를 입력하세요.',
+                                                      border: InputBorder.none,
+                                                    ),
+                                                    textInputAction:
+                                                        TextInputAction.go,
+                                                    onSubmitted: (value) async {
+                                                      await _searchBookAndSetState(
+                                                          setState);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(height: 5.h),
+                                        Expanded(
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              children: [
+                                                for (int i = 0;
+                                                    i < BookData.length;
+                                                    i++)
+                                                  searchutil.BookSearchListItem(
+                                                    data: BookData[i],
+                                                    type: "search",
+                                                    clubId: 0,
+                                                    onSelected:
+                                                        (selectedData) async {
+                                                      print(selectedData);
+                                                      _bookTitleController
+                                                          .clear();
+                                                      await addBookToLibrary(
+                                                        widget.token,
+                                                        selectedData['isbn'],
+                                                        selectedData['title'],
+                                                        selectedData[
+                                                            'description'],
+                                                        selectedData['author'],
+                                                        selectedData[
+                                                            'publisher'],
+                                                        selectedData['pubdate'],
+                                                        selectedData['image'],
+                                                        library.name,
+                                                      );
+                                                      widget.onLibraryUpdated();
+                                                      setState(() {
+                                                        BookData = [];
+                                                      });
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        }
+                      },
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'edit',
+                          child: Text('수정하기'),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Text('삭제하기'),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'add',
+                          child: Text('추가하기'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 SizedBox(height: 5.h),
                 SizedBox(
@@ -472,37 +779,43 @@ class _MyLibraryWidgetState extends State<MyLibraryWidget> {
                     itemCount: library.books.length,
                     itemBuilder: (context, bookIndex) {
                       var book = library.books[bookIndex];
-                      return Padding(
-                        padding: EdgeInsets.only(right: 5.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 90.w,
-                              height: 128.52.h,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(book.imageUrl),
-                                  fit: BoxFit.fill,
+                      print(book.toMap());
+                      return GestureDetector(
+                        onTap: () {
+                          //context.push('/book_info', extra: book.toMap());
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 5.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 90.w,
+                                height: 128.52.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(book.imageUrl),
+                                    fit: BoxFit.fill,
+                                  ),
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
-                                borderRadius: BorderRadius.circular(3),
                               ),
-                            ),
-                            SizedBox(height: 5.h),
-                            SizedBox(
-                              width: 90,
-                              height: 20,
-                              child: Text(
-                                book.title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13.sp,
+                              SizedBox(height: 5.h),
+                              SizedBox(
+                                width: 90,
+                                height: 20,
+                                child: Text(
+                                  book.title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.sp,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
