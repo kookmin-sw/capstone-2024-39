@@ -6,6 +6,7 @@ import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
   final dynamic contentData;
@@ -43,8 +44,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       _author = content['book']['author'];
       _publisher = content['book']['publisher'];
       _booktitle = content['book']['title'];
-      _startDate = formatDate(content['startDate']);
-      _endDate = formatDate(content['endDate']);
+      _startDate = _formatDate(content['startDate']);
+      _endDate = _formatDate(content['endDate']);
       if (_template == "독후감" || _template == "한줄평" || _template == "인용구") {
         _body = content['body'];
         _title = content['title'];
@@ -290,6 +291,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
         return Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
                   '카테고리: ',
@@ -297,8 +299,6 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
                 const SizedBox(width: 3),
                 SizedBox(
-                  width: 121,
-                  height: 22,
                   child: Text(
                     _category,
                     style: textStyle(14, null, false),
@@ -410,7 +410,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                               //width: _screenWidth * 0.7,
                               child: Text(
                                 _body,
-                                style: const TextStyle(fontSize: 14),
+                                style: textStyle(14, null, false),
                               ),
                             ),
                           ),
@@ -431,12 +431,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                     child: SizedBox(
                       //width: _screenWidth * 0.7,
                       child: TextField(
-                        style: const TextStyle(fontSize: 14),
+                        style: textStyle(14, null, false),
                         controller: _answerController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '답을 입력하세요',
-                        ),
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: '답을 입력하세요',
+                            hintStyle: textStyle(14, Colors.grey, false)),
                       ),
                     ),
                   ),
@@ -476,7 +476,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                               //width: _screenWidth * 0.7,
                               child: Text(
                                 _body,
-                                style: const TextStyle(fontSize: 14),
+                                style: textStyle(14, null, false),
                               ),
                             ),
                           ),
@@ -491,7 +491,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton(
                     onPressed: () {
@@ -564,7 +564,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                               //width: _screenWidth * 0.7,
                               child: Text(
                                 _body,
-                                style: const TextStyle(fontSize: 14),
+                                style: textStyle(14, null, false),
                               ),
                             ),
                           ),
@@ -622,6 +622,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                                 height: 24.h,
                                 alignment: Alignment.center,
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(width: 10.w),
                                     const Text('A: '),
@@ -630,7 +631,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                                         //width: _screenWidth * 0.7,
                                         child: Text(
                                           _exampleList[i],
-                                          style: const TextStyle(fontSize: 10),
+                                          style: textStyle(12, null, false),
                                         ),
                                       ),
                                     ),
@@ -640,7 +641,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                       ],
                     ),
                 ],
@@ -695,17 +696,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
   }
 }
 
-String formatDate(String dateString) {
+String _formatDate(String dateString) {
   DateTime dateTime = DateTime.parse(dateString);
   String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
   return formattedDate;
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

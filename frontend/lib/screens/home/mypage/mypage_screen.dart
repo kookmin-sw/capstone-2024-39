@@ -5,6 +5,7 @@ import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class MypageScreen extends StatefulWidget {
   const MypageScreen({super.key});
@@ -50,11 +51,22 @@ class _MypageScreenState extends State<MypageScreen>
   dynamic userInfo;
   int? userId;
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _initUserState();
+    _loadData(500);
+  }
+
+  Future<void> _loadData(int term) async {
+    Timer(Duration(milliseconds: term), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<void> _initUserState() async {
@@ -132,39 +144,46 @@ class _MypageScreenState extends State<MypageScreen>
           backgroundColor: const Color(0xFF0E9913),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            if (isLogin)
-              const LoggedWidget()
-            else
-              LoginWidget(updateLoginStatus: _updateLoginStatus),
-            TabBar(
-              labelColor: Colors.black,
-              indicatorColor: Colors.black,
-              indicatorWeight: 3,
-              indicatorSize: TabBarIndicatorSize.tab,
-              unselectedLabelColor: const Color(0xFF6E767F),
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
-              controller: _tabController,
-              tabs: const [
-                Tab(text: '독후감'),
-                Tab(text: '나만의 서재'),
-              ],
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+        body: _isLoading
+            ? Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 80.h),
+                  child: const CircularProgressIndicator(),
+                ),
+              )
+            : Column(
                 children: [
-                  BookReportWidget(books: books),
-                  MyLibraryWidget(
-                    libraries: libraries,
-                    onLibraryUpdated: _initUserState,
+                  if (isLogin)
+                    const LoggedWidget()
+                  else
+                    LoginWidget(updateLoginStatus: _updateLoginStatus),
+                  TabBar(
+                    labelColor: Colors.black,
+                    indicatorColor: Colors.black,
+                    indicatorWeight: 3,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    unselectedLabelColor: const Color(0xFF6E767F),
+                    overlayColor: MaterialStateProperty.all(Colors.transparent),
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(text: '독후감'),
+                      Tab(text: '나만의 서재'),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        BookReportWidget(books: books),
+                        MyLibraryWidget(
+                          libraries: libraries,
+                          onLibraryUpdated: _initUserState,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -182,44 +201,42 @@ class _MypageScreenState extends State<MypageScreen>
 class LoggedWidget extends StatelessWidget {
   const LoggedWidget({super.key});
 
-  
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
-            future: Provider.of<SecureStorageService>(context, listen: false)
-                .readData("name"),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                final name = snapshot.data ?? '';
-                return Container(
-                  padding: EdgeInsets.all(15.w),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.account_circle,
-                        size: 70.w,
-                      ),
-                      SizedBox(width: 16.w),
-                      Text(
-                        name,
-                        style: TextStyle(
-                            fontSize: 20.sp, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                );
-              }
-            },
+      future: Provider.of<SecureStorageService>(context, listen: false)
+          .readData("name"),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else {
+          final name = snapshot.data ?? '';
+          return Container(
+            padding: EdgeInsets.all(15.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.grey[200],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.account_circle,
+                  size: 70.w,
+                ),
+                SizedBox(width: 16.w),
+                Text(
+                  name,
+                  style:
+                      TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           );
+        }
+      },
+    );
   }
 }
 
@@ -279,22 +296,23 @@ class _LoginWidgetState extends State<LoginWidget> {
     final secureStorage =
         Provider.of<SecureStorageService>(context, listen: false);
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    print(googleUser);
 
     if (googleUser != null) {
       userInfo = await login(googleUser.email);
       await secureStorage.saveData('userID', googleUser.email);
       if (userInfo['exceptionCode'] != null) {
         context.push('/signup').then((_) {
-          widget.updateLoginStatus(true);
+          setState(() {
+            widget.updateLoginStatus(true);
+            //여기서 유저정보 업데이트 관련 함수 실행 필요
+          });
         });
       } else {
         await secureStorage.saveData("token", userInfo['token']);
         await secureStorage.saveData("id", userInfo['id']);
-        await secureStorage.saveData("name", userInfo['name']);
-        await secureStorage.saveData("age", userInfo['age'].toString());
-        await secureStorage.saveData("gender", userInfo['gender']);
         widget.updateLoginStatus(true);
-      }
+      } 
     }
   }
 }

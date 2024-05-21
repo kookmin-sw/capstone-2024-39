@@ -24,7 +24,7 @@ class _ShortsState extends State<ShortsScreen> {
   bool _isLoading = true;
   late PageController _pageController;
   Timer? _pageTimer;
-  int _currentPage = 0;
+  // int _currentPage = 0;
   int sumPages = 0;
   // List<dynamic> allShorts = [];
 
@@ -92,38 +92,21 @@ class _ShortsState extends State<ShortsScreen> {
     });
   }
 
-  // void _startPageTimer() {
-  //   _pageTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-  //     if (_pageController.hasClients) {
-  //       _currentPage++;
-  //       print(_currentPage);
-  //       print(_pageController.positions.length);
-  //       if (_currentPage < 0) {
-  //         _currentPage =  _pageController.positions.length - 1;
-  //       }
-  //       _pageController.animateToPage(
-  //         _currentPage,
-  //         duration: const Duration(milliseconds: 500),
-  //         curve: Curves.easeInOut,
-  //       );
-  //     }
-  //   });
-  // }
-
   void _startPageTimer() {
-    _pageTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (_pageController.hasClients) {
-        _currentPage++;
-        print(_currentPage);
-        if (_currentPage >= sumPages) {
-          _currentPage = 0;
+    _pageTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+        int currentPage = _pageController.page!.toInt();
+        int nextPage = currentPage + 1;
+        // _currentPage++;
+        // print(_currentPage);
+        if (nextPage >= sumPages) {
+          nextPage = 0;
         }
         _pageController.animateToPage(
-          _currentPage,
+          nextPage,
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
         );
-      }
+      
     });
   }
 
@@ -136,7 +119,7 @@ class _ShortsState extends State<ShortsScreen> {
   void initState() {
     super.initState();
     secureStorage = Provider.of<SecureStorageService>(context, listen: false);
-    _pageController = PageController();
+    _pageController = PageController(initialPage: 0);
     shortsList();
     _loadData();
   }
@@ -160,22 +143,28 @@ class _ShortsState extends State<ShortsScreen> {
               ),
             )
           : GestureDetector(
-              onPanDown: (details) {
-                _pageTimer?.cancel();
+              // onPanDown: (details) {
+              //   setState(() {
+              //     _pageTimer?.cancel();
+              //   });
+              // },
+              
+
+              onPanEnd: (details) {
                 setState(() {
-                  
+                  _resetPageTimer();
                 });
               },
-              onPanEnd: (details) {
-                _resetPageTimer();
+              onTapDown: (details) {
                 setState(() {
-                  
+                  _pageTimer?.cancel();
+                  print('here');
                 });
               },
               onTapUp: (details) {
-                _resetPageTimer();
                 setState(() {
-                  
+                  _resetPageTimer();
+                  print('reset'); 
                 });
               },
               child: Center(

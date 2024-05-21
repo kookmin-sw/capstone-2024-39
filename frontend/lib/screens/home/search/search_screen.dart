@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
-import 'package:frontend/screens/home/group/group_screen.dart';
-import 'package:frontend/screens/home/group/group_screen_util.dart'
-    as GroupUtil;
-import 'package:frontend/screens/home/search/search_screen_util.dart'
-    as SearchUtil;
+import 'package:frontend/screens/home/group/group_screen_util.dart';
+import 'package:frontend/screens/home/search/search_screen_util.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/env.dart';
 
 List<dynamic> BookData = [];
 List<dynamic> GroupData = [];
@@ -220,66 +218,75 @@ class _SearchState extends State<SearchScreen> {
                                   ),
                                 ],
                               ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                dynamic userInfo =
-                                    await login("test13@gmail.com");
-                                // dynamic userInfo = await singup("test13@gmail.com", "한지민", ?, "여자");
-                                print(userInfo['token']);
-                                print(userInfo['id']);
-                                await secureStorage.saveData(
-                                    "token", userInfo['token']);
-                                await secureStorage.saveData(
-                                    "id", userInfo['id']);
-                              },
-                              child: Text('한지민'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                dynamic userInfo =
-                                    await login("test80@gmail.com");
-                                // dynamic userInfo = await singup("test80@gmail.com", "젠랑이", 7, "남자");
-                                print(userInfo['token']);
-                                print(userInfo['id']);
-                                await secureStorage.saveData(
-                                    "token", userInfo['token']);
-                                await secureStorage.saveData(
-                                    "id", userInfo['id']);
-                              },
-                              child: Text('젠랑이'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                dynamic userInfo = await login(
-                                    "test10@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                                // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
-                                print(userInfo['token']);
-                                print(userInfo['id']);
-                                await secureStorage.saveData(
-                                    "token", userInfo['token']);
-                                await secureStorage.saveData(
-                                    "id", userInfo['id']);
-                              },
-                              child: Text('최창연'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                var token =
-                                    await secureStorage.readData("token");
-                                var id = await secureStorage.readData("id");
-                                print(token);
-                                print(id);
-                              },
-                              child: Text('토큰 확인'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await secureStorage.deleteData("token");
-                                await secureStorage.deleteData("id");
-                                await secureStorage.deleteAllData();
-                              },
-                              child: Text('토큰 삭제'),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     dynamic userInfo =
+                            //         await login("test13@gmail.com");
+                            //     // dynamic userInfo = await singup("test13@gmail.com", "한지민", ?, "여자");
+                            //     print(userInfo['token']);
+                            //     print(userInfo['id']);
+                            //     await secureStorage.saveData(
+                            //         "token", userInfo['token']);
+                            //     await secureStorage.saveData(
+                            //         "id", userInfo['id']);
+                            //   },
+                            //   child: Text('한지민'),
+                            // ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     dynamic userInfo =
+                            //         await login("test80@gmail.com");
+                            //     // dynamic userInfo = await singup("test80@gmail.com", "젠랑이", 7, "남자");
+                            //     print(userInfo['token']);
+                            //     print(userInfo['id']);
+                            //     await secureStorage.saveData(
+                            //         "token", userInfo['token']);
+                            //     await secureStorage.saveData(
+                            //         "id", userInfo['id']);
+                            //   },
+                            //   child: Text('젠랑이'),
+                            // ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     dynamic userInfo = await login(
+                            //         "changyon99@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                            //     // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
+                            //     print(userInfo['token']);
+                            //     print(userInfo['id']);
+                            //     await secureStorage.saveData(
+                            //         "token", userInfo['token']);
+                            //     await secureStorage.saveData(
+                            //         "id", userInfo['id']);
+                            //   },
+                            //   child: Text('최창연'),
+                            // ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     var token =
+                            //         await secureStorage.readData("token");
+                            //     var id = await secureStorage.readData("id");
+                            //     print(token);
+                            //     print(id);
+                            //   },
+                            //   child: Text('토큰 확인'),
+                            // ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     await secureStorage.deleteData("token");
+                            //     await secureStorage.deleteData("id");
+                            //     await secureStorage.deleteAllData();
+                            //   },
+                            //   child: Text('토큰 삭제'),
+                            // ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     print(await secureStorage.readData("name"));
+                            //     print(await secureStorage.readData("gender"));
+                            //     print(await secureStorage.readData("age"));
+                                
+                            //   },
+                            //   child: Text('정보확인'),
+                            // ),
                             if (GroupData.isNotEmpty)
                               SizedBox(
                                 height: 200.h, // 높이 조정
@@ -291,7 +298,7 @@ class _SearchState extends State<SearchScreen> {
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8.0),
-                                      child: GroupUtil.GroupListItem(
+                                      child: GroupListItem(
                                         data: GroupData[index],
                                         userInfo: userInfo,
                                       ),
@@ -301,7 +308,7 @@ class _SearchState extends State<SearchScreen> {
                               ),
                             if (BookData.isNotEmpty)
                               for (int i = 0; i < BookData.length; i++)
-                                SearchUtil.SearchListItem(
+                                SearchListItem(
                                   data: BookData[i],
                                   type: "search",
                                   clubId: 0,
@@ -316,13 +323,4 @@ class _SearchState extends State<SearchScreen> {
       ),
     );
   }
-}
-
-TextStyle textStyle(int fontsize, Color color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
 }

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
-import 'package:intl/intl.dart';
+import 'package:frontend/env.dart';
 
 //공지사항 목록 페이지
 
@@ -190,17 +190,3 @@ class _NoticeListScreenState extends State<NoticeListScreen> {
   }
 }
 
-String formatDate(String dateString) {
-  DateTime dateTime = DateTime.parse(dateString);
-  String formattedDate = DateFormat('yyyy.MM.dd. HH:mm').format(dateTime);
-  return formattedDate;
-}
-
-TextStyle textStyle(int fontsize, var color, bool isStroke) {
-  return TextStyle(
-    fontSize: fontsize.sp,
-    fontWeight: (isStroke) ? FontWeight.bold : FontWeight.normal,
-    fontFamily: 'Noto Sans KR',
-    color: color,
-  );
-}
