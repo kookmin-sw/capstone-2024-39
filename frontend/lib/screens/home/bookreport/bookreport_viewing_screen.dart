@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class BookReportViewingScreen extends StatefulWidget {
   final dynamic contentData;
@@ -101,147 +99,151 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
 
   @override
   void dispose() {
+    _answerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_template),
-        titleTextStyle: textStyle(22, Colors.white, true),
-        backgroundColor: const Color(0xFF0E9913),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+    return ScreenUtilInit(
+      designSize: const Size(390, 675),
+      builder: (context, child) => Scaffold(
+        appBar: AppBar(
+          title: Text(_template),
+          titleTextStyle: textStyle(22, Colors.white, true),
+          backgroundColor: const Color(0xFF0E9913),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            (_template != '퀴즈')
-                ? Column(
-                    children: [
-                      SizedBox(height: 10.h),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          children: [
-                            Text(
-                              '제목 : ',
-                              style: textStyle(15, null, false),
-                            ),
-                            Text(
-                              _title,
-                              style: textStyle(15, null, false),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              (_template != '퀴즈')
+                  ? Column(
+                      children: [
+                        SizedBox(height: 10.h),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Text(
+                                '제목 : ',
+                                style: textStyle(15, null, false),
+                              ),
+                              Text(
+                                _title,
+                                style: textStyle(15, null, false),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 1,
-                              color: const Color(0xFFA9AFB7),
+                        SizedBox(height: 10.h),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: const Color(0xFFA9AFB7),
+                              ),
                             ),
                           ),
                         ),
+                      ],
+                    )
+                  : Container(),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _booktitle,
+                        style: textStyle(15, null, true),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  )
-                : Container(),
-            SizedBox(height: 10.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Row(
+                  children: [
+                    Text(
+                      '$_author | $_publisher',
+                      style: textStyle(13, null, false),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.w),
                     child: Text(
-                      _booktitle,
-                      style: textStyle(15, null, true),
-                      overflow: TextOverflow.ellipsis,
+                      '독서기간 :',
+                      style: textStyle(13, null, false),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5.w),
+                    child: Text(
+                      _startDate,
+                      style: textStyle(13, null, false),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.w),
+                    child: Text(
+                      '~',
+                      style: textStyle(13, null, false),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 10.w),
+                    child: Text(
+                      _endDate,
+                      style: textStyle(13, null, false),
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 10.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: Row(
-                children: [
-                  Text(
-                    '$_author | $_publisher',
-                    style: textStyle(13, null, false),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 10.h),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 20.w),
-                  child: Text(
-                    '독서기간 :',
-                    style: textStyle(13, null, false),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 5.w),
-                  child: Text(
-                    _startDate,
-                    style: textStyle(13, null, false),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 10.w),
-                  child: Text(
-                    '~',
-                    style: textStyle(13, null, false),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 10.w),
-                  child: Text(
-                    _endDate,
-                    style: textStyle(13, null, false),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: const Color(0xFFA9AFB7),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: const Color(0xFFA9AFB7),
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 15.h),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _buildTemplateUI(_template),
-                  ),
-                ],
+              SizedBox(height: 15.h),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildTemplateUI(_template),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 15.h),
-          ],
+              SizedBox(height: 15.h),
+            ],
+          ),
         ),
       ),
     );
@@ -265,7 +267,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
+                padding: EdgeInsets.symmetric(horizontal: 15.w),
                 child: Text(
                   _body,
                   style: textStyle(14, null, false),
@@ -273,15 +275,15 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                   maxLines: 10,
                 ),
               ),
-              const Positioned(
-                left: 0,
-                top: 0,
-                child: Icon(Icons.format_quote),
+              Positioned(
+                left: -5.w,
+                top: 0.w,
+                child: const Icon(Icons.format_quote),
               ),
-              const Positioned(
-                right: 0,
-                bottom: 0,
-                child: Icon(Icons.format_quote),
+              Positioned(
+                right: -5.w,
+                bottom: 0.w,
+                child: const Icon(Icons.format_quote),
               ),
             ],
           ),
@@ -295,10 +297,10 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                   '카테고리: ',
                   style: textStyle(15, null, false),
                 ),
-                const SizedBox(width: 3),
+                SizedBox(width: 3.w),
                 SizedBox(
-                  width: 121,
-                  height: 22,
+                  width: 121.w,
+                  height: 22.h,
                   child: Text(
                     _category,
                     style: textStyle(14, null, false),
@@ -308,7 +310,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
             ),
             SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Row(
                 children: [
                   Expanded(
@@ -317,7 +319,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -326,39 +328,24 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                     switch (_category) {
                       case "단답형":
                         if (_answerController.text == _answer) {
-                          // 맞음
                           _showRightDialog();
                         } else {
-                          // 틀림
                           _showWrongDialog();
                         }
                         break;
                       case "O/X":
-                        if (_answer == 'O') {
-                          if (_oxanswer) {
-                            // 맞음
-                            _showRightDialog();
-                          } else {
-                            // 틀림
-                            _showWrongDialog();
-                          }
+                        if ((_answer == 'O' && _oxanswer) ||
+                            (_answer == 'X' && !_oxanswer)) {
+                          _showRightDialog();
                         } else {
-                          if (!_oxanswer) {
-                            //맞음
-                            _showRightDialog();
-                          } else {
-                            //틀림
-                            _showWrongDialog();
-                          }
+                          _showWrongDialog();
                         }
                         break;
                       case "객관식":
                         int check = int.parse(_answer) - 1;
                         if (_multipleanswer[check]) {
-                          // 맞음
                           _showRightDialog();
                         } else {
-                          // 틀림
                           _showWrongDialog();
                         }
                         break;
@@ -390,28 +377,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 190,
+                      width: 350.w,
+                      height: 190.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -422,21 +406,19 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 children: [
                   const Text('A: '),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
-                    child: SizedBox(
-                      //width: _screenWidth * 0.7,
-                      child: TextField(
-                        style: const TextStyle(fontSize: 14),
-                        controller: _answerController,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '답을 입력하세요',
-                        ),
+                    child: TextField(
+                      style: TextStyle(fontSize: 14.sp),
+                      controller: _answerController,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: '답을 입력하세요',
+                        hintStyle: TextStyle(fontSize: 14.sp),
                       ),
                     ),
                   ),
@@ -456,28 +438,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 220,
+                      width: 350.w,
+                      height: 220.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
-                          SizedBox(width: 10.h),
+                          SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -487,9 +466,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -503,14 +482,14 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: _oxanswer ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
+                          borderRadius: BorderRadius.circular(20.r)),
+                      minimumSize: Size(140.w, 140.h),
                     ),
-                    child: const Text('O'),
+                    child: Text('O', style: TextStyle(fontSize: 24.sp)),
                   ),
-                  const SizedBox(width: 30),
+                  SizedBox(width: 30.w),
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -521,12 +500,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                       foregroundColor: Colors.black,
                       backgroundColor: !_oxanswer ? Colors.green : Colors.white,
                       elevation: 0,
-                      side: const BorderSide(width: 0.5),
+                      side: BorderSide(width: 0.5.w),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      minimumSize: const Size(140, 140),
+                          borderRadius: BorderRadius.circular(20.r)),
+                      minimumSize: Size(140.w, 140.h),
                     ),
-                    child: const Text('X'),
+                    child: Text('X', style: TextStyle(fontSize: 24.sp)),
                   ),
                 ],
               ),
@@ -544,28 +523,25 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 350,
-                      height: 220,
+                      width: 350.w,
+                      height: 220.h,
                       decoration: BoxDecoration(
                         color: const Color(0xFFE7FFEB),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(width: 1),
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Row(
                         children: [
                           SizedBox(height: 40.h),
                           const Text('Q: '),
                           SizedBox(width: 10.w),
                           Expanded(
-                            child: SizedBox(
-                              //width: _screenWidth * 0.7,
-                              child: Text(
-                                _body,
-                                style: const TextStyle(fontSize: 14),
-                              ),
+                            child: Text(
+                              _body,
+                              style: TextStyle(fontSize: 14.sp),
                             ),
                           ),
                         ],
@@ -575,9 +551,9 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: 15.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+              padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
                   for (int i = 0; i < _exampleList.length; i++)
@@ -589,31 +565,29 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                               onTap: () {
                                 setState(() {
                                   for (int j = 0; j < 4; j++) {
-                                    if (i == j) {
-                                      _multipleanswer[j] = true;
-                                    } else {
-                                      _multipleanswer[j] = false;
-                                    }
+                                    _multipleanswer[j] = i == j;
                                   }
                                 });
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(0),
-                                child: _multipleanswer[i]
-                                    ? const Icon(Icons.check,
-                                        color: Colors.green)
-                                    : const Icon(Icons.check,
-                                        color: Colors.grey),
+                                padding: EdgeInsets.all(0.w),
+                                child: Icon(
+                                  Icons.check,
+                                  color: _multipleanswer[i]
+                                      ? Colors.green
+                                      : Colors.grey,
+                                  size: 24.sp,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 5),
+                            SizedBox(width: 5.w),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(20.r),
                                   border: Border.all(
                                     color: Colors.black,
-                                    width: 0.5,
+                                    width: 0.5.w,
                                   ),
                                   color: _multipleanswer[i]
                                       ? Colors.green
@@ -624,14 +598,12 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                                 child: Row(
                                   children: [
                                     SizedBox(width: 10.w),
-                                    const Text('A: '),
+                                    Text('A: ',
+                                        style: TextStyle(fontSize: 14.sp)),
                                     Expanded(
-                                      child: SizedBox(
-                                        //width: _screenWidth * 0.7,
-                                        child: Text(
-                                          _exampleList[i],
-                                          style: const TextStyle(fontSize: 10),
-                                        ),
+                                      child: Text(
+                                        _exampleList[i] ?? '',
+                                        style: TextStyle(fontSize: 14.sp),
                                       ),
                                     ),
                                   ],
@@ -640,7 +612,7 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 10.h),
                       ],
                     ),
                 ],
@@ -659,8 +631,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('정답'),
-          content: Text('정답을 맞추셨습니다.'),
+          title: const Text('정답'),
+          content: const Text('정답을 맞추셨습니다.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -679,8 +651,8 @@ class _BookReportViewingState extends State<BookReportViewingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('오답'),
-          content: Text('정답을 틀리셨습니다.'),
+          title: const Text('오답'),
+          content: const Text('정답을 틀리셨습니다.'),
           actions: [
             TextButton(
               onPressed: () {
