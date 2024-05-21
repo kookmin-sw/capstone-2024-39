@@ -323,7 +323,9 @@ Future<dynamic> quizCreate(
       "endDate": endDate,
     }),
   );
-  final data = res.body;
+  //final data = res.body;
+  final data = json.decode(utf8.decode(res.bodyBytes));
+  print(data);
   return data;
 }
 
@@ -690,6 +692,37 @@ Future<dynamic> getRecommend(String token) async {
   );
   final data = json.decode(utf8.decode(res.bodyBytes));
   // print(data);
+  return data;
+}
+
+//서재 삭제하기
+Future<String> deleteLibrary(String token, String groupName) async {
+  var address =
+      Uri.parse("$BASE_URL/member/my-book/rm/group?groupName=$groupName");
+  http.Response res = await http.delete(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = res.body;
+  return data;
+}
+
+//서재에서 책 삭제하기
+Future<String> deleteBookFromLibrary(
+    String token, String groupName, String isbn) async {
+  var address = Uri.parse(
+      "$BASE_URL/member/my-book/rm/book?groupName=$groupName&isbn=$isbn");
+  http.Response res = await http.delete(
+    address,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": 'Bearer $token',
+    },
+  );
+  final data = res.body;
   return data;
 }
 
