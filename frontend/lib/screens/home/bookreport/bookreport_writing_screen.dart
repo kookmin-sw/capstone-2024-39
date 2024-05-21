@@ -4,6 +4,7 @@ import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
+import 'package:get/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/env.dart';
@@ -141,6 +142,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
         _author = book.author;
         _publisher = book.publisher;
         _writingController.text = book.writing;
+        _isbn = book.isbn;
+        _description = book.description;
+        _publisherDate = book.publisherDate;
         _isTmp = true;
         print(_template);
       } else {
@@ -406,6 +410,9 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
                         author: _author,
                         publisher: _publisher,
                         writing: _writingController.text,
+                        isbn: _isbn,
+                        description: _description,
+                        publisherDate: _publisherDate,
                       );
                       await SecureStorageUtil.addBook(newBook);
                       ScaffoldMessenger.of(context).showSnackBar(
