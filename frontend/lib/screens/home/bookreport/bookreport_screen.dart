@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/env.dart';
 
 class BookReportScreen extends StatefulWidget {
   const BookReportScreen({super.key});
@@ -12,17 +14,34 @@ class BookReportScreen extends StatefulWidget {
 
 class _BookReportState extends State<BookReportScreen> {
   List<TmpBook> _books = [];
+  var secureStorage;
+  var id;
+  var token;
 
   @override
   void initState() {
     super.initState();
+    secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     _loadBooks();
+    _initUserState();
   }
 
   Future<void> _loadBooks() async {
     List<TmpBook> books = await SecureStorageUtil.loadBooks();
     setState(() {
       _books = books;
+    });
+  }
+
+  Future<void> _initUserState() async {
+    var _id = await secureStorage.readData('id');
+    var _token = await secureStorage.readData('token');
+
+    setState(() {
+      id = _id;
+      token = _token;
+      print(id);
+      print(token);
     });
   }
 
@@ -139,9 +158,13 @@ class _BookReportState extends State<BookReportScreen> {
   Widget _buildNewWritingEntry(BuildContext context) {
     return InkWell(
       onTap: () {
-        context.push('/bookreport_template').then((_) {
-          _loadBooks();
-        });
+        if (id == null || token == null) {
+          _showLoginDialog(context);
+        } else {
+          context.push('/bookreport_template').then((_) {
+            _loadBooks();
+          });
+        }
       },
       child: Container(
         height: 105.68.h,
@@ -179,4 +202,30 @@ class _BookReportState extends State<BookReportScreen> {
       ),
     );
   }
+}
+
+// 로그인하지 않은 경우
+void _showLoginDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('로그인 오류'),
+        titleTextStyle: textStyle(20, Colors.black, true),
+        content: const Text('로그인이 필요한 기능입니다.'),
+        contentTextStyle: textStyle(14, Colors.black, false),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.pop();
+            },
+            child: Text(
+              "확인",
+              style: textStyle(13, null, false),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

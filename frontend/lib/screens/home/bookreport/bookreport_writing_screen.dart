@@ -4,7 +4,6 @@ import 'package:frontend/http.dart';
 import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:frontend/screens/home/bookreport/booksearch_screen_util.dart'
     as searchutil;
-import 'package:get/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/env.dart';
@@ -395,33 +394,34 @@ class _BookReportWritingState extends State<BookReportWritingScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_isTmp) {
-                        await SecureStorageUtil.deleteBook(widget.index);
-                      }
-                      TmpBook newBook = TmpBook(
-                        title: _titleController.text,
-                        imageUrl: _imageUrl,
-                        startDate: _startDate,
-                        endDate: _endDate,
-                        template: _template,
-                        booktitle: _bookTitleController.text,
-                        author: _author,
-                        publisher: _publisher,
-                        writing: _writingController.text,
-                        isbn: _isbn,
-                        description: _description,
-                        publisherDate: _publisherDate,
-                      );
-                      await SecureStorageUtil.addBook(newBook);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('임시저장 되었습니다.')),
-                      );
-                      context.pop(true);
-                    },
-                    child: const Text('임시저장'),
-                  ),
+                  if(widget.clubId == null || widget.clubId == null)
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_isTmp) {
+                          await SecureStorageUtil.deleteBook(widget.index);
+                        }
+                        TmpBook newBook = TmpBook(
+                          title: _titleController.text,
+                          imageUrl: _imageUrl,
+                          startDate: _startDate,
+                          endDate: _endDate,
+                          template: _template,
+                          booktitle: _bookTitleController.text,
+                          author: _author,
+                          publisher: _publisher,
+                          writing: _writingController.text,
+                          isbn: _isbn,
+                          description: _description,
+                          publisherDate: _publisherDate,
+                        );
+                        await SecureStorageUtil.addBook(newBook);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('임시저장 되었습니다.')),
+                        );
+                        context.pop(true);
+                      },
+                      child: const Text('임시저장'),
+                    ),
                   SizedBox(width: 10.w),
                   ElevatedButton(
                     onPressed: () async {

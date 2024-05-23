@@ -27,7 +27,15 @@ class _NoticeListScreenState extends State<NoticeListScreen> {
   Future<void> updatePostList() async {
     var clubData = await groupSerachforId(widget.clubId);
     setState(() {
-      posts = clubData['posts'];
+      List<dynamic> temp = clubData['posts'];
+      if (temp.isNotEmpty) {
+        temp.sort((a, b) {
+          DateTime dateTimeA = DateTime.parse(a["createdAt"]);
+          DateTime dateTimeB = DateTime.parse(b["createdAt"]);
+          return dateTimeB.compareTo(dateTimeA);
+        });
+      }
+      posts = temp;
     });
   }
 

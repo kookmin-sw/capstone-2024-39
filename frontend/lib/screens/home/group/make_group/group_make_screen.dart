@@ -71,6 +71,7 @@ class _GroupMakeState extends State<GroupMakeScreen> {
       builder: (context, child) => Scaffold(
         appBar: AppBar(
           title: const Text('모임생성'),
+          titleTextStyle: textStyle(22, const Color(0xFF0E9913), true),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
