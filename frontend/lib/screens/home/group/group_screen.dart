@@ -142,8 +142,7 @@ class _GroupState extends State<GroupScreen> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        // print('${Thema[j]} 눌렸습니다.');
-                        final buttonOffset = j * 135.0.h;
+                        final buttonOffset = j * 137.h;
                         _scrollController.animateTo(buttonOffset,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeInOut);
@@ -265,8 +264,8 @@ class _GroupState extends State<GroupScreen> {
                   ),
                 ),
                 child: SizedBox(
-                  width: 390.w,
-                  height: 90.h,
+                  // width: 390.w,
+                  // height: 90.h,
                   child: ThemaList(context, Thema),
                 ),
               ),

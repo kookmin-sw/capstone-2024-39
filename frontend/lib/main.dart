@@ -18,7 +18,6 @@ import 'package:frontend/screens/home/group/in_group/post/post_screen.dart';
 import 'package:frontend/screens/home/group/in_group/voicecall/voice_class.dart';
 import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
 import 'package:frontend/screens/home/home_screen.dart';
-import 'package:frontend/screens/home/mypage/login_screen.dart';
 import 'package:frontend/screens/home/mypage/makelibrary_screen.dart';
 import 'package:frontend/screens/home/mypage/mypage_screen.dart';
 import 'package:frontend/screens/home/mypage/signup_screen.dart';
@@ -29,7 +28,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   runApp(const App());
-}
+} 
 
 final GoRouter router = GoRouter(
   routes: [
@@ -38,7 +37,7 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const HomeScreen(),
     ),  
     GoRoute(
-      name: 'search',
+      name: 'search', 
       path: '/search',
       builder: (context, state) => const SearchScreen(),
     ),
@@ -117,11 +116,6 @@ final GoRouter router = GoRouter(
       name: 'mypage',
       path: '/mypage',
       builder: (context, state) => const MypageScreen(),
-    ),
-    GoRoute(
-      name: 'login',
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       name: 'signup',

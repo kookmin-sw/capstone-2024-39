@@ -93,7 +93,7 @@ class _ShortsState extends State<ShortsScreen> {
   }
 
   void _startPageTimer() {
-    _pageTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _pageTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
         int currentPage = _pageController.page!.toInt();
         int nextPage = currentPage + 1;
         // _currentPage++;
