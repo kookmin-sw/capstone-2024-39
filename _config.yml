@@ -1,3 +1,5 @@
 title: Book:Meeting
 remote_theme: just-the-docs/just-the-docs
-color: green
+color_scheme: green
+
+search_enabled: false

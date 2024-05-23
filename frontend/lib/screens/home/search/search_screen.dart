@@ -247,20 +247,20 @@ class _SearchState extends State<SearchScreen> {
                             //   },
                             //   child: Text('젠랑이'),
                             // ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                dynamic userInfo = await login(
-                                    "changyon99@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
-                                // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
-                                print(userInfo['token']);
-                                print(userInfo['id']);
-                                await secureStorage.saveData(
-                                    "token", userInfo['token']);
-                                await secureStorage.saveData(
-                                    "id", userInfo['id']);
-                              },
-                              child: Text('최창연'),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     dynamic userInfo = await login(
+                            //         "changyon99@gmail.com"); //10-최창연, 11, 12, 13-한지민, 14, 15, 16
+                            //     // dynamic userInfo = await singup("test10@gmail.com", "최창연", 23, "남자");
+                            //     print(userInfo['token']);
+                            //     print(userInfo['id']);
+                            //     await secureStorage.saveData(
+                            //         "token", userInfo['token']);
+                            //     await secureStorage.saveData(
+                            //         "id", userInfo['id']);
+                            //   },
+                            //   child: Text('최창연'),
+                            // ),
                             // ElevatedButton(
                             //   onPressed: () async {
                             //     // var token =
@@ -272,14 +272,14 @@ class _SearchState extends State<SearchScreen> {
                             //   },
                             //   child: Text('회원 가입'),
                             // ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await secureStorage.deleteData("token");
-                                await secureStorage.deleteData("id");
-                                await secureStorage.deleteAllData();
-                              },
-                              child: Text('토큰 삭제'),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     await secureStorage.deleteData("token");
+                            //     await secureStorage.deleteData("id");
+                            //     await secureStorage.deleteAllData();
+                            //   },
+                            //   child: Text('토큰 삭제'),
+                            // ),
                             // ElevatedButton(
                             //   onPressed: () async {
                             //     print(await secureStorage.readData("name"));
