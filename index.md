@@ -21,17 +21,19 @@
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/4f28da4f-1ac9-4576-8135-c3cdbc4e941b">
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/1f41cef8-007f-44da-9abe-cd1c4adbb052">
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/5725ffa5-2144-4072-a586-b93e1840f265">
+<br>
 가벼운 독서모임을 원하는 사용자들을 위해<br>
 온라인 모임이 가능하도록 과제, 대표 책 선정, 게시판 등의 기능을 제공합니다.<br>
-
+<br>
 ### [ 독서 기록 관리 및 공유 ]
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/e8da4560-5da9-436c-a756-9b968e6d86c8">
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/7368e942-1527-44ca-a762-3ee1e927f258">
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/42205eea-b1f0-4b62-a0f3-5f876092ad47">
+<br>
 독서 모임에서 멤버들이 작성한 글에 대한 관리나 공유의 어려움을 해결하고자,<br>
 자유, 한줄평, 인용구, 퀴즈 등의 다양한 템플릿을 제공하고<br>
 모임 페이지를 통한 공유 기능을 제공합니다.<br>
-
+<br>
 ### [ 추천 ]
 <img width = "240" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/92c3c887-09aa-413e-bac0-d2bf1f459eb8">
 <br>
