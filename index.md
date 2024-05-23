@@ -6,15 +6,17 @@
 #### [중간 보고서](https://docs.google.com/document/d/1i16JsIX1ZV_-k1uWRbPaX7ZjnDUnKAtCAj4W1fes8B4/edit?usp=sharing)
 #### [중간 발표 자료](https://drive.google.com/file/d/16d2ZMzQ4o3kiDXWp-8oM8cN9kBTLiGhA/view?usp=sharing)
 
+
 <br>
 
 ## 소개 영상
+#### [Book:Meeting 시연 영상](https://youtu.be/aEsOtejFEfc)
 
 ## 주요 기능
 
 ### [ 모임 ]
 가벼운 독서모임을 원하는 사용자들을 위해<br>
-온라인 모임이 가능하도록 과제, 대표 책 선정, 게시판, 음성 채팅 등의 기능을 제공합니다.<br>
+온라인 모임이 가능하도록 과제, 대표 책 선정, 게시판 등의 기능을 제공합니다.<br>
 
 ### [ 독서 기록 관리 및 공유 ]
 독서 모임에서 멤버들이 작성한 글에 대한 관리나 공유의 어려움을 해결하고자,<br>
@@ -64,6 +66,34 @@
 
 
 ## 사용법
+### Frontend
+
+#### 1. 플러터 설치
+
+1. Flutter 공식 웹사이트([https://flutter.dev](https://flutter.dev))에 접속
+2. `Get Started`를 클릭하여 설치 가이드를 따라 설치
+3. 설치가 완료되면, 터미널 또는 커맨드 프롬프트를 열고 `flutter doctor` 명령어를 실행하여 설치가 올바르게 되었는지 확인
+
+#### 2. 프로젝트 디렉토리 이동
+
+```
+cd capstone-2024-39/frontend
+```
+
+#### 3. 플러터 패키지 설치
+
+```
+flutter pub get
+```
+
+#### 4. 프로젝트 실행
+
+```
+flutter run
+```
+
+<br>
+
 
 ## 기타
 추가적인 내용은 자유롭게 작성하세요.
