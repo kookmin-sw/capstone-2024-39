@@ -1,5 +1,2 @@
 title: Book:Meeting
-remote_theme: just-the-docs/just-the-docs
-color_scheme: green
-
-search_enabled: false
+remote_theme: alembic-jekyll-theme
