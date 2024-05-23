@@ -1,3 +1,4 @@
+
 # 📚 프로젝트 소개
 
 <font size=5>독서 모임 관리 서비스</font>
@@ -5,8 +6,8 @@
 #### [깃허브 바로가기](https://github.com/kookmin-sw/capstone-2024-39)
 #### [중간 보고서](https://docs.google.com/document/d/1i16JsIX1ZV_-k1uWRbPaX7ZjnDUnKAtCAj4W1fes8B4/edit?usp=sharing)
 #### [중간 발표 자료](https://drive.google.com/file/d/16d2ZMzQ4o3kiDXWp-8oM8cN9kBTLiGhA/view?usp=sharing)
-
-
+#### [포스터](https://drive.google.com/file/d/1Zq_1m_YbRiJ-4Sl7UL5bTPA4aHU8MO7S/view?usp=sharing)
+[Bookmeeting_2.pdf](https://github.com/kookmin-sw/capstone-2024-39/files/15418649/Bookmeeting_2.pdf)
 <br>
 
 ## 소개 영상
@@ -15,19 +16,25 @@
 ## 주요 기능
 
 ### [ 모임 ]
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/6ef282e0-0e29-4651-9c0c-4149a408e3d6)
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/1f41cef8-007f-44da-9abe-cd1c4adbb052)
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/4f28da4f-1ac9-4576-8135-c3cdbc4e941b)
+<img width = "390" src = "https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/4f28da4f-1ac9-4576-8135-c3cdbc4e941b">
 가벼운 독서모임을 원하는 사용자들을 위해<br>
 온라인 모임이 가능하도록 과제, 대표 책 선정, 게시판 등의 기능을 제공합니다.<br>
 
 ### [ 독서 기록 관리 및 공유 ]
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/f5052398-6004-465a-9fc2-479d0bbc2837)
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/e8da4560-5da9-436c-a756-9b968e6d86c8)
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/7368e942-1527-44ca-a762-3ee1e927f258)
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/42205eea-b1f0-4b62-a0f3-5f876092ad47)
 독서 모임에서 멤버들이 작성한 글에 대한 관리나 공유의 어려움을 해결하고자,<br>
 자유, 한줄평, 인용구, 퀴즈 등의 다양한 템플릿을 제공하고<br>
 모임 페이지를 통한 공유 기능을 제공합니다.<br>
-또한 사용자가 글의 공개 여부를 설정하여 누구나 볼 수 있지 않도록 합니다.<br>
 
 ### [ 추천 ]
-일반적인 서비스는 ‘책’에 대해서 추천을 제공하지만<br>
-저희는 그걸 기반으로 독서 모임 추천과 독후감 쇼츠 제공의<br>
-새로운 ‘컨텐츠’를 만들어 제공하고자 합니다.<br>
+![image](https://github.com/kookmin-sw/capstone-2024-39/assets/53289569/92c3c887-09aa-413e-bac0-d2bf1f459eb8)
+사용자가 생성한 독서 기록을 바탕으로 책을 추천합니다.<br>
 
 ## 팀원 소개
 ### Frontend
