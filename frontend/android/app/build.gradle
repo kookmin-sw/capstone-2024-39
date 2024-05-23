@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.capstone.frontend"
-    compileSdk flutter.compileSdkVersion
+    compileSdk 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -36,6 +36,12 @@ android {
         jvmTarget = '1.8'
     }
 
+    // allprojects {
+    //     repositories {
+    //         maven { url 'https://www.jitpack.io' }
+    //     }
+    // }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -45,7 +51,7 @@ android {
         applicationId "com.capstone.frontend"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -64,4 +70,6 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    
+}

@@ -30,12 +30,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
   go_router: ^13.2.3
   flutter_screenutil: ^5.9.0
-
   http: ^1.2.1
   provider: ^6.1.2
+  xml2json: ^5.3.1
+  intl: ^0.19.0
+
+  flutter_secure_storage: ^9.0.0
+  google_sign_in: ^6.2.1
+
+  agora_rtc_engine: ^6.3.1
+  permission_handler: ^11.3.1
+  agora_rtm: ^1.5.9
+  get: ^4.6.6
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -94,3 +102,24 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+    - family: pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Thin.otf
+          weight: 100
+        - asset: assets/fonts/Pretendard-ExtraLight.otf
+          weight: 200
+        - asset: assets/fonts/Pretendard-Light.otf
+          weight: 300
+        - asset: assets/fonts/Pretendard-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Pretendard-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Pretendard-SemiBold.otf
+          weight: 600
+        - asset: assets/fonts/Pretendard-Bold.otf
+          weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.otf
+          weight: 800
+        - asset: assets/fonts/Pretendard-Black.otf
+          weight: 900

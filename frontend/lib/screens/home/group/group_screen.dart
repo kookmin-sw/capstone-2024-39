@@ -1,12 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:frontend/screens/home/group/in_group/group_info_screen.dart';
 import 'package:frontend/screens/home/group/group_screen_util.dart';
-import 'package:frontend/screens/home/group/make_group/group_make_screen.dart';
-import 'package:frontend/provider/grouplist_provider.dart';
+import 'package:frontend/screens/home/search/search_screen_util.dart';
+import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:frontend/http.dart';
+import 'package:frontend/provider/secure_storage_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/env.dart';
+
+final List<String> realThema = [
+  '예술과 문학',
+  '금융/경제/투자',
+  '과학과 철학',
+  '자기계발',
+  '역사',
+  '취미'
+];
+final List<String> Thema = [
+  '예술과 문학',
+  '금융/경제/투자',
+  '과학과 철학',
+  '자기계발',
+  '역사',
+  '취미',
+  '내 모임',
+  '추천',
+];
+final List<IconData> ThemaIcon = [
+  Icons.palette_outlined,
+  Icons.attach_money,
+  Icons.science_outlined,
+  Icons.self_improvement,
+  Icons.history_edu,
+  Icons.hail_outlined,
+  // Icons.group
+  Icons.collections_bookmark_outlined,
+  // Icons.local_play_outlined,
+  Icons.memory,
+];
+List<List<dynamic>> _GroupList = [[], [], [], [], [], [], [], []];
 
 class GroupScreen extends StatefulWidget {
   const GroupScreen({super.key});
@@ -15,23 +48,16 @@ class GroupScreen extends StatefulWidget {
   State<GroupScreen> createState() => _GroupState();
 }
 
-final List<String> Thema = ['역사', '경제', '종교', '사회', '시집'];
-List<List<dynamic>> _GroupList = [[],[],[],[],[]];
-
 class _GroupState extends State<GroupScreen> {
-  ScrollController _scrollController = ScrollController();
+  var secureStorage;
+  var userInfo;
+  bool _isLoading = true;
 
-  // @override
-  // Future<void> setState(VoidCallback fn) async {
-  //   // TODO: implement setState
-  //   super.setState;
-  //   _makeGroupList();
-  // }
+  final ScrollController _scrollController = ScrollController();
 
-  void _makeGroupList() async {
-    for (int i = 0; i < Thema.length; i++) {
-      _GroupList[i] = await groupSerachforTopic(Thema[i]);
-    }
+  Future<void> _makeGroupList() async {
+    _GroupList = await groupSerachforTopic(realThema);
+    await _initUserState();
   }
 
   @override
@@ -40,50 +66,105 @@ class _GroupState extends State<GroupScreen> {
     super.dispose();
   }
 
+  Future<void> _initUserState() async {
+    List<dynamic> myList = [], recBook = [];
+    dynamic recList;
+    try {
+      var id = await secureStorage.readData('id');
+      var token = await secureStorage.readData('token');
+      var _userInfo = await getUserInfo(id, token);
+      for (int i = 0; i < _userInfo['clubsList'].length; i++) {
+        dynamic temp =
+            await groupSerachforId(_userInfo['clubsList'][i]['clubId']);
+        myList.add(temp);
+      }
+
+      recList = await getRecommend(token);
+      print(recList);
+      for (int i = 0; i < recList['isbnList'].length; i++) {
+        recBook.add(await SearchISBNBook(recList['isbnList'][i]));
+      }
+
+      // print(recBook);
+      setState(() {
+        userInfo = _userInfo;
+        _GroupList[6] = myList;
+        _GroupList[7] = recBook;
+      });
+    } catch (e) {
+      recList = await getRecommendAnony();
+      for (int i = 0; i < recList['isbnList'].length; i++) {
+        recBook.add(await SearchISBNBook(recList['isbnList'][i]));
+      }
+      setState(() {
+        _GroupList[7] = recBook;
+      });
+    }
+  }
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
+    secureStorage = Provider.of<SecureStorageService>(context, listen: false);
     _makeGroupList();
     _scrollController.addListener(() {});
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    Timer(const Duration(milliseconds: 1000), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   //테마별로 리스트 버튼 구현 + 스크롤 이동 구현
-  Widget _ThemaList(
+  Widget ThemaList(
     BuildContext context,
     List<String> Thema,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: Row(
-        children: List.generate(Thema.length, (int i) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0.5),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(
-                          // borderRadius: BorderRadius.circular(10), // 정사각형 버튼의 모양을 만듦
-                          ),
-                      elevation: 5,
-                      shadowColor: Colors.grey,
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: List.generate((Thema.length / 4).ceil(), (int i) {
+          int startIndex = i * 4;
+          int endIndex = (i + 1) * 4;
+          if (endIndex > Thema.length) endIndex = Thema.length;
+
+          List<Widget> rowButtons = [];
+          for (int j = startIndex; j < endIndex; j++) {
+            rowButtons.add(
+              SizedBox(
+                height: 80.h,
+                width: 90.w,
+                child: Column(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        final buttonOffset = j * 137.h;
+                        _scrollController.animateTo(buttonOffset,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut);
+                      },
+                      icon: Icon(
+                        ThemaIcon[j],
+                        color: Colors.white,
+                      ),
                     ),
-                    onPressed: () {
-                      // print(group[i].length);
-                      print(Thema[i] + ' 눌렸습니다.');
-                      final buttonOffset =
-                          i * 180.0; // 각 버튼의 높이를 기준으로 스크롤 위치를 계산합니다.
-                      _scrollController.animateTo(buttonOffset,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut);
-                    },
-                    child: Text('${i + 1}'),
-                  ),
-                  Text(Thema[i]),
-                ],
+                    Text(
+                      Thema[j],
+                      style: textStyle(13, Colors.white, false),
+                    ),
+                  ],
+                ),
               ),
+            );
+          }
+          return Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: rowButtons,
             ),
           );
         }),
@@ -101,25 +182,40 @@ class _GroupState extends State<GroupScreen> {
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 Thema[index],
+                style: textStyle(14, Colors.black, true),
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(_GroupList[index].length, (int i) {
-                  return GroupListItem(
-                    groupName: _GroupList[index][i]['name'], 
-                    groupCnt: _GroupList[index][i]['maximum'],
-                    publicState: _GroupList[index][i]['publicstatus'],
-                    topic: _GroupList[index][i]['topic'],
-                  );
-                }),
+            if (index != 7)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(_GroupList[index].length, (int i) {
+                    return GroupListItem(
+                      data: _GroupList[index][i],
+                      userInfo: userInfo,
+                    );
+                  }),
+                ),
               ),
-            ),
+            if (index == 7)
+              SizedBox(
+                width: double.infinity,
+                height: 120.h,
+                child: PageView.builder(
+                  itemCount: _GroupList[index].length,
+                  itemBuilder: (context, i) {
+                    return SearchListItem(
+                      data: _GroupList[index][i],
+                      type: "search",
+                      clubId: 0,
+                    );
+                  },
+                ),
+              ),
           ],
         ),
         SizedBox(
-          height: (index != 4)? 10.h : 500.h,
+          height: (index != 7) ? 10.h : 500.h,
         ),
       ],
     );
@@ -133,68 +229,95 @@ class _GroupState extends State<GroupScreen> {
         appBar: AppBar(
           scrolledUnderElevation: 0,
           backgroundColor: const Color(0xFF0E9913),
-          title: const Text(
+          title: Text(
             '모임',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-              fontFamily: 'Noto Sans KR',
-              fontWeight: FontWeight.w700,
-            ),
+            style: textStyle(22, Colors.white, true),
           ),
           centerTitle: true,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            context.push('/group_make');
-          },
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: (userInfo != null)
+            ? FloatingActionButton(
+                onPressed: () {
+                  context.push('/group_make').then((value) async {
+                    if (value == true) {
+                      _isLoading = true;
+                      _loadData();
+                      _makeGroupList();
+                    }
+                  });
+                },
+                shape: const CircleBorder(),
+                child: const Icon(Icons.add),
+              )
+            : null,
         body: Center(
           child: Column(
             children: [
               Container(
-                width: double.infinity,
-                height: 120.h,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF0E9913),
+                height: 150.h,
+                width: 390.w,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0E9913),
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
+                    bottomLeft: Radius.circular(50.r),
+                    bottomRight: Radius.circular(50.r),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _ThemaList(context, Thema),
-                      ],
+                child: SizedBox(
+                  // width: 390.w,
+                  // height: 90.h,
+                  child: ThemaList(context, Thema),
+                ),
+              ),
+              _isLoading
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 100.h),
+                        child: const CircularProgressIndicator(),
+                      ), // 로딩 애니매이션
+                    )
+                  : Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {
+                            _isLoading = true;
+                            _loadData();
+                            _makeGroupList();
+                          });
+                        },
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          scrollDirection: Axis.vertical,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              left: 10.w,
+                              right: 10.w,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //0
+                                groupList(0),
+                                //1
+                                groupList(1),
+                                //2
+                                groupList(2),
+                                //3
+                                groupList(3),
+                                //4
+                                groupList(4),
+                                //5
+                                groupList(5),
+                                //내 모임
+                                groupList(6),
+                                //추천
+                                groupList(7),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      //0
-                      groupList(0),
-                      //1
-                      groupList(1),
-                      //2
-                      groupList(2),
-                      //3
-                      groupList(3),
-                      //4
-                      groupList(4),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),
