@@ -46,10 +46,10 @@ async def get_embedding(embedding_request: EmbeddingRequest):
     )
     review_embedding = np.array(response.data[0].embedding)
 
-    title_weight = 0.5
-    review_weight = 0.5
+    title_weight = 0.3
+    review_weight = 0.7
 
-    book_embedding = title_weight * title_embedding + review_weight + review_embedding
+    book_embedding = title_weight * title_embedding + review_weight * review_embedding
 
     # upsert to pinecone index
     index.upsert(
