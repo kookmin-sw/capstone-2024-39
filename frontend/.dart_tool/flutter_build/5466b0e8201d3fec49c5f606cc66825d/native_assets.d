@@ -1,0 +1,1 @@
+ /Users/changyon99/capstone-2024-39/frontend/.dart_tool/flutter_build/5466b0e8201d3fec49c5f606cc66825d/native_assets.yaml: 
