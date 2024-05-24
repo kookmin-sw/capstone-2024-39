@@ -3,7 +3,7 @@ services:
   spring:
     container_name: spring
     restart: "no"
-    image: spring
+    image: capstone39/server:spring
     env_file:
       - .env
     ports:
@@ -12,7 +12,7 @@ services:
   fastapi:
     container_name: fastapi
     restart: "no"
-    image: fastapi
+    image: capstone39/server:fastapi
     env_file:
       - .env
     ports:
